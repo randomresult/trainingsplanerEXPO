@@ -203,9 +203,19 @@ Effort-based, skill-agnostisch — Beginner und Profi verdienen gleich:
 - **Club-Ranking:** Vereinsrangliste nach Anwesenheit (eigener Tab neben Punkte-Ranking)
 
 ### Club-Ranglisten (pro Verein)
-Zwei Leaderboard-Tabs, je mit Woche / Monat / Gesamt:
-- **Punkte** — Gesamtpunkte aus beiden Tracks. Layout: Podium (Top 3) + Liste ab Platz 4 mit Stacked Bar (lila = Vereinstraining, grün = Eigentraining) + Punktezahlen pro Track
-- **Anwesenheit** — Vereinstrainings besucht (verifiziert), mit Fortschrittsbalken + Rate % + eigene Stats
+**2 Haupt-Tabs · je 2 Subtabs · 3 Zeitfilter (Monat / 6 Monate / Gesamt)**
+
+Fair für alle Spielertypen — reine Vereinsspieler konkurrieren nur gegen andere Vereinsspieler, Eigentrainer haben ihre eigene Rangliste.
+
+**Punkte-Tab:**
+- 🏛 Verein: Punkte nur aus Vereinstraining (Anwesenheit, Übungen, MÜRs im Training)
+- 🏠 Eigen: Punkte nur aus Eigentraining (selbst geloggt)
+- Layout: Podium (Top 3) + Liste ab Platz 4 mit Fortschrittsbalken
+
+**Anwesenheit-Tab:**
+- 🏛 Verein: Anzahl Vereinstrainings besucht (X/Y) + Balken + Rate % + Streak
+- 🏠 Eigen: Eigentraining-Stunden (h min) + Balken + Sessions + Übungen
+- Kein Podium bei Anwesenheit — direkte Liste mit Balken
 
 ### Badges (vollautomatisch, kein Approval)
 Skill-agnostisch — gleiche Badges für alle Level:
