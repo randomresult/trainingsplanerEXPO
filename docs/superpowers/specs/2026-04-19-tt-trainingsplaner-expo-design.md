@@ -90,10 +90,16 @@ Referenz-Pattern: Strong / Hevy. Übungen = eigener Tab (Lern-Content). Hinzufü
 - `/register` — Club wählen, Name, wartet auf Trainer-Bestätigung
 
 ### Tab 1 — Dashboard `/`
-- Nächstes Training (eigenes oder zugewiesenes)
-- Mein Fortschritt + aktive MÜRs (wenn Spieler)
-- Club-Übersicht + offene Spieler-Anfragen (wenn Trainer)
-- Aktiven Club wechseln (wenn mehrere Clubs)
+
+**Layout (gleich für alle):**
+- **Header:** Name + Vereinsname links · Streak-Badge rechts (nur wenn vorhanden)
+- **Club-Button** *(nur Trainer):* Eigene Card mit Badge-Counter (offene Aktionen) · getrennt von Stats
+- **Stats-Card** (dynamisch):
+  - 🏛 Verein-Zeile: Rank · Punkte · Trainings (immer sichtbar)
+  - 🏠 Solo-Zeile: Rank · Punkte · Zeit (nur wenn Solo-Daten vorhanden)
+- **Nächstes Training:** Name, Datum, Uhrzeit, Übungsanzahl/Spieleranzahl · Button "Öffnen"
+- **Aktive MÜRs:** Fortschrittsbalken pro Reihe (X/Y Übungen)
+- **Letzte Badges:** 2-3 zuletzt erhaltene · Link zu allen
 
 ### Tab 2 — Bibliothek `/library`
 Übungen und Methodische Reihen in einem Tab — Toggle oben.
