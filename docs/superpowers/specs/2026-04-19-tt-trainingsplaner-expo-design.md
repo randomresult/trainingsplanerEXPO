@@ -122,9 +122,18 @@ Referenz-Pattern: Strong / Hevy. Übungen = eigener Tab (Lern-Content). Hinzufü
 - Eigenes Spielerprofil (QTTR, Material, Spielerlog) — wenn Spieler
 - Meine Trainingshistorie
 - Achievements + Badges + Zertifikate
-- `/profile/players` — Spielerliste — **nur Trainer**
-- `/profile/players/[id]` — Spielerprofil — **nur Trainer**
-- `/profile/club` — Vereins-Settings — **nur Trainer**
+
+### Trainer-Bereich (Header-Button, nur für Trainer sichtbar)
+Ein "🎓 Club" Button im Dashboard-Header mit Badge-Counter für offene Aktionen.
+Öffnet einen eigenen Screen mit allen Trainer-Funktionen:
+- Anwesenheit bestätigen (App + Web)
+- Training anpassen / abschließen (App + Web)
+- Extra Übungen zum Training hinzufügen + Spielern zuweisen (App + Web)
+- Spieler verwalten — Liste, Profile, Anfragen bestätigen (App + Web)
+- Zertifikate vergeben (App + Web)
+- Übungen / Reihen erstellen → **Web only**
+
+**Phones bleiben weg während Vereinstraining** — kein Live-Tracking, kein Zwang zur App-Nutzung während der Session. Alles wird vor oder nach dem Training erledigt.
 
 ---
 
