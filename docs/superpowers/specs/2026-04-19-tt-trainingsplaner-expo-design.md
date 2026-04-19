@@ -81,6 +81,10 @@ Jeder authentifizierte User
 
 ## Navigation & Screen-Struktur
 
+**4 Tabs** — Tab Bar auf Mobile, Sidebar auf Web (Expo Router, automatisch).
+
+Referenz-Pattern: Strong / Hevy (Fitness-Apps). Übungen browsen = eigener Tab weil Lern-Content (Schritte, Video). Übungen zu Training hinzufügen = voller Screen-Push aus dem Training heraus.
+
 ### Auth (nicht eingeloggt)
 - `/login` — E-Mail + Passwort, JWT von Strapi
 - `/register` — Club wählen, Name, wartet auf Trainer-Bestätigung
@@ -91,27 +95,34 @@ Jeder authentifizierte User
 - Club-Übersicht + offene Spieler-Anfragen (wenn Trainer)
 - Aktiven Club wechseln (wenn mehrere Clubs)
 
-### Tab 2 — Übungen `/exercises`
+### Tab 2 — Bibliothek `/library`
+Übungen und Methodische Reihen in einem Tab — Toggle oben zum Wechseln.
+
+**Übungen:**
 - Liste mit Filter (Kategorie, Spielerlevel, Fokusbereich) + Suche
-- `/exercises/[id]` — Detail: Schritte, YouTube-Video (online only), Hinweise
-- `/exercises/create` — **Web only, nur Trainer**
-- `/exercises/[id]/edit` — **Web only, nur Trainer**
+- `/library/exercises/[id]` — Detail: Schritte, YouTube-Video (online only), Hinweise
+- "Zu Training hinzufügen" Button auf Detailseite
+- `/library/exercises/create` — **Web only, nur Trainer**
+- `/library/exercises/[id]/edit` — **Web only, nur Trainer**
+
+**Methodische Reihen:**
+- Reihen-Liste mit eigenem Fortschrittsbalken pro Reihe
+- `/library/series/[id]` — Detail: Übungen in Reihenfolge, Fortschritt
+- "Ganze Reihe zu Training hinzufügen" Button
+- `/library/series/create` — **Web only, nur Trainer**
 
 ### Tab 3 — Training `/trainings`
 - Liste gefiltert nach Status (draft / in_progress / completed)
 - `/trainings/[id]` — Detail: Übungen abhaken, nachträglich loggen, abschließen
 - `/trainings/create` — **Alle Nutzer**
-  - Spieler: nur sich selbst als Teilnehmer, aus Übungsbibliothek wählen
+  - Spieler: nur sich selbst als Teilnehmer
   - Trainer: beliebige Spieler zuweisen, für Club sichtbar
+  - "Übung hinzufügen" → **voller Screen-Push** mit Bibliothek-Picker (Suche + Filter)
+  - "Reihe einfügen" → alle Übungen der Reihe werden hinzugefügt
 - `/trainings/[id]/edit` — Ersteller kann eigenes Training anpassen
 - `/trainings/[id]/session` — **Phase 2:** Session Host für Gruppen
 
-### Tab 4 — Methodische Reihen `/series`
-- Reihen-Liste
-- `/series/[id]` — Detail: Übungen in Reihenfolge, eigener Fortschritt
-- `/series/create` — **Web only, nur Trainer**
-
-### Tab 5 — Profil `/profile`
+### Tab 4 — Profil `/profile`
 - Eigenes Spielerprofil (QTTR, Material, Spielerlog) — wenn Spieler
 - Meine Trainingshistorie
 - `/profile/players` — Spielerliste des Clubs — **nur Trainer**
