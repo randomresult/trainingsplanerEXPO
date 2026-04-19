@@ -168,6 +168,21 @@ PlayerProgress: welche Übungen abgeschlossen, mastered?
 
 ## Achievement & Zertifikat-System
 
+### Zwei Progress-Tracks
+
+**Track 1 — Vereinstraining** (Trainer-geführt, verifizierbar):
+- Anwesenheit bei organisierten Trainings
+- MÜR-Fortschritt während Vereinstraining
+- Teilnahme-Metriken → Basis für Club-Rangliste
+
+**Track 2 — Eigentraining** (selbst geloggt):
+- Selbst erfasste Trainingsminuten
+- Eigenständig abgeschlossene MÜRs
+- Übungen mit Häufigkeit + Dauer (Metriken TBD)
+- → Persönlicher Fortschritt, Spieler sieht es immer, Trainer optional
+
+Beide Tracks fließen in Badges/Achievements — aber getrennt ausgewiesen im Profil.
+
 ### Badges (vollautomatisch)
 Kein Approval, kein Mensch — System vergibt sofort wenn Kriterium erfüllt:
 
