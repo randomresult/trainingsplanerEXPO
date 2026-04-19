@@ -167,6 +167,7 @@ Einheitliches Design für beide Sections (Lernpfade + Übungen), beide Modi (liv
 - Header-Block zeigt Gesamtfortschritt + Punkte-Summe oben
 
 **Abgeschlossene eigene Trainings** bleiben editierbar (Timer nachträglich anpassen).
+**Gesamt-Trainingszeit** kann ebenfalls nachträglich angepasst werden (z.B. wenn Live-Timer nicht exakt war — Pausen, vergessenes Stoppen).
 
 ### Tab 4 — Profil `/profile`
 - Eigenes Spielerprofil (QTTR, Material, Spielerlog) — wenn Spieler
