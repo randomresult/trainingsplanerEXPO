@@ -129,18 +129,44 @@ Referenz-Pattern: Strong / Hevy. Übungen = eigener Tab (Lern-Content). Hinzufü
 - `/library/paths/create` — **Web only, nur Trainer**
 
 ### Tab 3 — Training `/trainings`
-Zwei Bereiche im selben Tab:
+Zwei Subtabs im selben Tab: **🏛 Vereinstraining** + **🏠 Mein Training**
+
+Status-Filter (Anstehend / Fertig) — Aktiv wird direkt als Badge auf dem Item angezeigt.
 
 **Vereinstraining** (vom Trainer erstellt, zugewiesen)
-- Liste zugewiesener Vereinstrainings mit Status
-- `/trainings/[id]` — Detail + Nachloggen nach dem Training
+- Liste mit nächstem Training prominent (Trainer, Ort, Teilnehmer-Avatare)
+- `/trainings/[id]` — Detail: Trainer, Ort, Teilnehmerliste, geplante Übungen 1-N, Punkte-Vorschau
+- Detail zeigt **keine** Fokus/Dauer-Zeilen (Zeit steckt in den Übungen selbst)
 - Wie Trainer Vereinstraining plant/editiert → **noch offen (To Be Refined)**
 
 **Mein Training** (selbst erstellt, eigene Planung)
-- Spieler plant eigene Trainingsabende: Übungen + Lernpfade zusammenstellen
-- `/trainings/own/create` — Übungen aus Bibliothek wählen, Lernpfad hinzufügen
-- `/trainings/own/[id]` — Durchführen: Übungen abhaken, Lernpfad-Steps tracken
-- `/trainings/[id]/session` — **Phase 2**
+- Quick-Start Timer: "Freies Eigentraining" Button — Timer läuft, Übungen später taggen
+- Liste eigener Pläne (Entwurf / Aktiv / Fertig)
+- `/trainings/own/create` — Name, Datum, Uhrzeit + **zwei Sektionen:**
+  - 📋 Lernpfade (grüne Card) — ganze Lernpfade hinzufügen (inkl. Fortschrittsbalken)
+  - 💪 Übungen (lila Card) — einzelne Übungen aus Bibliothek
+  - Drag-Handle (≡) zum Reordern
+  - Summary: Dauer · Lp+Üb Count · mögliche Punkte
+- `/trainings/own/[id]` — Zwei Modi: Live starten ODER nachträglich loggen
+
+### Training Execution — Step-Layout
+
+Einheitliches Design für beide Sections (Lernpfade + Übungen), beide Modi (live + nachträglich):
+
+**1 Zeile pro Step** (gleiche Höhe für alle Status):
+```
+[✓ Checkbox] [Name der Übung] [⏱ 15m ✎] [+2 Pkt Badge]
+```
+
+- **Checkbox** markiert "gemacht / nicht gemacht" — kein separater "Fertig"-Button
+- **Name** durchgestrichen wenn erledigt
+- **⏱ Timer Pill** — bei erledigten/aktuellen editierbar (✎ Icon)
+- **Punkte-Badge** rechts — zeigt Belohnung
+- Wiederholungen werden über **längere Zeit** abgebildet (2× = 30m statt 15m)
+- Aktueller Step: gelber Highlight-Rahmen
+- Header-Block zeigt Gesamtfortschritt + Punkte-Summe oben
+
+**Abgeschlossene eigene Trainings** bleiben editierbar (Timer nachträglich anpassen).
 
 ### Tab 4 — Profil `/profile`
 - Eigenes Spielerprofil (QTTR, Material, Spielerlog) — wenn Spieler
