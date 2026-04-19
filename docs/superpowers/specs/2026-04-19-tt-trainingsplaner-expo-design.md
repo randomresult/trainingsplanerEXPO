@@ -98,30 +98,43 @@ Referenz-Pattern: Strong / Hevy. Übungen = eigener Tab (Lern-Content). Hinzufü
   - 🏛 Verein-Zeile: Rank · Punkte · Trainings (immer sichtbar)
   - 🏠 Solo-Zeile: Rank · Punkte · Zeit (nur wenn Solo-Daten vorhanden)
 - **Nächstes Training:** Name, Datum, Uhrzeit, Übungsanzahl/Spieleranzahl · Button "Öffnen"
-- **Aktive MÜRs:** Fortschrittsbalken pro Reihe (X/Y Übungen)
+- **Aktive Lernpfade:** Fortschrittsbalken pro Reihe (X/Y Übungen)
 - **Letzte Badges:** 2-3 zuletzt erhaltene · Link zu allen
 
 ### Tab 2 — Bibliothek `/library`
-Übungen und Methodische Reihen in einem Tab — Toggle oben.
+Übungen und Lernpfade in einem Tab — Toggle oben.
 
 **Übungen:**
 - Liste mit Filter (Kategorie, Spielerlevel, Fokusbereich) + Suche
-- `/library/exercises/[id]` — Detail: Schritte, YouTube-Video (online only), Hinweise
-- "Zu Training hinzufügen" Button auf Detailseite
+- `/library/exercises/[id]` — Detail: Steps nummeriert, YouTube-Video (online only), Trainer-Tipp
+- Buttons auf Detailseite:
+  - "Start" — direkt tracken (alle Nutzer)
+  - "Zu meinem Training" — zu eigener Planung hinzufügen (alle Nutzer)
+  - "Zu Vereinstraining" — **nur Trainer** (Vereinstraining-Planung noch offen)
 - `/library/exercises/create` — **Web only, nur Trainer**
 - `/library/exercises/[id]/edit` — **Web only, nur Trainer**
 
-**Methodische Reihen (MÜR):**
-- Reihen-Liste mit Fortschrittsbalken pro Reihe (eigener Fortschritt)
-- `/library/series/[id]` — Detail: Übungen in Reihenfolge, Fortschritt, Quick-Link zur einzelnen Übung
-- MÜR-Fortschritt ist persistent — bleibt aktiv unabhängig vom Training-Status
-- `/library/series/create` — **Web only, nur Trainer**
+**Lernpfade** (ehem. Methodische Reihen):
+- Liste mit Kategorie-Filter (Technik/Taktik/Kondition/Mental)
+- Fortschrittsbalken pro Lernpfad (X/Y Übungen · % · Status)
+- `/library/paths/[id]` — Detail: Übungen in Reihenfolge, aktueller Step hervorgehoben
+- Button: "Start" / "Weiter" — Schritt für Schritt durchgehen, Step abhaken
+- Lernpfad-Fortschritt ist persistent — unabhängig vom Training-Status
+- Kein "Zu Training hinzufügen" — Lernpfad ist selbst schon ein strukturierter Plan
+- `/library/paths/create` — **Web only, nur Trainer**
 
 ### Tab 3 — Training `/trainings`
-- Liste gefiltert nach Status (draft / in_progress / completed)
-- `/trainings/[id]` — Detail: Übungen abhaken, nachträglich loggen, abschließen
-- `/trainings/create` — Alle Nutzer
-  - "Übung hinzufügen" → voller Screen-Push mit Bibliothek-Picker
+Zwei Bereiche im selben Tab:
+
+**Vereinstraining** (vom Trainer erstellt, zugewiesen)
+- Liste zugewiesener Vereinstrainings mit Status
+- `/trainings/[id]` — Detail + Nachloggen nach dem Training
+- Wie Trainer Vereinstraining plant/editiert → **noch offen (To Be Refined)**
+
+**Mein Training** (selbst erstellt, eigene Planung)
+- Spieler plant eigene Trainingsabende: Übungen + Lernpfade zusammenstellen
+- `/trainings/own/create` — Übungen aus Bibliothek wählen, Lernpfad hinzufügen
+- `/trainings/own/[id]` — Durchführen: Übungen abhaken, Lernpfad-Steps tracken
 - `/trainings/[id]/session` — **Phase 2**
 
 ### Tab 4 — Profil `/profile`
@@ -162,12 +175,12 @@ Nach dem Training: Übungen abhaken, Notizen, "completed"
 
 ---
 
-## MÜR — Methodische Reihen
+## Lernpfade
 
 Strukturierter Lernpfad, unabhängig vom Training-System:
 
 ```
-MÜR "Vorhand Topspin Basics"
+Lernpfad "Vorhand Topspin Basics"
   └── Übung A: "Aufschlag Grundform" (15 Min, Steps 1-4)
   └── Übung B: "Topspin passiv" (15 Min, Steps 1-3)
   └── Übung C: "Topspin aktiv" (20 Min, Steps 1-5)
@@ -175,9 +188,9 @@ MÜR "Vorhand Topspin Basics"
 PlayerProgress: welche Übungen abgeschlossen, mastered?
 ```
 
-- MÜR-Fortschritt läuft parallel und persistent zu Trainings
-- Wenn Übung aus einer MÜR in einem Training abgehakt wird → MÜR-Progress automatisch aktualisiert
-- Quick-Link von MÜR-Schritt zur einzelnen Übung zum Hinzufügen in Custom Training
+- Lernpfad-Fortschritt läuft parallel und persistent zu Trainings
+- Wenn Übung aus einem Lernpfad in einem Training abgehakt wird → Lernpfad-Progress automatisch aktualisiert
+- Quick-Link von Lernpfad-Schritt zur einzelnen Übung zum Hinzufügen in Custom Training
 
 ---
 
@@ -188,13 +201,13 @@ Zwei getrennte Tracks, Punkte fließen in eine gemeinsame Rangliste:
 ### Training-Track (Vereinstraining, verifiziert)
 - Anwesenheit vom Trainer bestätigt
 - Übungen im Vereinstraining abgehakt → Punkte
-- MÜR-Übungen im Training → Punkte + **MÜR-Badge möglich**
-- MÜR komplett abgeschlossen im Training → Badge ✅
+- Lernpfad-Übungen im Training → Punkte + **Lernpfad-Badge möglich**
+- Lernpfad komplett abgeschlossen im Training → Badge ✅
 
 ### Own-Track (selbst geloggt, unverified)
 - Timer-basiert: Start → Training läuft → Stop
 - Art des Trainings taggen (predefined oder freestyle)
-- Übungen/MÜR-Übungen loggen → **nur Punkte, keine Badges**
+- Übungen/Lernpfad-Übungen loggen → **nur Punkte, keine Badges**
 - Trainer sieht Own-Track für Coaching-Zwecke, aber kein Club-Ranking dafür
 
 ---
@@ -208,7 +221,7 @@ Effort-based, skill-agnostisch — Beginner und Profi verdienen gleich:
 |---|---|---|
 | Vereinstraining besucht | +15 | Training |
 | Übung abgehakt | +2 | Beide |
-| MÜR abgeschlossen | +50 | Beide |
+| Lernpfad abgeschlossen | +50 | Beide |
 | Badge erhalten | +25 | Beide |
 | 7-Tage-Streak | +30 | Beide |
 | Zertifikat erhalten | +100 | Training |
@@ -223,7 +236,7 @@ Effort-based, skill-agnostisch — Beginner und Profi verdienen gleich:
 Fair für alle Spielertypen — reine Vereinsspieler konkurrieren nur gegen andere Vereinsspieler, Eigentrainer haben ihre eigene Rangliste.
 
 **Punkte-Tab:**
-- 🏛 Verein: Punkte nur aus Vereinstraining (Anwesenheit, Übungen, MÜRs im Training)
+- 🏛 Verein: Punkte nur aus Vereinstraining (Anwesenheit, Übungen, Lernpfads im Training)
 - 🏠 Eigen: Punkte nur aus Eigentraining (selbst geloggt)
 - Layout: Podium (Top 3) + Liste ab Platz 4 mit Fortschrittsbalken
 
@@ -240,7 +253,7 @@ Skill-agnostisch — gleiche Badges für alle Level:
 | 🔥 Streak | 7 / 14 / 30 Tage in Folge trainiert |
 | 💪 Fleißig | 10 / 50 / 100 Trainings absolviert |
 | 📚 Übungsmacher | 50 / 200 / 500 Übungen gemacht |
-| ✅ MÜR abgeschlossen | Nur Training-Track (Trainer-Setup) |
+| ✅ Lernpfad abgeschlossen | Nur Training-Track (Trainer-Setup) |
 | ⏱ Trainingszeit | 10h / 50h / 100h gesamt |
 
 ### Zertifikate / Urkunden (Trainer-Approval, hervorgehoben)
@@ -248,7 +261,7 @@ Klar getrennt von normalen Badges — spezielles visuelles Treatment (Gold-Rahme
 
 **Admin definiert global** (`certificate-template` Content Type):
 - Name, Level (Bronze / Silber / Gold)
-- Prerequisites: min. MÜRs / Übungen (automatisch geprüft)
+- Prerequisites: min. Lernpfads / Übungen (automatisch geprüft)
 
 **Flow:**
 1. System prüft Prerequisites → Trainer sieht "Max bereit für VH Bronze"
@@ -294,7 +307,7 @@ YouTube-Videos: nur online. Alle anderen Inhalte in-session verfügbar.
 Folgende Themen sind bewusst geparkt und werden in einem späteren Design-Zyklus verfeinert:
 
 - **Trainer-geführtes vs. selbstorganisiertes Training** — Unterschied zwischen Kinder-Training (Trainer managed alles) und Erwachsenen-Gruppen (Spieler mit Spezialrolle laden ein)
-- **MÜR-Zuweisung durch Trainer** — Trainer schlägt einzelnen Spielern MÜRs vor und trackt deren Fortschritt
+- **Lernpfad-Zuweisung durch Trainer** — Trainer schlägt einzelnen Spielern Lernpfads vor und trackt deren Fortschritt
 - **Training-Locking** — wer darf ein Training bearbeiten/abschließen
 - **Gruppen-Training ohne Trainer** — Spezialrolle, Einladungssystem
 
@@ -315,6 +328,6 @@ Folgende Themen sind bewusst geparkt und werden in einem späteren Design-Zyklus
 - Offline-First / Write-Queue / SQLite
 - YouTube-Video Download
 - Echtzeit-Sync (WebSocket)
-- Exercises / MÜRs erstellen auf Mobile (Web-only)
+- Exercises / Lernpfads erstellen auf Mobile (Web-only)
 - Match-Analyse
 - Club-Override für Zertifikate
