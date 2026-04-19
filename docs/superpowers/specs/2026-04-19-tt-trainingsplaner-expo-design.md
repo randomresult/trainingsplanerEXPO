@@ -204,8 +204,8 @@ Effort-based, skill-agnostisch — Beginner und Profi verdienen gleich:
 
 ### Club-Ranglisten (pro Verein)
 Zwei Leaderboard-Tabs, je mit Woche / Monat / Gesamt:
-- **Punkte** — Gesamtpunkte aus beiden Tracks
-- **Anwesenheit** — Vereinstrainings besucht (verifiziert)
+- **Punkte** — Gesamtpunkte aus beiden Tracks. Layout: Podium (Top 3) + Liste ab Platz 4 mit Stacked Bar (lila = Vereinstraining, grün = Eigentraining) + Punktezahlen pro Track
+- **Anwesenheit** — Vereinstrainings besucht (verifiziert), mit Fortschrittsbalken + Rate % + eigene Stats
 
 ### Badges (vollautomatisch, kein Approval)
 Skill-agnostisch — gleiche Badges für alle Level:
