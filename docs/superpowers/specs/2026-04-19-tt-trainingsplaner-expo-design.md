@@ -166,56 +166,70 @@ PlayerProgress: welche Übungen abgeschlossen, mastered?
 
 ---
 
+## Progress-Tracks
+
+Zwei getrennte Tracks, Punkte fließen in eine gemeinsame Rangliste:
+
+### Training-Track (Vereinstraining, verifiziert)
+- Anwesenheit vom Trainer bestätigt
+- Übungen im Vereinstraining abgehakt → Punkte
+- MÜR-Übungen im Training → Punkte + **MÜR-Badge möglich**
+- MÜR komplett abgeschlossen im Training → Badge ✅
+
+### Own-Track (selbst geloggt, unverified)
+- Timer-basiert: Start → Training läuft → Stop
+- Art des Trainings taggen (predefined oder freestyle)
+- Übungen/MÜR-Übungen loggen → **nur Punkte, keine Badges**
+- Trainer sieht Own-Track für Coaching-Zwecke, aber kein Club-Ranking dafür
+
+---
+
 ## Achievement & Zertifikat-System
 
-### Zwei Progress-Tracks
+### Punkte-System (beide Tracks fließen zusammen)
+Effort-based, skill-agnostisch — Beginner und Profi verdienen gleich:
 
-**Track 1 — Vereinstraining** (Trainer-geführt, verifizierbar):
-- Anwesenheit bei organisierten Trainings
-- MÜR-Fortschritt während Vereinstraining
-- Teilnahme-Metriken → Basis für Club-Rangliste
+| Aktion | Punkte | Track |
+|---|---|---|
+| Vereinstraining besucht | +15 | Training |
+| Übung abgehakt | +2 | Beide |
+| MÜR abgeschlossen | +50 | Beide |
+| Badge erhalten | +25 | Beide |
+| 7-Tage-Streak | +30 | Beide |
+| Zertifikat erhalten | +100 | Training |
 
-**Track 2 — Eigentraining** (selbst geloggt):
-- Selbst erfasste Trainingsminuten
-- Eigenständig abgeschlossene MÜRs
-- Übungen mit Häufigkeit + Dauer (Metriken TBD)
-- → Persönlicher Fortschritt, Spieler sieht es immer, Trainer optional
+### Anwesenheit
+- **Persönlich:** Counter ("28 Trainings besucht") + Streak ("5 in Folge") im Profil
+- **Club-Ranking:** Vereinsrangliste nach Anwesenheit (eigener Tab neben Punkte-Ranking)
 
-Beide Tracks fließen in Badges/Achievements — aber getrennt ausgewiesen im Profil.
+### Club-Ranglisten (pro Verein)
+Zwei Leaderboard-Tabs, je mit Woche / Monat / Gesamt:
+- **Punkte** — Gesamtpunkte aus beiden Tracks
+- **Anwesenheit** — Vereinstrainings besucht (verifiziert)
 
-### Badges (vollautomatisch)
-Kein Approval, kein Mensch — System vergibt sofort wenn Kriterium erfüllt:
+### Badges (vollautomatisch, kein Approval)
+Skill-agnostisch — gleiche Badges für alle Level:
 
 | Badge | Kriterium |
 |---|---|
 | 🔥 Streak | 7 / 14 / 30 Tage in Folge trainiert |
 | 💪 Fleißig | 10 / 50 / 100 Trainings absolviert |
 | 📚 Übungsmacher | 50 / 200 / 500 Übungen gemacht |
-| ✅ Reihe abgeschlossen | Erste / jede MÜR fertig |
+| ✅ MÜR abgeschlossen | Nur Training-Track (Trainer-Setup) |
 | ⏱ Trainingszeit | 10h / 50h / 100h gesamt |
 
-### Punkte-System
-Training absolviert: +10 · Übung gemacht: +2 · MÜR abgeschlossen: +50 · Badge erhalten: +25 · 7-Tage-Streak: +30 · Zertifikat erhalten: +100
+### Zertifikate / Urkunden (Trainer-Approval, hervorgehoben)
+Klar getrennt von normalen Badges — spezielles visuelles Treatment (Gold-Rahmen, Animation).
 
-### Club-Ranglisten (pro Verein)
-Drei Leaderboard-Tabs, je mit Woche / Monat / Gesamt:
-- **Punkte** — Gesamt-Punktestand
-- **Trainings** — Anzahl absolvierter Trainings
-- **Streak** — Längste aktuelle Trainingsstreak
-
-### Zertifikate / Urkunden (Trainer-Approval)
-Separates formales System, klar getrennt von Badges:
-
-**Admin definiert global** (ein neuer Strapi Content Type `certificate-template`):
-- Name (z.B. "Vorhand Topspin")
-- Level: Bronze / Silber / Gold
-- Prerequisites: min. Anzahl bestimmter Übungen oder MÜRs
+**Admin definiert global** (`certificate-template` Content Type):
+- Name, Level (Bronze / Silber / Gold)
+- Prerequisites: min. MÜRs / Übungen (automatisch geprüft)
 
 **Flow:**
-1. System prüft Prerequisites automatisch pro Spieler
-2. Trainer sieht welche Spieler bereit sind ("Max kann VH Bronze erhalten")
-3. Trainer bestätigt → Zertifikat freigeschaltet
-4. Spieler sieht Zertifikat im Profil + Urkunde druckbar (PDF)
+1. System prüft Prerequisites → Trainer sieht "Max bereit für VH Bronze"
+2. Trainer entscheidet: direkt vergeben (wenn er Können sieht) ODER Prüfung durchführen
+3. Prüfung ist optional — kein Pflichtschritt
+4. Trainer bestätigt in App → spezielles Zertifikat-Badge + Urkunde druckbar (PDF)
 
 Kein Club-Override — Admin-Definitionen gelten global.
 
