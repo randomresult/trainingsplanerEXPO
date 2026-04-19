@@ -108,6 +108,7 @@ Referenz-Pattern: Strong / Hevy. Übungen = eigener Tab (Lern-Content). Hinzufü
 - Liste mit Filter (Kategorie, Spielerlevel, Fokusbereich) + Suche
 - `/library/exercises/[id]` — Detail: Steps nummeriert, YouTube-Video (online only), Trainer-Tipp
 - ⭐ Favorit-Stern auf Listeneinträgen + Detailseite (alle Nutzer)
+- Punkte-Badge "+2 Pkt" rechts in Listeneinträgen (zeigt Belohnung bei Abschluss)
 - Buttons auf Detailseite:
   - "Start" — direkt tracken (alle Nutzer)
   - "Zu meinem Training" — zu eigener Planung hinzufügen (alle Nutzer)
@@ -118,7 +119,9 @@ Referenz-Pattern: Strong / Hevy. Übungen = eigener Tab (Lern-Content). Hinzufü
 **Lernpfade** (ehem. Methodische Reihen):
 - Liste mit Kategorie-Filter (Technik/Taktik/Kondition/Mental)
 - ⭐ Favorit-Stern auf Listeneinträgen + Detailseite (alle Nutzer)
-- Fortschrittsbalken pro Lernpfad (X/Y Übungen · % · Status)
+- Fortschrittsbalken pro Lernpfad + Status-Indikator ("Aktiv X/Y")
+- Completed Counter "✓ Nx abgeschlossen" (wie oft der Pfad durchlaufen wurde)
+- Punkte-Badge "+50 Pkt" rechts in Listeneinträgen (Belohnung bei Abschluss)
 - `/library/paths/[id]` — Detail: Übungen in Reihenfolge, aktueller Step hervorgehoben
 - Button: "Start" / "Weiter" — Schritt für Schritt durchgehen, Step abhaken
 - Lernpfad-Fortschritt ist persistent — unabhängig vom Training-Status
