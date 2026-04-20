@@ -2,6 +2,7 @@ import { View, Text, FlatList, Pressable, ActivityIndicator } from 'react-native
 import { router } from 'expo-router';
 import { useTrainings } from '@/lib/queries/useTrainings';
 import { cn } from '@/lib/utils/cn';
+import type { Training } from '@/lib/types/models';
 
 const STATUS_LABELS = {
   draft: 'Entwurf',
@@ -18,7 +19,7 @@ const STATUS_COLORS = {
 export default function TrainingsScreen() {
   const { data: trainings, isLoading } = useTrainings();
 
-  const renderTraining = ({ item }: { item: any }) => (
+  const renderTraining = ({ item }: { item: Training }) => (
     <Pressable
       onPress={() => router.push(`/trainings/${item.documentId}`)}
       className="bg-card rounded-xl p-4 mb-3 border border-border active:opacity-70"
