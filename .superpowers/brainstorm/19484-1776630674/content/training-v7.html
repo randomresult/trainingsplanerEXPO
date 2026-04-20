@@ -1,0 +1,202 @@
+<h2>Training — v7 konsistent</h2>
+<p class="subtitle">Kein Fertig-Button · Checkbox reicht · einheitliche Step-Höhe · Counter optional</p>
+
+<div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:flex-start">
+
+  <!-- Variante A: Mit Counter, einheitliche Höhe -->
+  <div style="text-align:center">
+    <div class="label" style="color:#6c47ff">A — Mit ↻ Counter</div>
+    <div style="width:215px;background:#0f0f1a;border-radius:20px;padding:12px;border:2px solid #6c47ff;color:#fff;font-size:11px;margin:0 auto">
+
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+        <div style="font-size:14px;color:#888">←</div>
+        <div style="flex:1">
+          <div style="font-size:10px;font-weight:bold">VH Topspin Übung</div>
+          <div style="font-size:7px;color:#f59e0b">⏱ 32:18 aktiv</div>
+        </div>
+        <div style="background:#ef444422;color:#ef4444;border-radius:5px;padding:3px 6px;font-size:8px;font-weight:bold">■</div>
+      </div>
+
+      <div style="background:#1a1a2e;border-radius:8px;padding:6px 8px;margin-bottom:6px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+          <div style="font-size:8px;color:#22c55e;font-weight:bold">4/7 Übungen</div>
+          <div style="font-size:9px;color:#f59e0b;font-weight:bold">+12 Pkt</div>
+        </div>
+        <div style="background:#333;border-radius:3px;height:4px">
+          <div style="background:#22c55e;width:57%;height:4px;border-radius:3px"></div>
+        </div>
+      </div>
+
+      <div style="background:#1a1a2e;border-radius:8px;padding:6px;margin-bottom:5px;border-left:3px solid #22c55e">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;padding:0 2px">
+          <div style="font-size:7px;color:#22c55e;font-weight:bold">📋 LERNPFAD · VH Topspin Basics</div>
+          <div style="font-size:7px;color:#6c47ff;font-weight:bold">3/5</div>
+        </div>
+
+        <!-- Erledigt -->
+        <div style="background:#111;border-radius:5px;padding:6px 7px;margin-bottom:3px">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+            <div style="width:16px;height:16px;background:#22c55e;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#111;font-weight:bold;flex-shrink:0">✓</div>
+            <div style="flex:1;font-size:9px;font-weight:bold;color:#aaa;text-decoration:line-through">RH Topspin passiv</div>
+            <div style="background:#f59e0b22;color:#f59e0b;border-radius:3px;padding:2px 5px;font-size:7px;font-weight:bold">+4</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;margin-left:22px">
+            <div style="background:#0f0f1a;border:1px solid #333;border-radius:3px;padding:1px 5px;font-size:7px;color:#aaa">⏱ 15m</div>
+            <div style="display:flex;background:#0f0f1a;border:1px solid #6c47ff55;border-radius:3px;overflow:hidden;align-items:center">
+              <div style="color:#6c47ff;padding:1px 5px;font-size:9px;font-weight:bold">−</div>
+              <div style="background:#6c47ff;color:#fff;padding:1px 5px;font-size:7px;font-weight:bold">↻2</div>
+              <div style="color:#6c47ff;padding:1px 5px;font-size:9px;font-weight:bold">+</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aktuell (kein Fertig-Button, nur Checkbox + Highlight) -->
+        <div style="background:#f59e0b22;border:1px solid #f59e0b;border-radius:5px;padding:6px 7px;margin-bottom:3px">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+            <div style="width:16px;height:16px;background:#1a1a2e;border:2px solid #f59e0b;border-radius:3px;flex-shrink:0"></div>
+            <div style="flex:1;font-size:9px;font-weight:bold">RH Topspin aktiv</div>
+            <div style="background:#f59e0b22;color:#f59e0b;border-radius:3px;padding:2px 5px;font-size:7px;font-weight:bold">+2</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;margin-left:22px">
+            <div style="background:#0f0f1a;border:1px solid #f59e0b55;border-radius:3px;padding:1px 5px;font-size:7px;color:#f59e0b">⏱ 15m</div>
+            <div style="display:flex;background:#0f0f1a;border:1px solid #6c47ff55;border-radius:3px;overflow:hidden;align-items:center">
+              <div style="color:#6c47ff;padding:1px 5px;font-size:9px;font-weight:bold">−</div>
+              <div style="background:#6c47ff;color:#fff;padding:1px 5px;font-size:7px;font-weight:bold">↻0</div>
+              <div style="color:#6c47ff;padding:1px 5px;font-size:9px;font-weight:bold">+</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nicht gestartet -->
+        <div style="background:#111;border-radius:5px;padding:6px 7px;opacity:0.6">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+            <div style="width:16px;height:16px;background:#1a1a2e;border:2px solid #555;border-radius:3px;flex-shrink:0"></div>
+            <div style="flex:1;font-size:9px">RH Topspin Konter</div>
+            <div style="background:#f59e0b22;color:#f59e0b;border-radius:3px;padding:2px 5px;font-size:7px;font-weight:bold">+2</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;margin-left:22px">
+            <div style="background:#0f0f1a;border:1px solid #333;border-radius:3px;padding:1px 5px;font-size:7px;color:#888">⏱ 20m</div>
+            <div style="display:flex;background:#0f0f1a;border:1px solid #555;border-radius:3px;overflow:hidden;align-items:center">
+              <div style="color:#555;padding:1px 5px;font-size:9px;font-weight:bold">−</div>
+              <div style="background:#333;color:#888;padding:1px 5px;font-size:7px;font-weight:bold">↻0</div>
+              <div style="color:#555;padding:1px 5px;font-size:9px;font-weight:bold">+</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#1a1a2e;border-radius:8px;padding:6px;border-left:3px solid #6c47ff">
+        <div style="font-size:7px;color:#6c47ff;font-weight:bold;margin-bottom:4px;padding:0 2px">💪 ÜBUNGEN</div>
+        <div style="background:#111;border-radius:5px;padding:6px 7px;margin-bottom:3px">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+            <div style="width:16px;height:16px;background:#22c55e;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#111;font-weight:bold;flex-shrink:0">✓</div>
+            <div style="flex:1;font-size:9px;font-weight:bold;color:#aaa;text-decoration:line-through">Freies Spiel</div>
+            <div style="background:#f59e0b22;color:#f59e0b;border-radius:3px;padding:2px 5px;font-size:7px;font-weight:bold">+2</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;margin-left:22px">
+            <div style="background:#0f0f1a;border:1px solid #333;border-radius:3px;padding:1px 5px;font-size:7px;color:#aaa">⏱ 15m</div>
+            <div style="display:flex;background:#0f0f1a;border:1px solid #6c47ff55;border-radius:3px;overflow:hidden;align-items:center">
+              <div style="color:#6c47ff;padding:1px 5px;font-size:9px;font-weight:bold">−</div>
+              <div style="background:#6c47ff;color:#fff;padding:1px 5px;font-size:7px;font-weight:bold">↻1</div>
+              <div style="color:#6c47ff;padding:1px 5px;font-size:9px;font-weight:bold">+</div>
+            </div>
+          </div>
+        </div>
+        <div style="background:#111;border-radius:5px;padding:6px 7px;opacity:0.6">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+            <div style="width:16px;height:16px;background:#1a1a2e;border:2px solid #555;border-radius:3px;flex-shrink:0"></div>
+            <div style="flex:1;font-size:9px">Aufschlag Varianten</div>
+            <div style="background:#f59e0b22;color:#f59e0b;border-radius:3px;padding:2px 5px;font-size:7px;font-weight:bold">+2</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;margin-left:22px">
+            <div style="background:#0f0f1a;border:1px solid #333;border-radius:3px;padding:1px 5px;font-size:7px;color:#888">⏱ 15m</div>
+            <div style="display:flex;background:#0f0f1a;border:1px solid #555;border-radius:3px;overflow:hidden;align-items:center">
+              <div style="color:#555;padding:1px 5px;font-size:9px;font-weight:bold">−</div>
+              <div style="background:#333;color:#888;padding:1px 5px;font-size:7px;font-weight:bold">↻0</div>
+              <div style="color:#555;padding:1px 5px;font-size:9px;font-weight:bold">+</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Variante B: Ohne Counter, nur Timer Edit -->
+  <div style="text-align:center">
+    <div class="label" style="color:#22c55e">B — Nur ⏱ Timer (ohne Counter)</div>
+    <div style="width:215px;background:#0f0f1a;border-radius:20px;padding:12px;border:2px solid #22c55e;color:#fff;font-size:11px;margin:0 auto">
+
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+        <div style="font-size:14px;color:#888">←</div>
+        <div style="flex:1">
+          <div style="font-size:10px;font-weight:bold">VH Topspin Übung</div>
+          <div style="font-size:7px;color:#f59e0b">⏱ 32:18 aktiv</div>
+        </div>
+        <div style="background:#ef444422;color:#ef4444;border-radius:5px;padding:3px 6px;font-size:8px;font-weight:bold">■</div>
+      </div>
+
+      <div style="background:#1a1a2e;border-radius:8px;padding:6px 8px;margin-bottom:6px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+          <div style="font-size:8px;color:#22c55e;font-weight:bold">4/7 Übungen</div>
+          <div style="font-size:9px;color:#f59e0b;font-weight:bold">+12 Pkt</div>
+        </div>
+        <div style="background:#333;border-radius:3px;height:4px">
+          <div style="background:#22c55e;width:57%;height:4px;border-radius:3px"></div>
+        </div>
+      </div>
+
+      <div style="background:#1a1a2e;border-radius:8px;padding:6px;margin-bottom:5px;border-left:3px solid #22c55e">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;padding:0 2px">
+          <div style="font-size:7px;color:#22c55e;font-weight:bold">📋 LERNPFAD · VH Topspin Basics</div>
+          <div style="font-size:7px;color:#6c47ff;font-weight:bold">3/5</div>
+        </div>
+
+        <!-- Alle Steps haben gleiche Höhe: 1 Zeile -->
+        <div style="background:#111;border-radius:5px;padding:7px;margin-bottom:3px;display:flex;align-items:center;gap:6px">
+          <div style="width:16px;height:16px;background:#22c55e;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#111;font-weight:bold;flex-shrink:0">✓</div>
+          <div style="flex:1;font-size:9px;font-weight:bold;color:#aaa;text-decoration:line-through">RH Topspin passiv</div>
+          <div style="background:#0f0f1a;border:1px solid #333;border-radius:3px;padding:2px 6px;font-size:7px;color:#aaa">⏱ 30m</div>
+          <div style="background:#f59e0b22;color:#f59e0b;border-radius:3px;padding:2px 5px;font-size:7px;font-weight:bold">+4</div>
+        </div>
+
+        <div style="background:#f59e0b22;border:1px solid #f59e0b;border-radius:5px;padding:7px;margin-bottom:3px;display:flex;align-items:center;gap:6px">
+          <div style="width:16px;height:16px;background:#1a1a2e;border:2px solid #f59e0b;border-radius:3px;flex-shrink:0"></div>
+          <div style="flex:1;font-size:9px;font-weight:bold">RH Topspin aktiv</div>
+          <div style="background:#0f0f1a;border:1px solid #f59e0b55;border-radius:3px;padding:2px 6px;font-size:7px;color:#f59e0b">⏱ 15m</div>
+          <div style="background:#f59e0b22;color:#f59e0b;border-radius:3px;padding:2px 5px;font-size:7px;font-weight:bold">+2</div>
+        </div>
+
+        <div style="background:#111;border-radius:5px;padding:7px;display:flex;align-items:center;gap:6px;opacity:0.6">
+          <div style="width:16px;height:16px;background:#1a1a2e;border:2px solid #555;border-radius:3px;flex-shrink:0"></div>
+          <div style="flex:1;font-size:9px">RH Topspin Konter</div>
+          <div style="background:#0f0f1a;border:1px solid #333;border-radius:3px;padding:2px 6px;font-size:7px;color:#888">⏱ 20m</div>
+          <div style="background:#f59e0b22;color:#f59e0b;border-radius:3px;padding:2px 5px;font-size:7px;font-weight:bold">+2</div>
+        </div>
+      </div>
+
+      <div style="background:#1a1a2e;border-radius:8px;padding:6px;border-left:3px solid #6c47ff">
+        <div style="font-size:7px;color:#6c47ff;font-weight:bold;margin-bottom:4px;padding:0 2px">💪 ÜBUNGEN</div>
+
+        <div style="background:#111;border-radius:5px;padding:7px;margin-bottom:3px;display:flex;align-items:center;gap:6px">
+          <div style="width:16px;height:16px;background:#22c55e;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#111;font-weight:bold;flex-shrink:0">✓</div>
+          <div style="flex:1;font-size:9px;font-weight:bold;color:#aaa;text-decoration:line-through">Freies Spiel</div>
+          <div style="background:#0f0f1a;border:1px solid #333;border-radius:3px;padding:2px 6px;font-size:7px;color:#aaa">⏱ 15m</div>
+          <div style="background:#f59e0b22;color:#f59e0b;border-radius:3px;padding:2px 5px;font-size:7px;font-weight:bold">+2</div>
+        </div>
+
+        <div style="background:#111;border-radius:5px;padding:7px;display:flex;align-items:center;gap:6px;opacity:0.6">
+          <div style="width:16px;height:16px;background:#1a1a2e;border:2px solid #555;border-radius:3px;flex-shrink:0"></div>
+          <div style="flex:1;font-size:9px">Aufschlag Varianten</div>
+          <div style="background:#0f0f1a;border:1px solid #333;border-radius:3px;padding:2px 6px;font-size:7px;color:#888">⏱ 15m</div>
+          <div style="background:#f59e0b22;color:#f59e0b;border-radius:3px;padding:2px 5px;font-size:7px;font-weight:bold">+2</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:14px;padding:10px;background:#0f2027;border-radius:8px;font-size:10px;color:#aaa;text-align:center">
+  <b style="color:#6c47ff">A:</b> Mit Counter (jeder Step 2 Zeilen, immer gleiche Höhe) ·
+  <b style="color:#22c55e">B:</b> Nur Timer Edit (jeder Step 1 Zeile, slimmer — Wdh über doppelte Zeit)
+</div>

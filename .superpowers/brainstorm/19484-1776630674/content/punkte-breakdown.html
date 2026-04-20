@@ -1,0 +1,252 @@
+<h2>Punkte-Rangliste — mit Track-Breakdown</h2>
+<p class="subtitle">Wie könnte der Indikator für Training vs. Eigentraining aussehen?</p>
+
+<div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;align-items:flex-start">
+
+  <!-- Option A: Gestapelter Balken pro Spieler -->
+  <div style="text-align:center">
+    <div class="label" style="color:#f59e0b">Option A — Stacked Bar</div>
+    <div style="width:190px;background:#0f0f1a;border-radius:20px;padding:10px;border:2px solid #f59e0b;font-size:11px;color:#fff;margin:0 auto">
+      <div style="display:flex;background:#1a1a2e;border-radius:8px;padding:2px;margin-bottom:6px">
+        <div style="flex:1;background:#f59e0b;color:#111;border-radius:6px;padding:3px;text-align:center;font-size:8px;font-weight:bold">Punkte</div>
+        <div style="flex:1;color:#888;padding:3px;text-align:center;font-size:8px">Anwesenheit</div>
+      </div>
+
+      <!-- Legende -->
+      <div style="display:flex;gap:8px;margin-bottom:6px;justify-content:center">
+        <div style="display:flex;align-items:center;gap:3px;font-size:8px;color:#6c47ff">
+          <div style="width:8px;height:8px;background:#6c47ff;border-radius:2px"></div>Vereinstraining
+        </div>
+        <div style="display:flex;align-items:center;gap:3px;font-size:8px;color:#22c55e">
+          <div style="width:8px;height:8px;background:#22c55e;border-radius:2px"></div>Eigentraining
+        </div>
+      </div>
+
+      <!-- Rangliste mit Stacked Bar -->
+      <div style="background:#1a1a2e;border-radius:8px;overflow:hidden">
+
+        <!-- Platz 1 -->
+        <div style="padding:5px 6px;border-bottom:1px solid #222;background:#f59e0b11">
+          <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px">
+            <div style="font-size:12px">🥇</div>
+            <div style="flex:1;font-size:9px;font-weight:bold">Max M.</div>
+            <div style="font-size:10px;color:#f59e0b;font-weight:bold">890</div>
+          </div>
+          <div style="background:#333;border-radius:3px;height:6px;overflow:hidden">
+            <div style="display:flex;height:6px">
+              <div style="background:#6c47ff;width:65%"></div>
+              <div style="background:#22c55e;width:35%"></div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:2px;font-size:7px">
+            <div style="color:#6c47ff">579 Training</div>
+            <div style="color:#22c55e">311 Eigen</div>
+          </div>
+        </div>
+
+        <!-- Platz 2 -->
+        <div style="padding:5px 6px;border-bottom:1px solid #222">
+          <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px">
+            <div style="font-size:12px">🥈</div>
+            <div style="flex:1;font-size:9px">Anna K.</div>
+            <div style="font-size:9px;color:#aaa">720</div>
+          </div>
+          <div style="background:#333;border-radius:3px;height:6px;overflow:hidden">
+            <div style="display:flex;height:6px">
+              <div style="background:#6c47ff;width:85%"></div>
+              <div style="background:#22c55e;width:15%"></div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:2px;font-size:7px">
+            <div style="color:#6c47ff">612 Training</div>
+            <div style="color:#22c55e">108 Eigen</div>
+          </div>
+        </div>
+
+        <!-- Platz 3 -->
+        <div style="padding:5px 6px;border-bottom:1px solid #222">
+          <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px">
+            <div style="font-size:12px">🥉</div>
+            <div style="flex:1;font-size:9px">Tom S.</div>
+            <div style="font-size:9px;color:#cd7f32">680</div>
+          </div>
+          <div style="background:#333;border-radius:3px;height:6px;overflow:hidden">
+            <div style="display:flex;height:6px">
+              <div style="background:#6c47ff;width:40%"></div>
+              <div style="background:#22c55e;width:60%"></div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:2px;font-size:7px">
+            <div style="color:#6c47ff">272 Training</div>
+            <div style="color:#22c55e">408 Eigen</div>
+          </div>
+        </div>
+
+        <!-- Du (highlighted) -->
+        <div style="padding:5px 6px;background:#6c47ff15">
+          <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px">
+            <div style="color:#6c47ff;font-size:9px;font-weight:bold;width:14px">5</div>
+            <div style="flex:1;font-size:9px;color:#6c47ff;font-weight:bold">Du</div>
+            <div style="font-size:9px;color:#6c47ff;font-weight:bold">580</div>
+          </div>
+          <div style="background:#333;border-radius:3px;height:6px;overflow:hidden">
+            <div style="display:flex;height:6px">
+              <div style="background:#6c47ff;width:70%"></div>
+              <div style="background:#22c55e;width:30%"></div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:2px;font-size:7px">
+            <div style="color:#6c47ff">406 Training</div>
+            <div style="color:#22c55e">174 Eigen</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option B: Pie/Ring Indikator nur beim eigenen Eintrag -->
+  <div style="text-align:center">
+    <div class="label" style="color:#6c47ff">Option B — Ring nur bei "Du"</div>
+    <div style="width:190px;background:#0f0f1a;border-radius:20px;padding:10px;border:2px solid #6c47ff;font-size:11px;color:#fff;margin:0 auto">
+      <div style="display:flex;background:#1a1a2e;border-radius:8px;padding:2px;margin-bottom:6px">
+        <div style="flex:1;background:#f59e0b;color:#111;border-radius:6px;padding:3px;text-align:center;font-size:8px;font-weight:bold">Punkte</div>
+        <div style="flex:1;color:#888;padding:3px;text-align:center;font-size:8px">Anwesenheit</div>
+      </div>
+
+      <!-- Podium clean ohne Bars -->
+      <div style="display:flex;align-items:flex-end;justify-content:center;gap:4px;margin-bottom:8px">
+        <div style="text-align:center;width:52px">
+          <div style="background:#1a1a2e;border-radius:8px;padding:4px">
+            <div style="font-size:18px">🥈</div>
+            <div style="font-size:8px">Anna K.</div>
+            <div style="font-size:9px;color:#aaa">720</div>
+          </div>
+        </div>
+        <div style="text-align:center;width:62px">
+          <div style="background:#2a1a3e;border-radius:8px;padding:4px;border:1px solid #f59e0b">
+            <div style="font-size:22px">🥇</div>
+            <div style="font-size:8px;font-weight:bold">Max M.</div>
+            <div style="font-size:10px;color:#f59e0b;font-weight:bold">890</div>
+          </div>
+        </div>
+        <div style="text-align:center;width:52px">
+          <div style="background:#1a1a2e;border-radius:8px;padding:4px">
+            <div style="font-size:18px">🥉</div>
+            <div style="font-size:8px">Tom S.</div>
+            <div style="font-size:9px;color:#cd7f32">680</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Liste mit Ring nur bei "Du" -->
+      <div style="background:#1a1a2e;border-radius:8px;overflow:hidden">
+        <div style="display:flex;align-items:center;padding:5px 6px;border-bottom:1px solid #222;gap:4px">
+          <div style="color:#888;font-size:9px;width:12px">4</div>
+          <div style="flex:1;font-size:9px">Lisa M.</div>
+          <div style="font-size:9px;color:#aaa">620</div>
+        </div>
+
+        <!-- Du - mit Breakdown Ring -->
+        <div style="padding:6px;background:#6c47ff15;border-bottom:1px solid #333">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div style="color:#6c47ff;font-size:9px;font-weight:bold;width:12px">5</div>
+            <div style="flex:1">
+              <div style="font-size:9px;color:#6c47ff;font-weight:bold;margin-bottom:3px">Du — 580 Punkte</div>
+              <div style="display:flex;align-items:center;gap:4px">
+                <div style="background:#333;border-radius:3px;height:5px;flex:1;overflow:hidden">
+                  <div style="display:flex;height:5px">
+                    <div style="background:#6c47ff;width:70%"></div>
+                    <div style="background:#22c55e;width:30%"></div>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:2px">
+                <div style="font-size:7px;color:#6c47ff">● 406 Training</div>
+                <div style="font-size:7px;color:#22c55e">● 174 Eigen</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;padding:5px 6px;gap:4px">
+          <div style="color:#888;font-size:9px;width:12px">6</div>
+          <div style="flex:1;font-size:9px;color:#888">Ben T.</div>
+          <div style="font-size:9px;color:#888">490</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option C: Tap to expand -->
+  <div style="text-align:center">
+    <div class="label" style="color:#22c55e">Option C — Tap für Details</div>
+    <div style="width:190px;background:#0f0f1a;border-radius:20px;padding:10px;border:2px solid #22c55e;font-size:11px;color:#fff;margin:0 auto">
+      <div style="display:flex;background:#1a1a2e;border-radius:8px;padding:2px;margin-bottom:6px">
+        <div style="flex:1;background:#f59e0b;color:#111;border-radius:6px;padding:3px;text-align:center;font-size:8px;font-weight:bold">Punkte</div>
+        <div style="flex:1;color:#888;padding:3px;text-align:center;font-size:8px">Anwesenheit</div>
+      </div>
+
+      <!-- Clean Liste, ein Eintrag expandiert -->
+      <div style="background:#1a1a2e;border-radius:8px;overflow:hidden">
+        <div style="display:flex;align-items:center;padding:6px;border-bottom:1px solid #222;gap:4px">
+          <div style="font-size:14px">🥇</div>
+          <div style="flex:1;font-size:9px;font-weight:bold">Max M.</div>
+          <div style="font-size:10px;color:#f59e0b;font-weight:bold">890</div>
+          <div style="font-size:8px;color:#888">›</div>
+        </div>
+        <div style="display:flex;align-items:center;padding:6px;border-bottom:1px solid #222;gap:4px">
+          <div style="font-size:14px">🥈</div>
+          <div style="flex:1;font-size:9px">Anna K.</div>
+          <div style="font-size:9px;color:#aaa">720</div>
+          <div style="font-size:8px;color:#888">›</div>
+        </div>
+
+        <!-- Expandierter Eintrag (Du) -->
+        <div style="border-bottom:1px solid #333;background:#6c47ff11">
+          <div style="display:flex;align-items:center;padding:6px;gap:4px">
+            <div style="color:#6c47ff;font-size:9px;font-weight:bold">5</div>
+            <div style="flex:1;font-size:9px;color:#6c47ff;font-weight:bold">Du</div>
+            <div style="font-size:9px;color:#6c47ff;font-weight:bold">580</div>
+            <div style="font-size:8px;color:#6c47ff">∨</div>
+          </div>
+          <!-- Expanded detail -->
+          <div style="padding:0 6px 6px;border-top:1px dashed #6c47ff33">
+            <div style="display:flex;gap:4px;margin-top:5px">
+              <div style="flex:1;background:#6c47ff22;border-radius:5px;padding:4px;text-align:center">
+                <div style="font-size:10px;font-weight:bold;color:#6c47ff">406</div>
+                <div style="font-size:7px;color:#888">Vereins-</div>
+                <div style="font-size:7px;color:#888">training</div>
+              </div>
+              <div style="display:flex;align-items:center;color:#888;font-size:10px">+</div>
+              <div style="flex:1;background:#22c55e22;border-radius:5px;padding:4px;text-align:center">
+                <div style="font-size:10px;font-weight:bold;color:#22c55e">174</div>
+                <div style="font-size:7px;color:#888">Eigen-</div>
+                <div style="font-size:7px;color:#888">training</div>
+              </div>
+              <div style="display:flex;align-items:center;color:#888;font-size:10px">=</div>
+              <div style="flex:1;background:#f59e0b22;border-radius:5px;padding:4px;text-align:center">
+                <div style="font-size:10px;font-weight:bold;color:#f59e0b">580</div>
+                <div style="font-size:7px;color:#888">Gesamt-</div>
+                <div style="font-size:7px;color:#888">punkte</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;padding:6px;gap:4px">
+          <div style="color:#888;font-size:9px;width:12px">6</div>
+          <div style="flex:1;font-size:9px;color:#888">Ben T.</div>
+          <div style="font-size:9px;color:#888">490</div>
+          <div style="font-size:8px;color:#888">›</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:14px;padding:10px;background:#0f2027;border-radius:8px;font-size:10px;color:#aaa;text-align:center">
+  <b style="color:#6c47ff">■</b> Vereinstraining &nbsp;&nbsp;
+  <b style="color:#22c55e">■</b> Eigentraining &nbsp;&nbsp;|&nbsp;&nbsp;
+  A = immer sichtbar · B = nur bei "Du" · C = Tap zum Aufklappen
+</div>

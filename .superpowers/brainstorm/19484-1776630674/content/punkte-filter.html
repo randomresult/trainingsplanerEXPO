@@ -1,0 +1,111 @@
+<h2>Punkte-Rangliste — mit Zeitfilter</h2>
+<p class="subtitle">Monat / 6 Monate / Gesamt</p>
+
+<div style="display:flex;justify-content:center">
+  <div style="width:220px;background:#0f0f1a;border-radius:20px;padding:12px;border:2px solid #f59e0b;font-size:11px;color:#fff">
+
+    <!-- Main Tabs -->
+    <div style="display:flex;background:#1a1a2e;border-radius:8px;padding:2px;margin-bottom:6px">
+      <div style="flex:1;background:#f59e0b;color:#111;border-radius:6px;padding:3px;text-align:center;font-size:8px;font-weight:bold">Punkte</div>
+      <div style="flex:1;color:#888;padding:3px;text-align:center;font-size:8px">Anwesenheit</div>
+    </div>
+
+    <!-- Zeitfilter -->
+    <div style="display:flex;gap:3px;margin-bottom:10px">
+      <div style="flex:1;background:#1a1a2e;color:#888;border-radius:4px;padding:3px;text-align:center;font-size:8px">Monat</div>
+      <div style="flex:1;background:#f59e0b22;color:#f59e0b;border-radius:4px;padding:3px;text-align:center;font-size:8px;font-weight:bold">6 Monate</div>
+      <div style="flex:1;background:#1a1a2e;color:#888;border-radius:4px;padding:3px;text-align:center;font-size:8px">Gesamt</div>
+    </div>
+
+    <!-- Podium -->
+    <div style="display:flex;align-items:flex-end;justify-content:center;gap:5px;margin-bottom:10px">
+      <div style="text-align:center;width:60px">
+        <div style="background:#1a1a2e;border-radius:8px;padding:5px;margin-bottom:2px">
+          <div style="font-size:20px">🥈</div>
+          <div style="font-size:8px;font-weight:bold">Anna K.</div>
+          <div style="font-size:9px;color:#aaa">720</div>
+        </div>
+        <div style="background:#aaa;height:35px;border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:center">
+          <div style="font-size:11px;color:#111;font-weight:bold">2</div>
+        </div>
+      </div>
+      <div style="text-align:center;width:70px">
+        <div style="background:#2a1a3e;border-radius:8px;padding:5px;margin-bottom:2px;border:1px solid #f59e0b">
+          <div style="font-size:24px">🥇</div>
+          <div style="font-size:8px;font-weight:bold">Max M.</div>
+          <div style="font-size:11px;color:#f59e0b;font-weight:bold">890</div>
+        </div>
+        <div style="background:#f59e0b;height:50px;border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:center">
+          <div style="font-size:11px;color:#111;font-weight:bold">1</div>
+        </div>
+      </div>
+      <div style="text-align:center;width:60px">
+        <div style="background:#1a1a2e;border-radius:8px;padding:5px;margin-bottom:2px">
+          <div style="font-size:20px">🥉</div>
+          <div style="font-size:8px">Tom S.</div>
+          <div style="font-size:9px;color:#cd7f32">680</div>
+        </div>
+        <div style="background:#cd7f32;height:25px;border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:center">
+          <div style="font-size:11px;color:#111;font-weight:bold">3</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legende -->
+    <div style="display:flex;gap:10px;margin-bottom:6px;justify-content:center">
+      <div style="display:flex;align-items:center;gap:3px;font-size:8px;color:#6c47ff">
+        <div style="width:8px;height:8px;background:#6c47ff;border-radius:2px"></div>Vereinstraining
+      </div>
+      <div style="display:flex;align-items:center;gap:3px;font-size:8px;color:#22c55e">
+        <div style="width:8px;height:8px;background:#22c55e;border-radius:2px"></div>Eigentraining
+      </div>
+    </div>
+
+    <!-- Liste ab 4 mit Stacked Bar -->
+    <div style="background:#1a1a2e;border-radius:8px;overflow:hidden">
+      <div style="padding:5px 8px;border-bottom:1px solid #222">
+        <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px">
+          <div style="color:#888;font-size:9px;width:12px">4</div>
+          <div style="flex:1;font-size:9px">Lisa M.</div>
+          <div style="font-size:9px;color:#aaa">620</div>
+        </div>
+        <div style="background:#333;border-radius:3px;height:5px;overflow:hidden;margin-left:17px">
+          <div style="display:flex;height:5px"><div style="background:#6c47ff;width:75%"></div><div style="background:#22c55e;width:25%"></div></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:2px;margin-left:17px">
+          <div style="font-size:7px;color:#6c47ff">465</div>
+          <div style="font-size:7px;color:#22c55e">155</div>
+        </div>
+      </div>
+      <div style="padding:5px 8px;border-bottom:1px solid #333;background:#6c47ff15">
+        <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px">
+          <div style="color:#6c47ff;font-size:9px;font-weight:bold;width:12px">5</div>
+          <div style="flex:1;font-size:9px;color:#6c47ff;font-weight:bold">Du</div>
+          <div style="font-size:9px;color:#6c47ff;font-weight:bold">580</div>
+        </div>
+        <div style="background:#333;border-radius:3px;height:5px;overflow:hidden;margin-left:17px">
+          <div style="display:flex;height:5px"><div style="background:#6c47ff;width:70%"></div><div style="background:#22c55e;width:30%"></div></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:2px;margin-left:17px">
+          <div style="font-size:7px;color:#6c47ff">406 Verein</div>
+          <div style="font-size:7px;color:#22c55e">174 Eigen</div>
+        </div>
+      </div>
+      <div style="padding:5px 8px">
+        <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px">
+          <div style="color:#888;font-size:9px;width:12px">6</div>
+          <div style="flex:1;font-size:9px;color:#888">Ben T.</div>
+          <div style="font-size:9px;color:#888">490</div>
+        </div>
+        <div style="background:#333;border-radius:3px;height:5px;overflow:hidden;margin-left:17px">
+          <div style="display:flex;height:5px"><div style="background:#6c47ff;width:30%"></div><div style="background:#22c55e;width:70%"></div></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:2px;margin-left:17px">
+          <div style="font-size:7px;color:#6c47ff">147</div>
+          <div style="font-size:7px;color:#22c55e">343</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

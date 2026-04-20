@@ -1,0 +1,293 @@
+<h2>Training Tab</h2>
+<p class="subtitle">Vereinstraining + Mein Training · Liste · Detail · Durchführen</p>
+
+<div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:flex-start">
+
+  <!-- 1. Training Liste (beide Bereiche) -->
+  <div style="text-align:center">
+    <div class="label" style="color:#6c47ff">📅 Training Liste</div>
+    <div style="width:200px;background:#0f0f1a;border-radius:20px;padding:12px;border:2px solid #6c47ff;color:#fff;font-size:11px;margin:0 auto">
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:12px;font-weight:bold">Training</div>
+        <div style="background:#6c47ff;color:#fff;border-radius:6px;padding:4px 8px;font-size:8px;font-weight:bold">+ Neu</div>
+      </div>
+
+      <!-- Subtabs -->
+      <div style="display:flex;background:#1a1a2e;border-radius:8px;padding:2px;margin-bottom:8px;gap:2px">
+        <div style="flex:1;background:#6c47ff;color:#fff;border-radius:6px;padding:4px;text-align:center;font-size:8px;font-weight:bold">🏛 Vereinstraining</div>
+        <div style="flex:1;color:#888;padding:4px;text-align:center;font-size:8px">🏠 Mein Training</div>
+      </div>
+
+      <!-- Status Filter -->
+      <div style="display:flex;gap:3px;margin-bottom:8px">
+        <div style="flex:1;background:#6c47ff;color:#fff;border-radius:10px;padding:3px;text-align:center;font-size:7px;font-weight:bold">Anstehend</div>
+        <div style="flex:1;background:#1a1a2e;color:#888;border-radius:10px;padding:3px;text-align:center;font-size:7px">Aktiv</div>
+        <div style="flex:1;background:#1a1a2e;color:#888;border-radius:10px;padding:3px;text-align:center;font-size:7px">Fertig</div>
+      </div>
+
+      <!-- Anstehende Trainings -->
+      <div style="background:#1a1a2e;border-radius:8px;overflow:hidden">
+        <!-- Nächstes -->
+        <div style="padding:8px;border-bottom:1px solid #222;border-left:3px solid #6c47ff">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+            <div style="font-size:9px;font-weight:bold">Vereinstraining Dienstag</div>
+            <div style="background:#6c47ff22;color:#6c47ff;border-radius:4px;padding:1px 5px;font-size:7px">Morgen</div>
+          </div>
+          <div style="font-size:7px;color:#888;margin-bottom:3px">Di 21. Apr · 19:00 · Coach Schmidt</div>
+          <div style="display:flex;gap:3px;align-items:center">
+            <div style="font-size:7px;color:#888">4 Übungen · 60 Min</div>
+            <div style="margin-left:auto;display:flex;gap:3px">
+              <div style="width:14px;height:14px;background:#6c47ff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px">M</div>
+              <div style="width:14px;height:14px;background:#22c55e;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px">A</div>
+              <div style="width:14px;height:14px;background:#888;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px">+6</div>
+            </div>
+          </div>
+        </div>
+        <!-- Später -->
+        <div style="padding:8px;border-bottom:1px solid #222">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+            <div style="font-size:9px;font-weight:bold">Vereinstraining Donnerstag</div>
+            <div style="font-size:7px;color:#888">Do 23. Apr</div>
+          </div>
+          <div style="font-size:7px;color:#888">19:00 · 4 Übungen · 8 Spieler</div>
+        </div>
+        <div style="padding:8px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+            <div style="font-size:9px;font-weight:bold">Vereinstraining Samstag</div>
+            <div style="font-size:7px;color:#888">Sa 25. Apr</div>
+          </div>
+          <div style="font-size:7px;color:#888">10:00 · 5 Übungen · 12 Spieler</div>
+        </div>
+      </div>
+
+      <!-- Stats unten -->
+      <div style="display:flex;gap:3px;margin-top:8px">
+        <div style="flex:1;background:#1a1a2e;border-radius:6px;padding:5px;text-align:center">
+          <div style="font-size:11px;font-weight:bold;color:#22c55e">24</div>
+          <div style="font-size:7px;color:#888">Absolviert</div>
+        </div>
+        <div style="flex:1;background:#1a1a2e;border-radius:6px;padding:5px;text-align:center">
+          <div style="font-size:11px;font-weight:bold;color:#f59e0b">🔥5</div>
+          <div style="font-size:7px;color:#888">Streak</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Mein Training Liste -->
+  <div style="text-align:center">
+    <div class="label" style="color:#22c55e">📅 Mein Training</div>
+    <div style="width:200px;background:#0f0f1a;border-radius:20px;padding:12px;border:2px solid #22c55e;color:#fff;font-size:11px;margin:0 auto">
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:12px;font-weight:bold">Training</div>
+        <div style="background:#22c55e;color:#111;border-radius:6px;padding:4px 8px;font-size:8px;font-weight:bold">+ Neu</div>
+      </div>
+
+      <div style="display:flex;background:#1a1a2e;border-radius:8px;padding:2px;margin-bottom:8px;gap:2px">
+        <div style="flex:1;color:#888;padding:4px;text-align:center;font-size:8px">🏛 Vereinstraining</div>
+        <div style="flex:1;background:#22c55e;color:#111;border-radius:6px;padding:4px;text-align:center;font-size:8px;font-weight:bold">🏠 Mein Training</div>
+      </div>
+
+      <!-- Quick Action Start Timer -->
+      <div style="background:linear-gradient(135deg,#1a2a1e,#0f1f14);border:1px solid #22c55e55;border-radius:10px;padding:8px;margin-bottom:8px;display:flex;align-items:center;gap:7px">
+        <div style="font-size:22px">⏱</div>
+        <div style="flex:1">
+          <div style="font-size:9px;font-weight:bold;color:#22c55e">Freies Eigentraining</div>
+          <div style="font-size:7px;color:#888">Timer starten, Übungen später taggen</div>
+        </div>
+        <div style="background:#22c55e;color:#111;border-radius:6px;padding:4px 8px;font-size:8px;font-weight:bold">▶</div>
+      </div>
+
+      <!-- Eigene Pläne -->
+      <div style="font-size:7px;color:#888;margin-bottom:4px;text-transform:uppercase;font-weight:bold">Eigene Pläne</div>
+      <div style="background:#1a1a2e;border-radius:8px;overflow:hidden;margin-bottom:8px">
+        <!-- Draft -->
+        <div style="padding:8px;border-bottom:1px solid #222;border-left:3px solid #f59e0b">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+            <div style="font-size:9px;font-weight:bold">Freitag Abend Training</div>
+            <div style="background:#f59e0b22;color:#f59e0b;border-radius:4px;padding:1px 5px;font-size:7px">Entwurf</div>
+          </div>
+          <div style="font-size:7px;color:#888">Geplant · 3 Übungen · ~45 Min</div>
+          <div style="display:flex;gap:3px;margin-top:4px">
+            <div style="flex:1;background:#22c55e;color:#111;border-radius:5px;padding:3px;text-align:center;font-size:7px;font-weight:bold">▶ Starten</div>
+            <div style="background:#333;color:#888;border-radius:5px;padding:3px 7px;font-size:7px">✎</div>
+          </div>
+        </div>
+        <!-- Aktiv -->
+        <div style="padding:8px;border-bottom:1px solid #222;border-left:3px solid #22c55e">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+            <div style="font-size:9px;font-weight:bold">Aufschlag Solo Session</div>
+            <div style="background:#22c55e22;color:#22c55e;border-radius:4px;padding:1px 5px;font-size:7px">Aktiv</div>
+          </div>
+          <div style="font-size:7px;color:#888">Heute · 2/4 Übungen ·  ⏱ 18 Min</div>
+          <div style="background:#333;border-radius:2px;height:3px;margin-top:4px">
+            <div style="background:#22c55e;width:50%;height:3px;border-radius:2px"></div>
+          </div>
+        </div>
+        <!-- Historie -->
+        <div style="padding:8px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+            <div style="font-size:9px;color:#aaa">Sonntag RH Training</div>
+            <div style="font-size:7px;color:#22c55e">✓ 20. Apr</div>
+          </div>
+          <div style="font-size:7px;color:#888">4 Übungen · 55 Min · +18 Pkt</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Mein Training erstellen -->
+  <div style="text-align:center">
+    <div class="label" style="color:#22c55e">➕ Mein Training erstellen</div>
+    <div style="width:200px;background:#0f0f1a;border-radius:20px;padding:12px;border:2px solid #22c55e;color:#fff;font-size:11px;margin:0 auto">
+
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
+        <div style="font-size:14px;color:#888">←</div>
+        <div style="font-size:11px;font-weight:bold;flex:1">Neues Training</div>
+        <div style="background:#333;color:#888;border-radius:5px;padding:3px 7px;font-size:7px">✕</div>
+      </div>
+
+      <!-- Name -->
+      <div style="background:#1a1a2e;border-radius:8px;padding:7px;margin-bottom:6px">
+        <div style="font-size:7px;color:#888;margin-bottom:3px">NAME</div>
+        <div style="font-size:10px;color:#fff;border-bottom:1px solid #333;padding-bottom:3px">Freitag Abend Training</div>
+      </div>
+
+      <!-- Datum -->
+      <div style="display:flex;gap:4px;margin-bottom:6px">
+        <div style="flex:1;background:#1a1a2e;border-radius:8px;padding:7px">
+          <div style="font-size:7px;color:#888;margin-bottom:3px">DATUM</div>
+          <div style="font-size:10px">Fr 24. Apr</div>
+        </div>
+        <div style="flex:1;background:#1a1a2e;border-radius:8px;padding:7px">
+          <div style="font-size:7px;color:#888;margin-bottom:3px">UHRZEIT</div>
+          <div style="font-size:10px">18:30</div>
+        </div>
+      </div>
+
+      <!-- Übungen + Lernpfade hinzufügen -->
+      <div style="background:#1a1a2e;border-radius:8px;padding:7px;margin-bottom:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+          <div style="font-size:8px;color:#888;font-weight:bold">ÜBUNGEN (3)</div>
+          <div style="font-size:8px;color:#22c55e">+ hinzufügen</div>
+        </div>
+        <!-- Drag handles -->
+        <div style="background:#111;border-radius:5px;padding:5px 6px;margin-bottom:3px;display:flex;align-items:center;gap:5px">
+          <div style="font-size:10px;color:#555">≡</div>
+          <div style="flex:1">
+            <div style="font-size:8px;font-weight:bold">Rückhand Topspin Grundform</div>
+            <div style="font-size:7px;color:#888">15 Min · +2 Pkt</div>
+          </div>
+          <div style="font-size:9px;color:#ef4444">✕</div>
+        </div>
+        <div style="background:#111;border-radius:5px;padding:5px 6px;margin-bottom:3px;display:flex;align-items:center;gap:5px">
+          <div style="font-size:10px;color:#555">≡</div>
+          <div style="flex:1">
+            <div style="font-size:8px;font-weight:bold">Vorhand Block</div>
+            <div style="font-size:7px;color:#888">20 Min · +2 Pkt</div>
+          </div>
+          <div style="font-size:9px;color:#ef4444">✕</div>
+        </div>
+        <div style="background:#111;border-radius:5px;padding:5px 6px;display:flex;align-items:center;gap:5px">
+          <div style="font-size:10px;color:#555">≡</div>
+          <div style="flex:1">
+            <div style="font-size:8px;font-weight:bold">Aufschlag Unterschnitt</div>
+            <div style="font-size:7px;color:#888">15 Min · +2 Pkt</div>
+          </div>
+          <div style="font-size:9px;color:#ef4444">✕</div>
+        </div>
+      </div>
+
+      <!-- Zusammenfassung -->
+      <div style="background:#22c55e11;border:1px solid #22c55e33;border-radius:8px;padding:7px;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;font-size:8px">
+          <div><div style="color:#22c55e;font-weight:bold">50 Min</div><div style="color:#888;font-size:7px">Dauer</div></div>
+          <div><div style="color:#22c55e;font-weight:bold">3</div><div style="color:#888;font-size:7px">Übungen</div></div>
+          <div><div style="color:#f59e0b;font-weight:bold">+6 Pkt</div><div style="color:#888;font-size:7px">Möglich</div></div>
+        </div>
+      </div>
+
+      <div style="background:#22c55e;color:#111;border-radius:7px;padding:7px;text-align:center;font-size:9px;font-weight:bold">
+        ✓ Training speichern
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Training durchführen / abhaken -->
+  <div style="text-align:center">
+    <div class="label" style="color:#f59e0b">▶ Training durchführen</div>
+    <div style="width:200px;background:#0f0f1a;border-radius:20px;padding:12px;border:2px solid #f59e0b;color:#fff;font-size:11px;margin:0 auto">
+
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+        <div style="font-size:14px;color:#888">←</div>
+        <div style="flex:1">
+          <div style="font-size:10px;font-weight:bold">Aufschlag Solo Session</div>
+          <div style="font-size:7px;color:#888">Heute · ⏱ 18:23 aktiv</div>
+        </div>
+        <div style="background:#ef444422;color:#ef4444;border-radius:5px;padding:3px 7px;font-size:8px;font-weight:bold">■ Stop</div>
+      </div>
+
+      <!-- Fortschritt -->
+      <div style="background:#1a1a2e;border-radius:8px;padding:7px;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+          <div style="font-size:8px;color:#22c55e;font-weight:bold">2 von 4 gemacht</div>
+          <div style="font-size:8px;color:#f59e0b">+4 Pkt bisher</div>
+        </div>
+        <div style="background:#333;border-radius:4px;height:6px">
+          <div style="background:#22c55e;width:50%;height:6px;border-radius:4px"></div>
+        </div>
+      </div>
+
+      <!-- Übungen mit Checkbox -->
+      <div style="background:#1a1a2e;border-radius:8px;overflow:hidden;margin-bottom:8px">
+        <div style="padding:7px 8px;border-bottom:1px solid #222;display:flex;align-items:center;gap:6px">
+          <div style="width:18px;height:18px;background:#22c55e;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold;color:#111;flex-shrink:0">✓</div>
+          <div style="flex:1">
+            <div style="font-size:8px;color:#666;text-decoration:line-through">Aufschlag Unterschnitt</div>
+            <div style="font-size:7px;color:#555">15 Min · +2 Pkt</div>
+          </div>
+        </div>
+        <div style="padding:7px 8px;border-bottom:1px solid #222;display:flex;align-items:center;gap:6px">
+          <div style="width:18px;height:18px;background:#22c55e;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold;color:#111;flex-shrink:0">✓</div>
+          <div style="flex:1">
+            <div style="font-size:8px;color:#666;text-decoration:line-through">Aufschlag Seitschnitt</div>
+            <div style="font-size:7px;color:#555">10 Min · +2 Pkt</div>
+          </div>
+        </div>
+        <div style="padding:7px 8px;border-bottom:1px solid #222;display:flex;align-items:center;gap:6px;background:#f59e0b11">
+          <div style="width:18px;height:18px;background:#1a1a2e;border:2px solid #f59e0b;border-radius:4px;flex-shrink:0"></div>
+          <div style="flex:1">
+            <div style="font-size:8px;font-weight:bold">Aufschlag Topspin</div>
+            <div style="font-size:7px;color:#f59e0b">15 Min · jetzt dran</div>
+          </div>
+          <div style="font-size:10px;color:#f59e0b">▶</div>
+        </div>
+        <div style="padding:7px 8px;display:flex;align-items:center;gap:6px;opacity:0.6">
+          <div style="width:18px;height:18px;background:#1a1a2e;border:2px solid #555;border-radius:4px;flex-shrink:0"></div>
+          <div style="flex:1">
+            <div style="font-size:8px;color:#888">Aufschlag Kombinationen</div>
+            <div style="font-size:7px;color:#555">15 Min · +2 Pkt</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notiz -->
+      <div style="background:#1a1a2e;border-radius:8px;padding:7px;margin-bottom:8px">
+        <div style="font-size:7px;color:#888;margin-bottom:3px">NOTIZ (optional)</div>
+        <div style="font-size:8px;color:#555">Notiz hinzufügen...</div>
+      </div>
+
+      <!-- Aktionen -->
+      <div style="display:flex;gap:4px">
+        <div style="flex:1;background:#22c55e;color:#111;border-radius:7px;padding:7px;text-align:center;font-size:9px;font-weight:bold">✓ Abschließen</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:14px;padding:10px;background:#0f2027;border-radius:8px;font-size:10px;color:#aaa;text-align:center">
+  Quick Start Timer · Drag & Drop Reihenfolge · Live Checkbox · Notiz · Summary Punkte
+</div>

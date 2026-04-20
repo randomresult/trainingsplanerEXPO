@@ -1,0 +1,119 @@
+<h2>Ranglisten-Tabs</h2>
+<p class="subtitle">Wieviele Tabs, welche Kategorien?</p>
+
+<div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;align-items:flex-start">
+
+  <!-- Option A: 2 Tabs -->
+  <div style="text-align:center">
+    <div class="label" style="color:#888">Option A — 2 Tabs</div>
+    <div style="width:185px;background:#0f0f1a;border-radius:20px;padding:10px;border:2px solid #444;font-size:11px;color:#fff;margin:0 auto">
+      <div style="display:flex;background:#1a1a2e;border-radius:8px;padding:2px;margin-bottom:8px">
+        <div style="flex:1;background:#f59e0b;color:#111;border-radius:6px;padding:4px;text-align:center;font-size:8px;font-weight:bold">Punkte</div>
+        <div style="flex:1;color:#888;padding:4px;text-align:center;font-size:8px">Anwesenheit</div>
+      </div>
+      <div style="font-size:9px;color:#888;text-align:center;padding:20px 0">
+        Punkte = beide Tracks<br><br>
+        Anwesenheit = Vereinstraining<br>nur Gesamt
+      </div>
+    </div>
+  </div>
+
+  <!-- Option B: 3 Tabs Punkte + Anwesenheit + Eigentraining -->
+  <div style="text-align:center">
+    <div class="label" style="color:#6c47ff">Option B — 3 Tabs</div>
+    <div style="width:185px;background:#0f0f1a;border-radius:20px;padding:10px;border:2px solid #6c47ff;font-size:11px;color:#fff;margin:0 auto">
+      <div style="display:flex;background:#1a1a2e;border-radius:6px;padding:2px;margin-bottom:8px;gap:2px">
+        <div style="flex:1;background:#f59e0b;color:#111;border-radius:4px;padding:3px;text-align:center;font-size:7px;font-weight:bold">Punkte</div>
+        <div style="flex:1;color:#888;padding:3px;text-align:center;font-size:7px">Anwesen.</div>
+        <div style="flex:1;color:#888;padding:3px;text-align:center;font-size:7px">Eigentr.</div>
+      </div>
+
+      <!-- Punkte Inhalt (aktiv) -->
+      <div style="font-size:8px;color:#888;margin-bottom:6px;text-align:center">Aktiv: Punkte-Tab</div>
+
+      <!-- Mini Podium -->
+      <div style="display:flex;align-items:flex-end;justify-content:center;gap:3px;margin-bottom:6px">
+        <div style="text-align:center;width:50px">
+          <div style="background:#1a1a2e;border-radius:6px;padding:3px"><div style="font-size:14px">🥈</div><div style="font-size:7px">Anna</div><div style="font-size:8px;color:#aaa">720</div></div>
+          <div style="background:#aaa;height:22px;border-radius:3px 3px 0 0"></div>
+        </div>
+        <div style="text-align:center;width:58px">
+          <div style="background:#2a1a3e;border-radius:6px;padding:3px;border:1px solid #f59e0b"><div style="font-size:18px">🥇</div><div style="font-size:7px;font-weight:bold">Max</div><div style="font-size:9px;color:#f59e0b;font-weight:bold">890</div></div>
+          <div style="background:#f59e0b;height:35px;border-radius:3px 3px 0 0"></div>
+        </div>
+        <div style="text-align:center;width:50px">
+          <div style="background:#1a1a2e;border-radius:6px;padding:3px"><div style="font-size:14px">🥉</div><div style="font-size:7px">Tom</div><div style="font-size:8px;color:#cd7f32">680</div></div>
+          <div style="background:#cd7f32;height:16px;border-radius:3px 3px 0 0"></div>
+        </div>
+      </div>
+
+      <!-- Liste mit Stacked Bar -->
+      <div style="background:#1a1a2e;border-radius:6px;overflow:hidden">
+        <div style="padding:4px 6px;border-bottom:1px solid #222">
+          <div style="display:flex;gap:4px;margin-bottom:2px"><div style="color:#888;font-size:8px;width:10px">4</div><div style="flex:1;font-size:8px">Lisa M.</div><div style="font-size:8px;color:#aaa">620</div></div>
+          <div style="background:#333;border-radius:2px;height:4px;overflow:hidden;margin-left:14px"><div style="display:flex;height:4px"><div style="background:#6c47ff;width:75%"></div><div style="background:#22c55e;width:25%"></div></div></div>
+        </div>
+        <div style="padding:4px 6px;background:#6c47ff15">
+          <div style="display:flex;gap:4px;margin-bottom:2px"><div style="color:#6c47ff;font-size:8px;font-weight:bold;width:10px">5</div><div style="flex:1;font-size:8px;color:#6c47ff;font-weight:bold">Du</div><div style="font-size:8px;color:#6c47ff;font-weight:bold">580</div></div>
+          <div style="background:#333;border-radius:2px;height:4px;overflow:hidden;margin-left:14px"><div style="display:flex;height:4px"><div style="background:#6c47ff;width:70%"></div><div style="background:#22c55e;width:30%"></div></div></div>
+          <div style="display:flex;gap:6px;margin-top:2px;margin-left:14px"><div style="font-size:6px;color:#6c47ff">406 Verein</div><div style="font-size:6px;color:#22c55e">174 Eigen</div></div>
+        </div>
+      </div>
+
+      <div style="margin-top:6px;font-size:8px;color:#888;text-align:center">
+        Anwesenheit: Gesamt (kein Filter)<br>
+        Eigentraining: selbst geloggt, 🔔 unverified
+      </div>
+    </div>
+  </div>
+
+  <!-- Option C: 3 Tabs anders benannt -->
+  <div style="text-align:center">
+    <div class="label" style="color:#22c55e">Option C — Verein / Eigen / Gesamt</div>
+    <div style="width:185px;background:#0f0f1a;border-radius:20px;padding:10px;border:2px solid #22c55e;font-size:11px;color:#fff;margin:0 auto">
+      <div style="display:flex;background:#1a1a2e;border-radius:6px;padding:2px;margin-bottom:8px;gap:2px">
+        <div style="flex:1;background:#6c47ff;color:#fff;border-radius:4px;padding:3px;text-align:center;font-size:7px;font-weight:bold">🏛 Verein</div>
+        <div style="flex:1;color:#888;padding:3px;text-align:center;font-size:7px">🏠 Eigen</div>
+        <div style="flex:1;color:#888;padding:3px;text-align:center;font-size:7px">⭐ Gesamt</div>
+      </div>
+
+      <!-- Verein Tab (Anwesenheit) aktiv -->
+      <div style="font-size:8px;color:#6c47ff;margin-bottom:5px;text-align:center;font-weight:bold">Vereinstraining — Anwesenheit</div>
+      <div style="background:#1a1a2e;border-radius:6px;overflow:hidden;margin-bottom:6px">
+        <div style="padding:4px 7px;border-bottom:1px solid #222">
+          <div style="display:flex;align-items:center;gap:3px;margin-bottom:2px"><div style="color:#f59e0b;font-size:8px;width:10px">1</div><div style="flex:1;font-size:8px;font-weight:bold">Anna K.</div><div style="font-size:8px;color:#22c55e">12/12</div></div>
+          <div style="background:#333;border-radius:2px;height:4px"><div style="background:#22c55e;width:100%;height:4px;border-radius:2px"></div></div>
+        </div>
+        <div style="padding:4px 7px;border-bottom:1px solid #222;background:#6c47ff15">
+          <div style="display:flex;align-items:center;gap:3px;margin-bottom:2px"><div style="color:#6c47ff;font-size:8px;font-weight:bold;width:10px">2</div><div style="flex:1;font-size:8px;color:#6c47ff;font-weight:bold">Du</div><div style="font-size:8px;color:#22c55e;font-weight:bold">10/12</div></div>
+          <div style="background:#333;border-radius:2px;height:4px"><div style="background:#6c47ff;width:83%;height:4px;border-radius:2px"></div></div>
+        </div>
+        <div style="padding:4px 7px">
+          <div style="display:flex;align-items:center;gap:3px;margin-bottom:2px"><div style="color:#888;font-size:8px;width:10px">3</div><div style="flex:1;font-size:8px;color:#888">Tom S.</div><div style="font-size:8px;color:#aaa">8/12</div></div>
+          <div style="background:#333;border-radius:2px;height:4px"><div style="background:#aaa;width:67%;height:4px;border-radius:2px"></div></div>
+        </div>
+      </div>
+
+      <!-- Eigen Tab Preview -->
+      <div style="background:#1a1a2e;border-radius:6px;padding:6px;border:1px dashed #22c55e22">
+        <div style="font-size:7px;color:#22c55e;margin-bottom:3px">🏠 Eigentraining-Tab würde zeigen:</div>
+        <div style="font-size:7px;color:#888">• Stunden selbst trainiert<br>• Übungen solo gemacht<br>• ⚠️ Selbst gemeldet, unverified</div>
+      </div>
+
+      <div style="margin-top:6px">
+        <div style="display:flex;background:#1a1a2e;border-radius:6px;padding:2px;gap:2px">
+          <div style="flex:1;color:#888;padding:2px;text-align:center;font-size:7px">🏛 Verein</div>
+          <div style="flex:1;color:#888;padding:2px;text-align:center;font-size:7px">🏠 Eigen</div>
+          <div style="flex:1;background:#f59e0b;color:#111;border-radius:4px;padding:2px;text-align:center;font-size:7px;font-weight:bold">⭐ Gesamt</div>
+        </div>
+        <div style="font-size:7px;color:#888;text-align:center;margin-top:3px">Gesamt = kombinierte Punkte</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:14px;padding:10px;background:#0f2027;border-radius:8px;font-size:10px;color:#aaa;text-align:center">
+  <b style="color:#fff">Anwesenheit:</b> kein Woche/Monat-Filter, nur Gesamt &nbsp;|&nbsp;
+  <b style="color:#22c55e">Eigentraining-Rangliste:</b> selbst gemeldet — motivierend aber nicht verifiziert
+</div>
