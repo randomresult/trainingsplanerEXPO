@@ -11,6 +11,7 @@
   "dependencies": {
     "@tanstack/react-query": "^5.99.2",
     "axios": "^1.15.1",
+    "clsx": "^2.1.1",
     "expo": "~55.0.15",
     "expo-constants": "~55.0.14",
     "expo-linking": "~55.0.13",
