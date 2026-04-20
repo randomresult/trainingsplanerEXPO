@@ -7,25 +7,20 @@ import type { StrapiResponse } from '../types/api';
 
 export const useTrainings = () => {
   const user = useAuthStore((s) => s.user);
-  const clubId = user?.player?.Club?.documentId;
+  const clubId = user?.clubs?.[0]?.documentId;
 
   return useQuery({
     queryKey: ['trainings', clubId],
     queryFn: async () => {
+      // Strapi v5 users-permissions rejects filters on relations. Fetch and
+      // filter client-side.
       const { data } = await apiClient.get<StrapiResponse<Training[]>>('/trainings', {
-        params: {
-          filters: {
-            Club: {
-              documentId: {
-                $eq: clubId,
-              },
-            },
-          },
-          populate: ['exercises', 'players'],
-        },
+        params: { populate: '*' },
       });
 
-      return data.data;
+      return data.data.filter((t: any) =>
+        t.clubs?.some((c: any) => c.documentId === clubId)
+      );
     },
     enabled: !!clubId,
   });
@@ -36,9 +31,7 @@ export const useTrainingDetail = (id: string) => {
     queryKey: ['trainings', id],
     queryFn: async () => {
       const { data } = await apiClient.get<StrapiResponse<Training>>(`/trainings/${id}`, {
-        params: {
-          populate: ['exercises', 'players'],
-        },
+        params: { populate: '*' },
       });
 
       return data.data;
@@ -57,7 +50,7 @@ interface CreateTrainingInput {
 export const useCreateTraining = () => {
   const queryClient = useQueryClient();
   const user = useAuthStore((s) => s.user);
-  const clubId = user?.player?.Club?.documentId;
+  const clubId = user?.clubs?.[0]?.documentId;
 
   return useMutation({
     mutationFn: async (input: CreateTrainingInput) => {
@@ -66,7 +59,7 @@ export const useCreateTraining = () => {
           Name: input.name,
           Date: input.date,
           training_status: 'draft',
-          Club: {
+          clubs: {
             connect: [{ documentId: clubId }],
           },
           exercises: {
@@ -126,8 +119,8 @@ interface CompleteTrainingInput {
   sessionDuration: number;
   playerProgressData: Array<{
     playerId: string;
-    exerciseId: string;
-    points: number;
+    completedExerciseIds: string[];
+    pointsEarned: number;
   }>;
 }
 
@@ -136,27 +129,12 @@ export const useCompleteTraining = () => {
 
   return useMutation({
     mutationFn: async (input: CompleteTrainingInput) => {
-      // 1. Complete training
-      await apiClient.put(`/trainings/${input.trainingId}`, {
-        data: {
-          training_status: 'completed',
-          completedAt: new Date().toISOString(),
-          actualDuration: input.sessionDuration,
-        },
+      // Single transactional call — backend updates training + creates
+      // all player-progress entries atomically. Rolls back on any failure.
+      await apiClient.post(`/trainings/${input.trainingId}/complete`, {
+        actualDuration: input.sessionDuration,
+        playerProgressData: input.playerProgressData,
       });
-
-      // 2. Create player-progress entries
-      for (const progress of input.playerProgressData) {
-        await apiClient.post('/player-progresses', {
-          data: {
-            player: { connect: [{ documentId: progress.playerId }] },
-            exercise: { connect: [{ documentId: progress.exerciseId }] },
-            training: { connect: [{ documentId: input.trainingId }] },
-            Points: progress.points,
-          },
-        });
-      }
-
       return input.trainingId;
     },
     onSuccess: (trainingId) => {

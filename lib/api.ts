@@ -1,4 +1,5 @@
 import axios from 'axios';
+import qs from 'qs';
 import { storage } from './storage';
 
 const BASE_URL = 'https://trainingsplaner-strapi.onrender.com/api';
@@ -9,6 +10,7 @@ export const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
   timeout: 30000,
+  paramsSerializer: (params) => qs.stringify(params, { encodeValuesOnly: true }),
 });
 
 // JWT Request Interceptor

@@ -18,20 +18,24 @@ export default function ProfileScreen() {
         <View className="items-center mb-4">
           <View className="w-20 h-20 rounded-full bg-primary/10 items-center justify-center mb-3">
             <Text className="text-3xl font-bold text-primary">
-              {user?.username?.[0]?.toUpperCase() || 'T'}
+              {(user?.firstName?.[0] || user?.username?.[0] || 'T').toUpperCase()}
             </Text>
           </View>
           <Text className="text-xl font-semibold text-foreground mb-1">
-            {user?.username || 'Trainer'}
+            {[user?.firstName, user?.lastName].filter(Boolean).join(' ') ||
+              user?.username ||
+              'Trainer'}
           </Text>
           <Text className="text-sm text-muted-foreground">{user?.email || ''}</Text>
         </View>
 
-        {user?.player?.Club && (
+        {user?.clubs && user.clubs.length > 0 && (
           <View className="border-t border-border pt-3">
-            <Text className="text-xs text-muted-foreground mb-1">Verein</Text>
+            <Text className="text-xs text-muted-foreground mb-1">
+              {user.clubs.length === 1 ? 'Verein' : 'Vereine'}
+            </Text>
             <Text className="text-sm text-foreground font-semibold">
-              {user.player.Club.Name}
+              {user.clubs.map((c) => c.Name).join(', ')}
             </Text>
           </View>
         )}

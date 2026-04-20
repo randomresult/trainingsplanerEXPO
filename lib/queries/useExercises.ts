@@ -23,7 +23,7 @@ export const useExercises = (searchQuery?: string) => {
     queryKey: ['exercises', searchQuery],
     queryFn: async () => {
       const params: any = {
-        populate: 'focus',
+        populate: '*',
       };
 
       if (searchQuery) {
@@ -49,7 +49,7 @@ export const useExerciseDetail = (id: string) => {
     queryFn: async () => {
       const { data } = await apiClient.get<StrapiResponse<ExerciseRaw>>(`/exercises/${id}`, {
         params: {
-          populate: 'focus',
+          populate: '*',
         },
       });
 

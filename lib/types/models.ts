@@ -1,17 +1,18 @@
+export interface Club {
+  documentId: string;
+  Name: string;
+}
+
 export interface User {
   id: number;
+  documentId?: string;
   username: string;
   email: string;
-  isTrainer: boolean;
-  player: {
-    documentId: string;
-    firstname: string;
-    Name: string;
-    Club: {
-      documentId: string;
-      Name: string;
-    };
-  };
+  firstName?: string;
+  lastName?: string;
+  clubs?: Club[];
+  player?: Player | null;
+  role?: { name?: string } | null;
 }
 
 export interface Exercise {
@@ -37,10 +38,7 @@ export interface Player {
   Name: string;
   email: string;
   requiresInviteAcceptance: boolean;
-  Club: {
-    documentId: string;
-    Name: string;
-  };
+  Club?: Club | null;
 }
 
 export interface Training {
