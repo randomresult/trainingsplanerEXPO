@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Übungen - TT Trainingsplaner</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            padding-bottom: 80px;
+            padding-top: 276px;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: #0a0a0f;
+            border-bottom: 1px solid #1a1a24;
+            z-index: 100;
+        }
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .toggle-bar {
+            display: flex;
+            gap: 12px;
+        }
+        .toggle-btn {
+            flex: 1;
+            padding: 14px;
+            background: #1a1a24;
+            border: none;
+            border-radius: 12px;
+            color: #888;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .toggle-btn.active {
+            background: #6c47ff;
+            color: #fff;
+        }
+        .search-bar {
+            position: fixed;
+            top: 120px;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: #0a0a0f;
+            border-bottom: 1px solid #1a1a24;
+            z-index: 99;
+        }
+        .search-input {
+            width: 100%;
+            padding: 14px 20px 14px 50px;
+            background: #1a1a24;
+            border: 1px solid #333;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 15px;
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM18 18l-4-4' stroke='%23888' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 18px center;
+        }
+        .filter-chips {
+            position: fixed;
+            top: 202px;
+            left: 0;
+            right: 0;
+            padding: 16px 20px;
+            background: #0a0a0f;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            border-bottom: 1px solid #1a1a24;
+            z-index: 98;
+        }
+        .filter-chips::-webkit-scrollbar {
+            display: none;
+        }
+        .chip {
+            padding: 10px 18px;
+            background: #1a1a24;
+            border: 1px solid #333;
+            border-radius: 24px;
+            font-size: 14px;
+            color: #aaa;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        .chip.active {
+            background: #6c47ff33;
+            border-color: #6c47ff;
+            color: #6c47ff;
+        }
+        .content {
+            padding: 16px 0;
+        }
+        .exercise-card {
+            background: #1a1a24;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 0 20px 16px 20px;
+            border: 1px solid #2a2a3a;
+            position: relative;
+        }
+        .exercise-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .exercise-title {
+            flex: 1;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .favorite-btn {
+            font-size: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        .exercise-meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+        .meta-tag {
+            padding: 4px 8px;
+            background: #0f0f1a;
+            border-radius: 6px;
+            font-size: 11px;
+            color: #888;
+        }
+        .exercise-desc {
+            font-size: 13px;
+            color: #aaa;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        .exercise-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .exercise-time {
+            font-size: 13px;
+            color: #888;
+        }
+        .completed-badge {
+            font-size: 11px;
+            color: #22c55e;
+            background: #22c55e22;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+        .points-badge {
+            background: #6c47ff33;
+            color: #6c47ff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-left: auto;
+        }
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1a1a24;
+            border-top: 1px solid #2a2a3a;
+            display: flex;
+            padding: 8px 0;
+        }
+        .tab-item {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            text-decoration: none;
+            color: #888;
+        }
+        .tab-item.active {
+            color: #6c47ff;
+        }
+        .tab-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        .tab-label {
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-title">Bibliothek</div>
+        <div class="toggle-bar">
+            <button class="toggle-btn active">Übungen</button>
+            <button class="toggle-btn">Lernpfade</button>
+        </div>
+    </div>
+
+    <div class="search-bar">
+        <input type="text" class="search-input" placeholder="Übungen durchsuchen...">
+    </div>
+
+    <div class="filter-chips">
+        <div class="chip active">Alle</div>
+        <div class="chip">Aufschlag</div>
+        <div class="chip">Topspin</div>
+        <div class="chip">Block</div>
+        <div class="chip">Footwork</div>
+        <div class="chip">Anfänger</div>
+        <div class="chip">Fortgeschritten</div>
+    </div>
+
+    <div class="content">
+        <!-- Exercise 1 -->
+        <div class="exercise-card">
+            <div class="exercise-header">
+                <div class="exercise-title">Vorhand Topspin Grundform</div>
+                <button class="favorite-btn">⭐</button>
+            </div>
+            <div class="exercise-meta">
+                <span class="meta-tag">Topspin</span>
+                <span class="meta-tag">Anfänger</span>
+                <span class="meta-tag">Technik</span>
+            </div>
+            <div class="exercise-desc">
+                Grundlegende Topspin-Bewegung mit Fokus auf Hüftrotation und Balltreffpunkt.
+            </div>
+            <div class="exercise-footer">
+                <div class="exercise-time">⏱ 15 Min</div>
+                <div class="completed-badge">✓ 3x</div>
+                <div class="points-badge">+2 Pkt</div>
+            </div>
+        </div>
+
+        <!-- Exercise 2 -->
+        <div class="exercise-card">
+            <div class="exercise-header">
+                <div class="exercise-title">Aufschlag Varianten Mix</div>
+                <button class="favorite-btn">☆</button>
+            </div>
+            <div class="exercise-meta">
+                <span class="meta-tag">Aufschlag</span>
+                <span class="meta-tag">Fortgeschritten</span>
+                <span class="meta-tag">Taktik</span>
+            </div>
+            <div class="exercise-desc">
+                Verschiedene Aufschlagarten kombinieren: kurz, lang, Seitenschnitt, Unterschnitt.
+            </div>
+            <div class="exercise-footer">
+                <div class="exercise-time">⏱ 20 Min</div>
+                <div class="points-badge">+2 Pkt</div>
+            </div>
+        </div>
+
+        <!-- Exercise 3 -->
+        <div class="exercise-card">
+            <div class="exercise-header">
+                <div class="exercise-title">Block gegen Topspin</div>
+                <button class="favorite-btn">☆</button>
+            </div>
+            <div class="exercise-meta">
+                <span class="meta-tag">Block</span>
+                <span class="meta-tag">Anfänger</span>
+                <span class="meta-tag">Technik</span>
+            </div>
+            <div class="exercise-desc">
+                Passiver Block mit korrekter Schlägerhaltung und Timing gegen mittlere Topspins.
+            </div>
+            <div class="exercise-footer">
+                <div class="exercise-time">⏱ 12 Min</div>
+                <div class="points-badge">+2 Pkt</div>
+            </div>
+        </div>
+
+        <!-- Exercise 4 -->
+        <div class="exercise-card">
+            <div class="exercise-header">
+                <div class="exercise-title">Footwork Diagonal</div>
+                <button class="favorite-btn">⭐</button>
+            </div>
+            <div class="exercise-meta">
+                <span class="meta-tag">Footwork</span>
+                <span class="meta-tag">Fortgeschritten</span>
+                <span class="meta-tag">Kondition</span>
+            </div>
+            <div class="exercise-desc">
+                Schnelle Beinarbeit von Vorhand auf Rückhand diagonal mit Topspinschlag.
+            </div>
+            <div class="exercise-footer">
+                <div class="exercise-time">⏱ 18 Min</div>
+                <div class="completed-badge">✓ 5x</div>
+                <div class="points-badge">+2 Pkt</div>
+            </div>
+        </div>
+
+        <!-- Exercise 5 -->
+        <div class="exercise-card">
+            <div class="exercise-header">
+                <div class="exercise-title">Rückhand Konter</div>
+                <button class="favorite-btn">☆</button>
+            </div>
+            <div class="exercise-meta">
+                <span class="meta-tag">Rückhand</span>
+                <span class="meta-tag">Anfänger</span>
+                <span class="meta-tag">Technik</span>
+            </div>
+            <div class="exercise-desc">
+                Kurzer, schneller Konter aus der Rückhand mit Fokus auf Handgelenk-Rotation.
+            </div>
+            <div class="exercise-footer">
+                <div class="exercise-time">⏱ 10 Min</div>
+                <div class="points-badge">+2 Pkt</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+        <a href="mvp-dashboard-player.html" class="tab-item">
+            <div class="tab-icon">🏠</div>
+            <div class="tab-label">Home</div>
+        </a>
+        <a href="mvp-library-exercises.html" class="tab-item active">
+            <div class="tab-icon">📚</div>
+            <div class="tab-label">Bibliothek</div>
+        </a>
+        <a href="mvp-training-list-player.html" class="tab-item">
+            <div class="tab-icon">🏋️</div>
+            <div class="tab-label">Training</div>
+        </a>
+        <a href="mvp-profile.html" class="tab-item">
+            <div class="tab-icon">👤</div>
+            <div class="tab-label">Profil</div>
+        </a>
+    </div>
+</body>
+</html>

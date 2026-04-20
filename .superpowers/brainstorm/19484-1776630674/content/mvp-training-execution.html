@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training Execution - TT Trainingsplaner</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            padding-bottom: 100px;
+        }
+        .header {
+            position: sticky;
+            top: 0;
+            padding: 16px 20px;
+            background: #0a0a0f;
+            border-bottom: 1px solid #1a1a24;
+            z-index: 10;
+        }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .close-btn {
+            font-size: 24px;
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+        }
+        .timer {
+            font-size: 24px;
+            font-weight: 700;
+            color: #f59e0b;
+        }
+        .stop-btn {
+            background: #ef444422;
+            color: #ef4444;
+            border: none;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .progress-info {
+            font-size: 13px;
+            color: #22c55e;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .progress-bar {
+            background: #333;
+            border-radius: 4px;
+            height: 6px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: #22c55e;
+            height: 100%;
+            border-radius: 4px;
+            width: 33%;
+        }
+        .content {
+            padding: 20px;
+        }
+        .section {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        .section.lernpfad {
+            border-left: 3px solid #22c55e;
+        }
+        .section.exercises {
+            border-left: 3px solid #6c47ff;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 0 4px;
+        }
+        .section-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .section-title.lernpfad {
+            color: #22c55e;
+        }
+        .section-title.exercises {
+            color: #6c47ff;
+        }
+        .section-count {
+            font-size: 11px;
+            font-weight: 700;
+            color: #6c47ff;
+        }
+        .step-item {
+            background: #111;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .step-item.completed {
+            opacity: 1;
+        }
+        .step-item.active {
+            background: #f59e0b22;
+            border: 1px solid #f59e0b;
+        }
+        .step-item.pending {
+            opacity: 0.6;
+        }
+        .step-checkbox {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .step-checkbox.completed {
+            background: #22c55e;
+            color: #111;
+        }
+        .step-checkbox.active {
+            background: #1a1a2e;
+            border: 2px solid #f59e0b;
+        }
+        .step-checkbox.pending {
+            background: #1a1a2e;
+            border: 2px solid #555;
+        }
+        .step-name {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .step-name.completed {
+            text-decoration: line-through;
+            color: #aaa;
+        }
+        .step-name.active {
+            color: #fff;
+        }
+        .step-name.pending {
+            color: #aaa;
+        }
+        .step-timer {
+            background: #0f0f1a;
+            border: 1px solid;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 11px;
+        }
+        .step-timer.completed {
+            border-color: #6c47ff55;
+            color: #6c47ff;
+        }
+        .step-timer.active {
+            border-color: #f59e0b55;
+            color: #f59e0b;
+        }
+        .step-timer.pending {
+            border-color: #333;
+            color: #888;
+        }
+        .step-points {
+            background: #f59e0b22;
+            color: #f59e0b;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px 20px;
+            background: #1a1a24;
+            border-top: 1px solid #2a2a3a;
+        }
+        .button-row {
+            display: flex;
+            gap: 12px;
+        }
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-secondary {
+            background: #1a1a2e;
+            color: #aaa;
+            border: 1px solid #333;
+        }
+        .btn-primary {
+            background: #6c47ff;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-top">
+            <button class="close-btn">←</button>
+            <div style="flex: 1; text-align: center;">
+                <div style="font-size: 14px; font-weight: 600; margin-bottom: 2px;">Jugendtraining</div>
+                <div class="timer">32:18</div>
+            </div>
+            <button class="stop-btn">■</button>
+        </div>
+        <div class="progress-info">4/7 Übungen · +12 Pkt</div>
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+    </div>
+
+    <div class="content">
+        <!-- Training Info Box -->
+        <div style="background: #1a1a24; border-radius: 12px; padding: 14px; margin-bottom: 16px; border: 1px solid #2a2a3a;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div>
+                    <div style="font-size: 11px; color: #888; margin-bottom: 4px;">📅 Mo 21. Apr · 18:00 · 📍 Halle 1</div>
+                    <div style="font-size: 13px; color: #6c47ff; font-weight: 600;">Du bist Trainer</div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <div style="width: 24px; height: 24px; border-radius: 50%; background: #6c47ff; display: flex; align-items: center; justify-content: center; font-size: 12px; margin-left: 0;">👦</div>
+                <div style="width: 24px; height: 24px; border-radius: 50%; background: #6c47ff; display: flex; align-items: center; justify-content: center; font-size: 12px; margin-left: -8px;">👧</div>
+                <div style="width: 24px; height: 24px; border-radius: 50%; background: #6c47ff; display: flex; align-items: center; justify-content: center; font-size: 12px; margin-left: -8px;">👦</div>
+                <div style="width: 24px; height: 24px; border-radius: 50%; background: #6c47ff; display: flex; align-items: center; justify-content: center; font-size: 12px; margin-left: -8px;">👧</div>
+                <div style="width: 24px; height: 24px; border-radius: 50%; background: #888; display: flex; align-items: center; justify-content: center; font-size: 10px; margin-left: -8px; font-weight: 700;">+4</div>
+                <div style="font-size: 12px; color: #888; margin-left: 4px;">8 Teilnehmer</div>
+            </div>
+        </div>
+
+        <!-- Lernpfad Section -->
+        <div class="section lernpfad">
+            <div class="section-header">
+                <div class="section-title lernpfad">📋 LERNPFAD · VH Topspin Basics</div>
+                <div class="section-count">3/5</div>
+            </div>
+
+            <!-- Step 1 - Completed -->
+            <div class="step-item completed">
+                <div class="step-checkbox completed">✓</div>
+                <div class="step-name completed">VH Topspin Grundform</div>
+                <div class="step-timer completed">⏱ 20m ✎</div>
+                <div class="step-points">+4</div>
+            </div>
+
+            <!-- Step 2 - Active -->
+            <div class="step-item active">
+                <div class="step-checkbox active"></div>
+                <div class="step-name active">Topspin gegen Block</div>
+                <div class="step-timer active">⏱ 18m ✎</div>
+                <div class="step-points">+2</div>
+            </div>
+
+            <!-- Step 3 - Pending -->
+            <div class="step-item pending">
+                <div class="step-checkbox pending"></div>
+                <div class="step-name pending">Topspin Diagonal</div>
+                <div class="step-timer pending">⏱ 15m</div>
+                <div class="step-points">+2</div>
+            </div>
+        </div>
+
+        <!-- Übungen Section -->
+        <div class="section exercises">
+            <div class="section-header">
+                <div class="section-title exercises">💪 ÜBUNGEN</div>
+            </div>
+
+            <!-- Exercise 1 - Completed -->
+            <div class="step-item completed">
+                <div class="step-checkbox completed">✓</div>
+                <div class="step-name completed">Footwork Diagonal</div>
+                <div class="step-timer completed">⏱ 18m ✎</div>
+                <div class="step-points">+2</div>
+            </div>
+
+            <!-- Exercise 2 - Pending -->
+            <div class="step-item pending">
+                <div class="step-checkbox pending"></div>
+                <div class="step-name pending">Block gegen Topspin</div>
+                <div class="step-timer pending">⏱ 12m</div>
+                <div class="step-points">+2</div>
+            </div>
+
+            <!-- Exercise 3 - Pending -->
+            <div class="step-item pending">
+                <div class="step-checkbox pending"></div>
+                <div class="step-name pending">Aufschlag Varianten Mix</div>
+                <div class="step-timer pending">⏱ 18m</div>
+                <div class="step-points">+2</div>
+            </div>
+
+            <!-- Exercise 4 - Pending -->
+            <div class="step-item pending">
+                <div class="step-checkbox pending"></div>
+                <div class="step-name pending">Rückhand Konter</div>
+                <div class="step-timer pending">⏱ 12m</div>
+                <div class="step-points">+2</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-bar">
+        <button class="btn btn-primary" style="width: 100%;">✓ Training abschließen</button>
+    </div>
+</body>
+</html>

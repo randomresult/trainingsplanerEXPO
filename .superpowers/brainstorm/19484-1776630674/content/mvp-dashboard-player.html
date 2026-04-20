@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - TT Trainingsplaner</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            padding-bottom: 80px;
+        }
+        .header {
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1a1a24;
+        }
+        .header-left {
+            flex: 1;
+        }
+        .header-name {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .header-club {
+            font-size: 12px;
+            color: #888;
+            margin-top: 2px;
+        }
+        .header-streak {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #1a1a24;
+            padding: 8px 12px;
+            border-radius: 20px;
+        }
+        .streak-icon {
+            font-size: 20px;
+        }
+        .streak-text {
+            font-size: 16px;
+            font-weight: 700;
+            color: #f59e0b;
+        }
+        .content {
+            padding: 20px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: #1a1a24;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .stat-value.orange { color: #f59e0b; }
+        .stat-value.green { color: #22c55e; }
+        .stat-value.purple { color: #6c47ff; }
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+        }
+        .section {
+            margin-bottom: 24px;
+        }
+        .section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        .next-training {
+            background: #1a1a24;
+            border-radius: 12px;
+            padding: 16px;
+            border-left: 4px solid #6c47ff;
+        }
+        .next-training-label {
+            font-size: 11px;
+            color: #6c47ff;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        .next-training-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .next-training-meta {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 12px;
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: #6c47ff;
+            color: #fff;
+        }
+        .lernpfad-card {
+            background: #1a1a24;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+        .lernpfad-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .lernpfad-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .lernpfad-progress {
+            font-size: 13px;
+            color: #6c47ff;
+            font-weight: 600;
+        }
+        .progress-bar {
+            background: #0f0f1a;
+            border-radius: 4px;
+            height: 6px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: #6c47ff;
+            height: 100%;
+            border-radius: 4px;
+        }
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .badge-card {
+            background: #1a1a24;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+        .badge-card.highlight {
+            border-color: #f59e0b;
+        }
+        .badge-icon {
+            font-size: 32px;
+            margin-bottom: 6px;
+        }
+        .badge-label {
+            font-size: 11px;
+            color: #888;
+        }
+        .badge-card.highlight .badge-label {
+            color: #f59e0b;
+        }
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1a1a24;
+            border-top: 1px solid #2a2a3a;
+            display: flex;
+            padding: 8px 0;
+        }
+        .tab-item {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            text-decoration: none;
+            color: #888;
+        }
+        .tab-item.active {
+            color: #6c47ff;
+        }
+        .tab-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        .tab-label {
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <div class="header-name">Hallo, Max 👋</div>
+            <div class="header-club">TTC Musterstadt</div>
+        </div>
+    </div>
+
+    <div class="content">
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value orange">580</div>
+                <div class="stat-label">Punkte</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value green">24</div>
+                <div class="stat-label">Trainings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value purple">18.5h</div>
+                <div class="stat-label">Zeit</div>
+            </div>
+        </div>
+
+        <!-- Nächstes Training -->
+        <div class="section">
+            <div class="next-training">
+                <div class="next-training-label">Nächstes Training</div>
+                <div class="next-training-name">Dienstag Abend</div>
+                <div class="next-training-meta">Di 22. Apr · 19:00 · 4 Übungen</div>
+                <button class="btn btn-primary">Öffnen</button>
+            </div>
+        </div>
+
+        <!-- Aktive Lernpfade -->
+        <div class="section">
+            <div class="section-title">Aktive Lernpfade</div>
+            <div class="lernpfad-card">
+                <div class="lernpfad-header">
+                    <div class="lernpfad-name">VH Topspin Basics</div>
+                    <div class="lernpfad-progress">3/5</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 60%"></div>
+                </div>
+            </div>
+            <div class="lernpfad-card">
+                <div class="lernpfad-header">
+                    <div class="lernpfad-name">Aufschlag Varianten</div>
+                    <div class="lernpfad-progress">1/6</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 17%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Erfolge -->
+        <div class="section">
+            <div class="section-title">Erfolge</div>
+            <div class="badges-grid">
+                <div class="badge-card highlight">
+                    <div class="badge-icon">🔥</div>
+                    <div class="badge-label">7 Tage</div>
+                </div>
+                <div class="badge-card">
+                    <div class="badge-icon">✅</div>
+                    <div class="badge-label">Lernpfad</div>
+                </div>
+                <div class="badge-card">
+                    <div class="badge-icon">💪</div>
+                    <div class="badge-label">10 Trainings</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+        <a href="mvp-dashboard-player.html" class="tab-item active">
+            <div class="tab-icon">🏠</div>
+            <div class="tab-label">Home</div>
+        </a>
+        <a href="mvp-library-exercises.html" class="tab-item">
+            <div class="tab-icon">📚</div>
+            <div class="tab-label">Bibliothek</div>
+        </a>
+        <a href="mvp-training-list-player.html" class="tab-item">
+            <div class="tab-icon">🏋️</div>
+            <div class="tab-label">Training</div>
+        </a>
+        <a href="mvp-profile.html" class="tab-item">
+            <div class="tab-icon">👤</div>
+            <div class="tab-label">Profil</div>
+        </a>
+    </div>
+</body>
+</html>

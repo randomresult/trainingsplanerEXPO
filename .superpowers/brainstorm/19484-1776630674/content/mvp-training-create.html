@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training erstellen - TT Trainingsplaner</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            padding-bottom: 100px;
+        }
+        .header {
+            position: sticky;
+            top: 0;
+            padding: 16px 20px;
+            background: #0a0a0f;
+            border-bottom: 1px solid #1a1a24;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        .back-btn {
+            font-size: 24px;
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+        }
+        .header-title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 700;
+            text-align: center;
+        }
+        .close-btn {
+            font-size: 20px;
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+        }
+        .content {
+            padding: 20px;
+        }
+        .form-section {
+            margin-bottom: 24px;
+        }
+        .form-label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        .input-field {
+            background: #1a1a24;
+            border: 1px solid #2a2a3a;
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: #fff;
+            font-size: 15px;
+            width: 100%;
+        }
+        .input-field::placeholder {
+            color: #555;
+        }
+        .input-row {
+            display: flex;
+            gap: 12px;
+        }
+        .input-row > div {
+            flex: 1;
+        }
+        .exercises-section {
+            background: #1a1a24;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .exercises-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .exercises-title {
+            font-size: 12px;
+            color: #888;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .add-btn {
+            font-size: 13px;
+            color: #6c47ff;
+            font-weight: 600;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .exercise-item {
+            background: #111;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .drag-handle {
+            font-size: 18px;
+            color: #555;
+            cursor: grab;
+        }
+        .exercise-content {
+            flex: 1;
+        }
+        .exercise-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .exercise-meta {
+            font-size: 12px;
+            color: #888;
+        }
+        .remove-btn {
+            font-size: 16px;
+            color: #ef4444;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .summary-box {
+            background: #6c47ff11;
+            border: 1px solid #6c47ff33;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            text-align: center;
+        }
+        .summary-value {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .summary-value.purple { color: #6c47ff; }
+        .summary-value.orange { color: #f59e0b; }
+        .summary-label {
+            font-size: 11px;
+            color: #888;
+        }
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px 20px;
+            background: #1a1a24;
+            border-top: 1px solid #2a2a3a;
+        }
+        .btn-save {
+            width: 100%;
+            padding: 16px;
+            background: #6c47ff;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="back-btn" onclick="window.location.href='mvp-training-list-trainer.html'">←</button>
+        <div class="header-title">Neues Training</div>
+        <button class="close-btn">×</button>
+    </div>
+
+    <div class="content">
+        <div class="form-section">
+            <div class="form-label">Name</div>
+            <input type="text" class="input-field" placeholder="z.B. Jugendtraining" value="Freitag Abend Training">
+        </div>
+
+        <div class="form-section">
+            <div class="input-row">
+                <div>
+                    <div class="form-label">Datum</div>
+                    <input type="text" class="input-field" value="Fr 24. Apr">
+                </div>
+                <div>
+                    <div class="form-label">Uhrzeit</div>
+                    <input type="text" class="input-field" value="18:30">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="form-label">Ort</div>
+            <input type="text" class="input-field" placeholder="z.B. Halle 1" value="Halle 1">
+        </div>
+
+        <div class="form-section">
+            <div class="exercises-section" style="border-left: 3px solid #22c55e; margin-bottom: 12px;">
+                <div class="exercises-header">
+                    <div class="exercises-title" style="color: #22c55e;">📋 Lernpfade (1)</div>
+                    <button class="add-btn" style="color: #22c55e;">+ Hinzufügen</button>
+                </div>
+
+                <div class="exercise-item">
+                    <div class="drag-handle">≡</div>
+                    <div class="exercise-content">
+                        <div class="exercise-name">VH Topspin Basics</div>
+                        <div class="exercise-meta">5 Übungen · 75 Min · +50 Pkt</div>
+                    </div>
+                    <button class="remove-btn">×</button>
+                </div>
+            </div>
+
+            <div class="exercises-section" style="border-left: 3px solid #6c47ff;">
+                <div class="exercises-header">
+                    <div class="exercises-title" style="color: #6c47ff;">💪 Übungen (3)</div>
+                    <button class="add-btn">+ Hinzufügen</button>
+                </div>
+
+                <div class="exercise-item">
+                    <div class="drag-handle">≡</div>
+                    <div class="exercise-content">
+                        <div class="exercise-name">Footwork Diagonal</div>
+                        <div class="exercise-meta">18 Min · +2 Pkt</div>
+                    </div>
+                    <button class="remove-btn">×</button>
+                </div>
+
+                <div class="exercise-item">
+                    <div class="drag-handle">≡</div>
+                    <div class="exercise-content">
+                        <div class="exercise-name">Block gegen Topspin</div>
+                        <div class="exercise-meta">12 Min · +2 Pkt</div>
+                    </div>
+                    <button class="remove-btn">×</button>
+                </div>
+
+                <div class="exercise-item">
+                    <div class="drag-handle">≡</div>
+                    <div class="exercise-content">
+                        <div class="exercise-name">Aufschlag Varianten Mix</div>
+                        <div class="exercise-meta">20 Min · +2 Pkt</div>
+                    </div>
+                    <button class="remove-btn">×</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-box">
+            <div class="summary-grid">
+                <div>
+                    <div class="summary-value purple">125 Min</div>
+                    <div class="summary-label">Dauer</div>
+                </div>
+                <div>
+                    <div class="summary-value purple">8</div>
+                    <div class="summary-label">Übungen</div>
+                </div>
+                <div>
+                    <div class="summary-value orange">+56 Pkt</div>
+                    <div class="summary-label">Möglich</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-bar">
+        <button class="btn-save">✓ Training speichern</button>
+    </div>
+</body>
+</html>

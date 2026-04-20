@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - TT Trainingsplaner</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 400px;
+            width: 100%;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .logo-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: #6c47ff;
+        }
+        .logo-subtitle {
+            font-size: 14px;
+            color: #888;
+            margin-top: 4px;
+        }
+        .card {
+            background: #1a1a24;
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid #333;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #aaa;
+            margin-bottom: 8px;
+        }
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: #0f0f1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #6c47ff;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #6c47ff;
+            color: #fff;
+            margin-top: 8px;
+        }
+        .btn-primary:hover {
+            background: #5a38e6;
+        }
+        .forgot-password {
+            text-align: center;
+            margin-top: 16px;
+        }
+        .forgot-password a {
+            color: #6c47ff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .divider {
+            text-align: center;
+            margin: 24px 0;
+            color: #666;
+            font-size: 14px;
+        }
+        .register-link {
+            text-align: center;
+            font-size: 14px;
+            color: #aaa;
+        }
+        .register-link a {
+            color: #6c47ff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <div class="logo-icon">🏓</div>
+            <div class="logo-text">TT Trainingsplaner</div>
+            <div class="logo-subtitle">Strukturiertes Gruppentraining</div>
+        </div>
+
+        <div class="card">
+            <div class="form-group">
+                <label class="form-label">E-Mail</label>
+                <input type="email" class="form-input" placeholder="deine.email@example.com" value="">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Passwort</label>
+                <input type="password" class="form-input" placeholder="••••••••" value="">
+            </div>
+
+            <button class="btn btn-primary">Anmelden</button>
+
+            <div class="forgot-password">
+                <a href="#">Passwort vergessen?</a>
+            </div>
+
+            <div class="divider">───────  oder  ───────</div>
+
+            <div class="register-link">
+                Noch kein Account? <a href="mvp-register.html">Jetzt registrieren</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lernpfad Detail - TT Trainingsplaner</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            padding-bottom: 100px;
+        }
+        .header {
+            position: sticky;
+            top: 0;
+            padding: 16px 20px;
+            background: #0a0a0f;
+            border-bottom: 1px solid #1a1a24;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        .back-btn {
+            font-size: 24px;
+            background: none;
+            border: none;
+            color: #6c47ff;
+            cursor: pointer;
+        }
+        .favorite-btn {
+            font-size: 28px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .content {
+            padding: 20px;
+        }
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+        .category-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            background: #1a1a24;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .info-card {
+            background: #1a1a24;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+        .info-value {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .info-value.purple { color: #6c47ff; }
+        .info-value.orange { color: #f59e0b; }
+        .info-value.green { color: #22c55e; }
+        .info-label {
+            font-size: 11px;
+            color: #888;
+        }
+        .section {
+            margin-bottom: 28px;
+        }
+        .section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        .description {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #ccc;
+            margin-bottom: 24px;
+        }
+        .goal-box {
+            background: #1a1a24;
+            border-radius: 12px;
+            padding: 16px;
+            border-left: 3px solid #6c47ff;
+        }
+        .goal-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #6c47ff;
+        }
+        .goal-text {
+            font-size: 14px;
+            color: #aaa;
+            line-height: 1.5;
+        }
+        .exercise-item {
+            background: #1a1a24;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #2a2a3a;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .exercise-number {
+            width: 36px;
+            height: 36px;
+            background: #6c47ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .exercise-content {
+            flex: 1;
+        }
+        .exercise-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .exercise-meta {
+            font-size: 12px;
+            color: #888;
+        }
+        .exercise-chevron {
+            font-size: 18px;
+            color: #666;
+        }
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px 20px;
+            background: #1a1a24;
+            border-top: 1px solid #2a2a3a;
+        }
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: #6c47ff;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="back-btn" onclick="window.location.href='mvp-library-paths.html'">←</button>
+        <button class="favorite-btn">⭐</button>
+    </div>
+
+    <div class="content">
+        <h1 class="title">VH Topspin Basics</h1>
+        <div class="category-badge">Technik</div>
+
+        <div class="info-grid">
+            <div class="info-card">
+                <div class="info-value purple">5</div>
+                <div class="info-label">Übungen</div>
+            </div>
+            <div class="info-card">
+                <div class="info-value orange">75 Min</div>
+                <div class="info-label">Gesamt</div>
+            </div>
+            <div class="info-card">
+                <div class="info-value green">+50 Pkt</div>
+                <div class="info-label">Belohnung</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="description">
+                Schritt für Schritt vom passiven Topspin bis zum aktiven Angriffsschlag. Dieser Lernpfad ist perfekt für Einsteiger und legt das Fundament für alle fortgeschrittenen Topspin-Varianten.
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="goal-box">
+                <div class="goal-header">
+                    🎯 Lernziel
+                </div>
+                <div class="goal-text">
+                    Saubere Topspin-Grundform mit stabiler Hüftrotation und konstantem Balltreffpunkt. Am Ende kannst du eigenständig Topspins über den ganzen Tisch spielen.
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Übungen in Reihenfolge</div>
+
+            <div class="exercise-item">
+                <div class="exercise-number">1</div>
+                <div class="exercise-content">
+                    <div class="exercise-name">Vorhand Topspin Grundform</div>
+                    <div class="exercise-meta">15 Min • Anfänger • +2 Pkt</div>
+                </div>
+                <div class="exercise-chevron">›</div>
+            </div>
+
+            <div class="exercise-item">
+                <div class="exercise-number">2</div>
+                <div class="exercise-content">
+                    <div class="exercise-name">Topspin gegen Block</div>
+                    <div class="exercise-meta">18 Min • Anfänger • +2 Pkt</div>
+                </div>
+                <div class="exercise-chevron">›</div>
+            </div>
+
+            <div class="exercise-item">
+                <div class="exercise-number">3</div>
+                <div class="exercise-content">
+                    <div class="exercise-name">Topspin Diagonal</div>
+                    <div class="exercise-meta">15 Min • Fortgeschritten • +2 Pkt</div>
+                </div>
+                <div class="exercise-chevron">›</div>
+            </div>
+
+            <div class="exercise-item">
+                <div class="exercise-number">4</div>
+                <div class="exercise-content">
+                    <div class="exercise-name">Topspin aus Bewegung</div>
+                    <div class="exercise-meta">12 Min • Fortgeschritten • +2 Pkt</div>
+                </div>
+                <div class="exercise-chevron">›</div>
+            </div>
+
+            <div class="exercise-item">
+                <div class="exercise-number">5</div>
+                <div class="exercise-content">
+                    <div class="exercise-name">Topspin Variationen</div>
+                    <div class="exercise-meta">15 Min • Fortgeschritten • +2 Pkt</div>
+                </div>
+                <div class="exercise-chevron">›</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-bar">
+        <button class="btn btn-primary">Zu Training hinzufügen</button>
+    </div>
+</body>
+</html>
