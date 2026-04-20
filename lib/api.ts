@@ -1,7 +1,6 @@
 import axios from 'axios';
-import { createMMKV } from 'react-native-mmkv';
+import { storage } from './storage';
 
-const storage = createMMKV();
 const BASE_URL = 'https://trainingsplaner-strapi.onrender.com/api';
 
 export const apiClient = axios.create({
