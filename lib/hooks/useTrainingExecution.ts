@@ -24,6 +24,21 @@ export function useTrainingExecution(exercises: Exercise[]) {
 
   const currentExercise = exerciseStates.find((ex) => ex.isActive);
 
+  // Re-seed exerciseStates when exercises arrive after mount
+  // (e.g. useTrainingDetail still loading on initial render)
+  useEffect(() => {
+    if (exercises.length > 0 && exerciseStates.length === 0) {
+      setExerciseStates(
+        exercises.map((ex) => ({
+          ...ex,
+          completed: false,
+          isActive: false,
+          isPaused: false,
+        }))
+      );
+    }
+  }, [exercises.length]);
+
   // Session Timer (always runs)
   useEffect(() => {
     sessionInterval.current = setInterval(() => {
