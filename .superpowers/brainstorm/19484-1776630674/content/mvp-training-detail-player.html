@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training Detail - TT Trainingsplaner</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            padding-bottom: 100px;
+        }
+        .header {
+            position: sticky;
+            top: 0;
+            padding: 16px 20px;
+            background: #0a0a0f;
+            border-bottom: 1px solid #1a1a24;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        .back-btn {
+            font-size: 24px;
+            background: none;
+            border: none;
+            color: #6c47ff;
+            cursor: pointer;
+        }
+        .content {
+            padding: 20px;
+        }
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .info-card {
+            background: #1a1a24;
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .info-label {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+        .info-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+        }
+        .section {
+            margin-bottom: 28px;
+        }
+        .section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        .participants-compact {
+            background: #1a1a24;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #2a2a3a;
+        }
+        .participants-avatars {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+        .participant-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #6c47ff;
+            border: 2px solid #1a1a24;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            margin-left: -8px;
+            flex-shrink: 0;
+        }
+        .participant-avatar:first-child {
+            margin-left: 0;
+        }
+        .participant-count {
+            font-size: 13px;
+            color: #888;
+            margin-left: 4px;
+        }
+        .show-all-btn {
+            width: 100%;
+            padding: 10px;
+            background: #0f0f1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #6c47ff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .lernpfad-section {
+            background: #1a1a24;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-left: 3px solid #22c55e;
+        }
+        .lernpfad-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .lernpfad-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #22c55e;
+        }
+        .lernpfad-count {
+            font-size: 13px;
+            font-weight: 700;
+            color: #6c47ff;
+        }
+        .lernpfad-step {
+            background: #111;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .step-number {
+            width: 28px;
+            height: 28px;
+            background: #6c47ff33;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #6c47ff;
+            flex-shrink: 0;
+        }
+        .step-name {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .step-duration {
+            font-size: 12px;
+            color: #888;
+        }
+        .exercises-section {
+            background: #1a1a24;
+            border-radius: 12px;
+            padding: 16px;
+            border-left: 3px solid #6c47ff;
+        }
+        .exercises-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #6c47ff;
+            margin-bottom: 12px;
+        }
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px 20px;
+            background: #1a1a24;
+            border-top: 1px solid #2a2a3a;
+        }
+        .waiting-message {
+            text-align: center;
+            padding: 16px;
+            background: #f59e0b22;
+            border-radius: 12px;
+            border: 1px solid #f59e0b33;
+            margin-bottom: 12px;
+        }
+        .waiting-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        .waiting-text {
+            font-size: 14px;
+            color: #f59e0b;
+            font-weight: 600;
+        }
+        .waiting-subtext {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="back-btn" onclick="window.location.href='mvp-training-list-player.html'">←</button>
+    </div>
+
+    <div class="content">
+        <h1 class="title">Jugendtraining</h1>
+
+        <div class="info-grid">
+            <div class="info-card">
+                <div class="info-label">Datum</div>
+                <div class="info-value">Mo 21. Apr</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">Uhrzeit</div>
+                <div class="info-value">18:00</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">Ort</div>
+                <div class="info-value">Halle 1</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">Trainer</div>
+                <div class="info-value">Lisa Schmidt</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Teilnehmer (8)</div>
+            <div class="participants-compact">
+                <div class="participants-avatars">
+                    <div class="participant-avatar">👦</div>
+                    <div class="participant-avatar">👧</div>
+                    <div class="participant-avatar">👦</div>
+                    <div class="participant-avatar">👧</div>
+                    <div class="participant-avatar">👦</div>
+                    <div class="participant-avatar">+3</div>
+                    <div class="participant-count">8 Teilnehmer</div>
+                </div>
+                <button class="show-all-btn">Alle anzeigen</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Training</div>
+
+            <!-- Lernpfad Section -->
+            <div class="lernpfad-section">
+                <div class="lernpfad-header">
+                    <div class="lernpfad-title">📋 LERNPFAD · VH Topspin Basics</div>
+                    <div class="lernpfad-count">5 Übungen</div>
+                </div>
+
+                <div class="lernpfad-step">
+                    <div class="step-number">1</div>
+                    <div class="step-name">VH Topspin Grundform</div>
+                    <div class="step-duration">20m</div>
+                </div>
+
+                <div class="lernpfad-step">
+                    <div class="step-number">2</div>
+                    <div class="step-name">Topspin gegen Block</div>
+                    <div class="step-duration">18m</div>
+                </div>
+
+                <div class="lernpfad-step">
+                    <div class="step-number">3</div>
+                    <div class="step-name">Topspin Diagonal</div>
+                    <div class="step-duration">15m</div>
+                </div>
+
+                <div class="lernpfad-step">
+                    <div class="step-number">4</div>
+                    <div class="step-name">Topspin aus Bewegung</div>
+                    <div class="step-duration">12m</div>
+                </div>
+
+                <div class="lernpfad-step">
+                    <div class="step-number">5</div>
+                    <div class="step-name">Topspin Variationen</div>
+                    <div class="step-duration">10m</div>
+                </div>
+            </div>
+
+            <!-- Einzelne Übungen -->
+            <div class="exercises-section">
+                <div class="exercises-title">💪 EINZELNE ÜBUNGEN</div>
+
+                <div class="lernpfad-step">
+                    <div class="step-number">1</div>
+                    <div class="step-name">Footwork Diagonal</div>
+                    <div class="step-duration">18m</div>
+                </div>
+
+                <div class="lernpfad-step">
+                    <div class="step-number">2</div>
+                    <div class="step-name">Block gegen Topspin</div>
+                    <div class="step-duration">12m</div>
+                </div>
+
+                <div class="lernpfad-step">
+                    <div class="step-number">3</div>
+                    <div class="step-name">Aufschlag Varianten Mix</div>
+                    <div class="step-duration">20m</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-bar">
+        <div class="waiting-message">
+            <div class="waiting-icon">⏳</div>
+            <div class="waiting-text">Warten auf Start</div>
+            <div class="waiting-subtext">Training wird von Lisa Schmidt gestartet</div>
+        </div>
+    </div>
+</body>
+</html>

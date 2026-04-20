@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVP Mockups - TT Trainingsplaner</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #0a0a0f;
+            color: #fff;
+        }
+        h1 { color: #6c47ff; margin-bottom: 10px; }
+        .subtitle { color: #888; margin-bottom: 40px; }
+        .flow {
+            background: #1a1a24;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+            border: 1px solid #333;
+        }
+        .flow h2 {
+            color: #6c47ff;
+            margin-top: 0;
+            font-size: 20px;
+        }
+        .screens {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+        .screen {
+            background: #0f0f1a;
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid #444;
+            text-decoration: none;
+            color: #fff;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .screen.available {
+            border-color: #22c55e;
+        }
+        .screen.available::after {
+            content: "✓";
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 20px;
+            height: 20px;
+            background: #22c55e;
+            color: #111;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .screen:hover {
+            background: #1a1a28;
+            border-color: #6c47ff;
+            transform: translateY(-2px);
+        }
+        .screen-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #6c47ff;
+        }
+        .screen-desc {
+            font-size: 13px;
+            color: #aaa;
+            line-height: 1.4;
+        }
+        .role-tag {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+        .role-all { background: #2a2a3a; color: #aaa; }
+        .role-trainer { background: #6c47ff33; color: #6c47ff; }
+        .role-player { background: #10b98133; color: #10b981; }
+    </style>
+</head>
+<body>
+    <h1>🏓 TT Trainingsplaner — MVP Mockups</h1>
+    <p class="subtitle">Trainer-zentrierte Gruppentrainings-App • 4 Tabs • Vereinsbasiert</p>
+
+    <div class="flow">
+        <h2>🔐 Auth Flow</h2>
+        <div class="screens">
+            <a href="mvp-login.html" class="screen">
+                <div class="screen-title">Login</div>
+                <div class="screen-desc">E-Mail + Passwort, JWT Auth</div>
+                <span class="role-tag role-all">Alle</span>
+            </a>
+            <a href="mvp-register.html" class="screen">
+                <div class="screen-title">Registrierung</div>
+                <div class="screen-desc">Club wählen, Name, E-Mail • Trainer muss freischalten</div>
+                <span class="role-tag role-all">Alle</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="flow">
+        <h2>📱 Tab 1 — Dashboard</h2>
+        <div class="screens">
+            <a href="mvp-dashboard-player.html" class="screen available">
+                <div class="screen-title">Dashboard (Spieler)</div>
+                <div class="screen-desc">Stats, nächstes Training, Lernpfade, Badges</div>
+                <span class="role-tag role-all">Alle</span>
+            </a>
+            <a href="mvp-dashboard-trainer.html" class="screen available">
+                <div class="screen-title">Dashboard (Trainer)</div>
+                <div class="screen-desc">Wie Spieler + Club-Button mit Badge-Counter</div>
+                <span class="role-tag role-trainer">Trainer</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="flow">
+        <h2>📚 Tab 2 — Bibliothek</h2>
+        <div class="screens">
+            <a href="mvp-library-exercises.html" class="screen available">
+                <div class="screen-title">Übungen Liste</div>
+                <div class="screen-desc">Filter, Suche, Favoriten, Punkte-Badge</div>
+                <span class="role-tag role-all">Alle</span>
+            </a>
+            <a href="mvp-library-exercise-detail.html" class="screen">
+                <div class="screen-title">Übung Detail</div>
+                <div class="screen-desc">Steps, Video, Trainer-Tipp • Read-only MVP</div>
+                <span class="role-tag role-all">Alle</span>
+            </a>
+            <a href="mvp-library-paths.html" class="screen available">
+                <div class="screen-title">Lernpfade Liste</div>
+                <div class="screen-desc">Kategorien, Fortschritt, Favoriten</div>
+                <span class="role-tag role-all">Alle</span>
+            </a>
+            <a href="mvp-library-path-detail.html" class="screen available">
+                <div class="screen-title">Lernpfad Detail</div>
+                <div class="screen-desc">Übungen in Reihenfolge, Progress</div>
+                <span class="role-tag role-all">Alle</span>
+            </a>
+            <a href="mvp-library-create-exercise.html" class="screen">
+                <div class="screen-title">Übung erstellen</div>
+                <div class="screen-desc">Web only • Steps, Kategorien, Fokus</div>
+                <span class="role-tag role-trainer">Trainer (Web)</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="flow">
+        <h2>🏋️ Tab 3 — Training</h2>
+        <div class="screens">
+            <a href="mvp-training-list-player.html" class="screen available">
+                <div class="screen-title">Training Liste (Spieler)</div>
+                <div class="screen-desc">Zugewiesene Gruppentrainings, Status-Filter</div>
+                <span class="role-tag role-player">Spieler</span>
+            </a>
+            <a href="mvp-training-list-trainer.html" class="screen available">
+                <div class="screen-title">Training Liste (Trainer)</div>
+                <div class="screen-desc">Wie Spieler + "Neues Training erstellen" Button</div>
+                <span class="role-tag role-trainer">Trainer</span>
+            </a>
+            <a href="mvp-training-create.html" class="screen available">
+                <div class="screen-title">Training erstellen</div>
+                <div class="screen-desc">Name, Datum, Spieler wählen, Übungen/Lernpfade hinzufügen</div>
+                <span class="role-tag role-trainer">Trainer</span>
+            </a>
+            <a href="mvp-training-detail-trainer.html" class="screen available">
+                <div class="screen-title">Training Detail</div>
+                <div class="screen-desc">Trainer, Ort, Gruppe, geplante Übungen</div>
+                <span class="role-tag role-all">Alle</span>
+            </a>
+            <a href="mvp-training-execution.html" class="screen available">
+                <div class="screen-title">Training Execution</div>
+                <div class="screen-desc">Übungen abhaken, Timer, Step-Layout</div>
+                <span class="role-tag role-all">Alle</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="flow">
+        <h2>👤 Tab 4 — Profil</h2>
+        <div class="screens">
+            <a href="mvp-profile.html" class="screen available">
+                <div class="screen-title">Profil</div>
+                <div class="screen-desc">Stats, Spielerinformationen, Erfolge</div>
+                <span class="role-tag role-all">Alle</span>
+            </a>
+            <a href="mvp-profile-material.html" class="screen">
+                <div class="screen-title">Material bearbeiten</div>
+                <div class="screen-desc">Schläger, Beläge, Spielweise</div>
+                <span class="role-tag role-all">Alle</span>
+            </a>
+            <a href="mvp-profile-history.html" class="screen">
+                <div class="screen-title">Trainingshistorie</div>
+                <div class="screen-desc">Vergangene Trainings mit Filter</div>
+                <span class="role-tag role-all">Alle</span>
+            </a>
+            <a href="mvp-profile-badges.html" class="screen">
+                <div class="screen-title">Badges & Achievements</div>
+                <div class="screen-desc">Alle erhaltenen Badges, Progress zu nächsten</div>
+                <span class="role-tag role-all">Alle</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="flow">
+        <h2>🎓 Trainer-Bereich</h2>
+        <div class="screens">
+            <a href="mvp-trainer-dashboard.html" class="screen">
+                <div class="screen-title">Trainer Dashboard</div>
+                <div class="screen-desc">Offene Aktionen, Quick-Actions</div>
+                <span class="role-tag role-trainer">Trainer</span>
+            </a>
+            <a href="mvp-trainer-attendance.html" class="screen">
+                <div class="screen-title">Anwesenheit bestätigen</div>
+                <div class="screen-desc">Training wählen, Spieler abhaken</div>
+                <span class="role-tag role-trainer">Trainer</span>
+            </a>
+            <a href="mvp-trainer-players.html" class="screen">
+                <div class="screen-title">Spieler verwalten</div>
+                <div class="screen-desc">Liste, Anfragen bestätigen, Profile</div>
+                <span class="role-tag role-trainer">Trainer</span>
+            </a>
+        </div>
+    </div>
+
+    <p style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #333; color: #666; text-align: center;">
+        <a href="index.html" style="color: #6c47ff; text-decoration: none;">← Zurück zu allen Mockups</a>
+    </p>
+</body>
+</html>

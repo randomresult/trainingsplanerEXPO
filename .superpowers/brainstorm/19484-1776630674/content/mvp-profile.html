@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil - TT Trainingsplaner</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            padding-bottom: 80px;
+        }
+        .header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #1a1a24;
+        }
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #6c47ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin: 0 auto 16px;
+        }
+        .username {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .club-name {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 16px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 0 20px;
+        }
+        .stat-card {
+            background: #1a1a24;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .stat-value.purple { color: #6c47ff; }
+        .stat-value.green { color: #22c55e; }
+        .stat-value.orange { color: #f59e0b; }
+        .stat-label {
+            font-size: 11px;
+            color: #888;
+        }
+        .content {
+            padding: 20px;
+        }
+        .section {
+            margin-bottom: 28px;
+        }
+        .section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        .info-card {
+            background: #1a1a24;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #2a2a3a;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+        .info-label {
+            font-size: 13px;
+            color: #888;
+        }
+        .info-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
+        .badge-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        .badge-item {
+            background: #1a1a24;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid #2a2a3a;
+        }
+        .badge-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        .badge-name {
+            font-size: 10px;
+            color: #888;
+        }
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1a1a24;
+            border-top: 1px solid #2a2a3a;
+            display: flex;
+            padding: 8px 0;
+        }
+        .tab-item {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            text-decoration: none;
+            color: #888;
+        }
+        .tab-item.active {
+            color: #6c47ff;
+        }
+        .tab-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        .tab-label {
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="avatar">👤</div>
+        <div class="username">Max Mustermann</div>
+        <div class="club-name">TTC Musterstadt</div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value purple">247</div>
+                <div class="stat-label">Punkte</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value green">24</div>
+                <div class="stat-label">Trainings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value orange">36h</div>
+                <div class="stat-label">Zeit</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="section">
+            <div class="section-title">Spielerinformationen</div>
+            <div class="info-card">
+                <div class="info-row">
+                    <div class="info-label">Mitglied seit</div>
+                    <div class="info-value">März 2024</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Spielstil</div>
+                    <div class="info-value">Offensiv</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Lieblings-Schlag</div>
+                    <div class="info-value">VH Topspin</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Erfolge</div>
+            <div class="badge-grid">
+                <div class="badge-item">
+                    <div class="badge-icon">🏆</div>
+                    <div class="badge-name">Erster Sieg</div>
+                </div>
+                <div class="badge-item">
+                    <div class="badge-icon">⭐</div>
+                    <div class="badge-name">10 Trainings</div>
+                </div>
+                <div class="badge-item" style="opacity: 0.3;">
+                    <div class="badge-icon">🎯</div>
+                    <div class="badge-name">100 Punkte</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+        <a href="mvp-dashboard-player.html" class="tab-item">
+            <div class="tab-icon">🏠</div>
+            <div class="tab-label">Home</div>
+        </a>
+        <a href="mvp-library-exercises.html" class="tab-item">
+            <div class="tab-icon">📚</div>
+            <div class="tab-label">Bibliothek</div>
+        </a>
+        <a href="mvp-training-list-player.html" class="tab-item">
+            <div class="tab-icon">🏋️</div>
+            <div class="tab-label">Training</div>
+        </a>
+        <a href="mvp-profile.html" class="tab-item active">
+            <div class="tab-icon">👤</div>
+            <div class="tab-label">Profil</div>
+        </a>
+    </div>
+</body>
+</html>

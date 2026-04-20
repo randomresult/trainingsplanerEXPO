@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrierung - TT Trainingsplaner</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .header {
+            margin-bottom: 32px;
+        }
+        .back-btn {
+            color: #6c47ff;
+            text-decoration: none;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 20px;
+        }
+        .logo {
+            text-align: center;
+        }
+        .logo-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+            color: #6c47ff;
+        }
+        .logo-subtitle {
+            font-size: 14px;
+            color: #888;
+            margin-top: 4px;
+        }
+        .card {
+            background: #1a1a24;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid #333;
+            margin-top: 24px;
+        }
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #aaa;
+            margin-bottom: 8px;
+        }
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            background: #0f0f1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+        }
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #6c47ff;
+        }
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23888' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+        .hint {
+            font-size: 12px;
+            color: #888;
+            margin-top: 6px;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #6c47ff;
+            color: #fff;
+            margin-top: 8px;
+        }
+        .btn-primary:hover {
+            background: #5a38e6;
+        }
+        .info-box {
+            background: #252530;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #aaa;
+            border-left: 3px solid #6c47ff;
+        }
+        .info-box-title {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        .login-link {
+            text-align: center;
+            font-size: 14px;
+            color: #aaa;
+            margin-top: 24px;
+        }
+        .login-link a {
+            color: #6c47ff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="mvp-login.html" class="back-btn">← Zurück</a>
+        <div class="logo">
+            <div class="logo-icon">🏓</div>
+            <div class="logo-text">Registrieren</div>
+            <div class="logo-subtitle">Werde Teil deines Vereins</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Account erstellen</div>
+
+        <div class="form-group">
+            <label class="form-label">Verein wählen</label>
+            <select class="form-select">
+                <option value="">Wähle deinen Verein...</option>
+                <option value="1">TTC Musterstadt</option>
+                <option value="2">SV Tischtennis Berlin</option>
+                <option value="3">TSV Sportfreunde Hamburg</option>
+                <option value="4">VfL TT München</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Vorname</label>
+            <input type="text" class="form-input" placeholder="Max" value="">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Nachname</label>
+            <input type="text" class="form-input" placeholder="Mustermann" value="">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">E-Mail</label>
+            <input type="email" class="form-input" placeholder="max.mustermann@example.com" value="">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Passwort</label>
+            <input type="password" class="form-input" placeholder="Mindestens 8 Zeichen" value="">
+            <div class="hint">Mindestens 8 Zeichen, Buchstaben und Zahlen</div>
+        </div>
+
+        <button class="btn btn-primary">Registrieren</button>
+
+        <div class="info-box">
+            <div class="info-box-title">ℹ️ Freischaltung erforderlich</div>
+            Nach der Registrierung muss ein Trainer deines Vereins deinen Account freischalten. Du erhältst eine E-Mail, sobald dies erfolgt ist.
+        </div>
+
+        <div class="login-link">
+            Bereits registriert? <a href="mvp-login.html">Jetzt anmelden</a>
+        </div>
+    </div>
+</body>
+</html>

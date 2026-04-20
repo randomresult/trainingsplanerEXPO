@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lernpfade - TT Trainingsplaner</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            padding-bottom: 80px;
+            padding-top: 190px;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: #0a0a0f;
+            border-bottom: 1px solid #1a1a24;
+            z-index: 100;
+        }
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .toggle-bar {
+            display: flex;
+            gap: 12px;
+        }
+        .toggle-btn {
+            flex: 1;
+            padding: 14px;
+            background: #1a1a24;
+            border: none;
+            border-radius: 12px;
+            color: #888;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+        .toggle-btn.active {
+            background: #6c47ff;
+            color: #fff;
+        }
+        .filter-chips {
+            position: fixed;
+            top: 120px;
+            left: 0;
+            right: 0;
+            padding: 16px 20px;
+            background: #0a0a0f;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            border-bottom: 1px solid #1a1a24;
+            z-index: 98;
+        }
+        .filter-chips::-webkit-scrollbar {
+            display: none;
+        }
+        .chip {
+            padding: 10px 18px;
+            background: #1a1a24;
+            border: 1px solid #333;
+            border-radius: 24px;
+            font-size: 14px;
+            color: #aaa;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        .chip.active {
+            background: #6c47ff33;
+            border-color: #6c47ff;
+            color: #6c47ff;
+        }
+        .content {
+            padding: 16px 0;
+        }
+        .path-card {
+            background: #1a1a24;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 0 20px 16px 20px;
+            border: 1px solid #2a2a3a;
+            position: relative;
+        }
+        .path-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        .path-title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .favorite-btn {
+            font-size: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        .path-category {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #0f0f1a;
+            border-radius: 6px;
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .path-desc {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+        .progress-section {
+            margin-bottom: 12px;
+            min-height: 28px;
+        }
+        .progress-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        .completed-badge {
+            font-size: 12px;
+            color: #22c55e;
+            background: #22c55e22;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+        .progress-bar {
+            background: #0f0f1a;
+            border-radius: 8px;
+            height: 8px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        .progress-fill {
+            background: #6c47ff;
+            height: 100%;
+            border-radius: 8px;
+        }
+        .path-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .path-exercises {
+            font-size: 13px;
+            color: #888;
+        }
+        .points-badge {
+            background: #6c47ff33;
+            color: #6c47ff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1a1a24;
+            border-top: 1px solid #2a2a3a;
+            display: flex;
+            padding: 8px 0;
+        }
+        .tab-item {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            text-decoration: none;
+            color: #888;
+        }
+        .tab-item.active {
+            color: #6c47ff;
+        }
+        .tab-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        .tab-label {
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-title">Bibliothek</div>
+        <div class="toggle-bar">
+            <a href="mvp-library-exercises.html" class="toggle-btn">Übungen</a>
+            <a href="mvp-library-paths.html" class="toggle-btn active">Lernpfade</a>
+        </div>
+    </div>
+
+    <div class="filter-chips">
+        <div class="chip active">Alle</div>
+        <div class="chip">Technik</div>
+        <div class="chip">Taktik</div>
+        <div class="chip">Kondition</div>
+        <div class="chip">Mental</div>
+    </div>
+
+    <div class="content">
+        <!-- Path 1 - Active -->
+        <div class="path-card">
+            <div class="path-header">
+                <div>
+                    <div class="path-title">VH Topspin Basics</div>
+                    <div class="path-category">Technik</div>
+                </div>
+                <button class="favorite-btn">⭐</button>
+            </div>
+            <div class="path-desc">
+                Schritt für Schritt vom passiven Topspin bis zum aktiven Angriffsschlag. Perfekt für Einsteiger.
+            </div>
+            <div class="progress-section">
+                <div class="progress-header">
+                    <span class="completed-badge">✓ 1x abgeschlossen</span>
+                </div>
+            </div>
+            <div class="path-footer">
+                <div class="path-exercises">5 Übungen • 75 Min</div>
+                <div class="points-badge">+50 Pkt</div>
+            </div>
+        </div>
+
+        <!-- Path 2 - Completed -->
+        <div class="path-card">
+            <div class="path-header">
+                <div>
+                    <div class="path-title">Aufschlag Varianten</div>
+                    <div class="path-category">Taktik</div>
+                </div>
+                <button class="favorite-btn">☆</button>
+            </div>
+            <div class="path-desc">
+                Von Kurz/Lang über Seitenschnitt bis zu komplexen Kombinationen. Alle wichtigen Aufschlagarten.
+            </div>
+            <div class="progress-section">
+                <div class="progress-header">
+                    <span class="completed-badge">✓ 2x abgeschlossen</span>
+                </div>
+            </div>
+            <div class="path-footer">
+                <div class="path-exercises">6 Übungen • 90 Min</div>
+                <div class="points-badge">+50 Pkt</div>
+            </div>
+        </div>
+
+        <!-- Path 3 - Not started -->
+        <div class="path-card">
+            <div class="path-header">
+                <div>
+                    <div class="path-title">Block Technik</div>
+                    <div class="path-category">Technik</div>
+                </div>
+                <button class="favorite-btn">☆</button>
+            </div>
+            <div class="path-desc">
+                Passive und aktive Blockschläge gegen unterschiedliche Topspins. Defensive Stabilität aufbauen.
+            </div>
+            <div class="progress-section">
+                <div class="progress-header">
+                    <!-- Not completed yet - no badge -->
+                </div>
+            </div>
+            <div class="path-footer">
+                <div class="path-exercises">5 Übungen • 60 Min</div>
+                <div class="points-badge">+50 Pkt</div>
+            </div>
+        </div>
+
+        <!-- Path 4 -->
+        <div class="path-card">
+            <div class="path-header">
+                <div>
+                    <div class="path-title">Footwork Intensiv</div>
+                    <div class="path-category">Kondition</div>
+                </div>
+                <button class="favorite-btn">⭐</button>
+            </div>
+            <div class="path-desc">
+                Schnelle Beinarbeit in allen Spielsituationen. Von Sidesteps bis zu komplexen Laufmustern.
+            </div>
+            <div class="progress-section">
+                <div class="progress-header">
+                    <span class="completed-badge">✓ 3x abgeschlossen</span>
+                </div>
+            </div>
+            <div class="path-footer">
+                <div class="path-exercises">7 Übungen • 105 Min</div>
+                <div class="points-badge">+50 Pkt</div>
+            </div>
+        </div>
+
+        <!-- Path 5 -->
+        <div class="path-card">
+            <div class="path-header">
+                <div>
+                    <div class="path-title">Rückhand Topspin</div>
+                    <div class="path-category">Technik</div>
+                </div>
+                <button class="favorite-btn">☆</button>
+            </div>
+            <div class="path-desc">
+                Moderne Rückhand-Topspintechnik für offensive Spieler. Vom Konter zum Topspin.
+            </div>
+            <div class="progress-section">
+                <div class="progress-header">
+                    <!-- Not completed yet - no badge -->
+                </div>
+            </div>
+            <div class="path-footer">
+                <div class="path-exercises">6 Übungen • 80 Min</div>
+                <div class="points-badge">+50 Pkt</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+        <a href="mvp-dashboard-player.html" class="tab-item">
+            <div class="tab-icon">🏠</div>
+            <div class="tab-label">Home</div>
+        </a>
+        <a href="mvp-library-exercises.html" class="tab-item active">
+            <div class="tab-icon">📚</div>
+            <div class="tab-label">Bibliothek</div>
+        </a>
+        <a href="mvp-training-list-player.html" class="tab-item">
+            <div class="tab-icon">🏋️</div>
+            <div class="tab-label">Training</div>
+        </a>
+        <a href="mvp-profile.html" class="tab-item">
+            <div class="tab-icon">👤</div>
+            <div class="tab-label">Profil</div>
+        </a>
+    </div>
+</body>
+</html>
