@@ -26,10 +26,16 @@ export default function TrainingsLayout() {
         }}
       />
       <Stack.Screen
-        name="[id]"
+        name="[id]/index"
         options={{
           title: 'Training',
           headerBackTitle: 'Zurück',
+        }}
+      />
+      <Stack.Screen
+        name="[id]/execute"
+        options={{
+          headerShown: false,
         }}
       />
     </Stack>

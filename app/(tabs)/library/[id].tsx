@@ -97,18 +97,31 @@ export default function ExerciseDetailScreen() {
             📋 Anleitung
           </Text>
           <View className="bg-card rounded-xl border-l-4 border-primary p-4">
-            {exercise.Steps.map((step, idx) => (
-              <View key={idx} className="flex-row mb-3 last:mb-0">
-                <View className="w-6 h-6 rounded-full bg-primary items-center justify-center mr-3 mt-0.5">
-                  <Text className="text-xs font-bold text-primary-foreground">
-                    {idx + 1}
-                  </Text>
+            {exercise.Steps.map((step: any, idx: number) => {
+              const title = typeof step === 'string' ? step : step?.Name;
+              const body = typeof step === 'string' ? null : step?.Description;
+              return (
+                <View key={step?.id ?? idx} className="flex-row mb-3 last:mb-0">
+                  <View className="w-6 h-6 rounded-full bg-primary items-center justify-center mr-3 mt-0.5">
+                    <Text className="text-xs font-bold text-primary-foreground">
+                      {idx + 1}
+                    </Text>
+                  </View>
+                  <View className="flex-1">
+                    {title ? (
+                      <Text className="text-sm font-semibold text-foreground leading-relaxed">
+                        {title}
+                      </Text>
+                    ) : null}
+                    {body ? (
+                      <Text className="text-sm text-muted-foreground leading-relaxed mt-0.5">
+                        {body}
+                      </Text>
+                    ) : null}
+                  </View>
                 </View>
-                <Text className="flex-1 text-sm text-foreground leading-relaxed">
-                  {step}
-                </Text>
-              </View>
-            ))}
+              );
+            })}
           </View>
         </View>
       )}

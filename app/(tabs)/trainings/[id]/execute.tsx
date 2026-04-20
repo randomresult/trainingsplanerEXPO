@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert, Platform } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useTrainingDetail, useCompleteTraining } from '@/lib/queries/useTrainings';
 import { useTrainingExecution } from '@/lib/hooks/useTrainingExecution';
@@ -27,36 +27,38 @@ export default function ExecuteTrainingScreen() {
     ? (completedCount / training.exercises.length) * 100
     : 0;
 
-  const handleFinishTraining = () => {
-    Alert.alert(
-      'Training beenden',
-      'Möchtest du das Training wirklich beenden?',
-      [
-        { text: 'Abbrechen', style: 'cancel' },
-        {
-          text: 'Beenden',
-          style: 'destructive',
-          onPress: () => {
-            // Create player-progress data (points based on completion)
-            const playerProgressData = training?.players?.flatMap((player) =>
-              exerciseStates
-                .filter((ex) => ex.completed)
-                .map((ex) => ({
-                  playerId: player.documentId,
-                  exerciseId: ex.documentId,
-                  points: 10, // Base points for completion
-                }))
-            ) || [];
+  const confirmFinish = (onConfirm: () => void) => {
+    if (Platform.OS === 'web') {
+      if (typeof window !== 'undefined' && window.confirm('Möchtest du das Training wirklich beenden?')) {
+        onConfirm();
+      }
+      return;
+    }
+    Alert.alert('Training beenden', 'Möchtest du das Training wirklich beenden?', [
+      { text: 'Abbrechen', style: 'cancel' },
+      { text: 'Beenden', style: 'destructive', onPress: onConfirm },
+    ]);
+  };
 
-            completeTraining.mutate({
-              trainingId: id,
-              sessionDuration: sessionElapsed,
-              playerProgressData,
-            });
-          },
-        },
-      ]
-    );
+  const handleFinishTraining = () => {
+    confirmFinish(() => {
+      const completedExercises = exerciseStates.filter((ex) => ex.completed);
+      const pointsPerExercise = 10;
+      const pointsEarned = completedExercises.length * pointsPerExercise;
+
+      const playerProgressData =
+        training?.players?.map((player) => ({
+          playerId: player.documentId,
+          completedExerciseIds: completedExercises.map((ex) => ex.documentId),
+          pointsEarned,
+        })) || [];
+
+      completeTraining.mutate({
+        trainingId: id,
+        sessionDuration: sessionElapsed,
+        playerProgressData,
+      });
+    });
   };
 
   if (isLoading) {
@@ -146,16 +148,22 @@ export default function ExecuteTrainingScreen() {
             {expanded && (
               <View className="border-t border-border pt-3 mt-3">
                 <Text className="text-xs font-bold mb-2">📋 Anleitung:</Text>
-                {currentExercise.Steps?.map((step, idx) => (
-                  <View key={idx} className="flex-row mb-1.5">
-                    <Text className="text-xs text-muted-foreground mr-2">
-                      {idx + 1}.
-                    </Text>
-                    <Text className="text-xs text-muted-foreground flex-1">
-                      {step}
-                    </Text>
-                  </View>
-                ))}
+                {currentExercise.Steps?.map((step: any, idx: number) => {
+                  const text =
+                    typeof step === 'string'
+                      ? step
+                      : [step?.Name, step?.Description].filter(Boolean).join(' — ');
+                  return (
+                    <View key={step?.id ?? idx} className="flex-row mb-1.5">
+                      <Text className="text-xs text-muted-foreground mr-2">
+                        {idx + 1}.
+                      </Text>
+                      <Text className="text-xs text-muted-foreground flex-1">
+                        {text}
+                      </Text>
+                    </View>
+                  );
+                })}
 
                 {currentExercise.Hint && (
                   <>
