@@ -16,6 +16,29 @@
 
 ## 1. Projekt-Übersicht & Strategie
 
+### ⚠️ Wichtiger Hinweis: API als Baseline
+
+**Das Strapi Backend und die APIs wurden ursprünglich für den Web Frontend (Nuxt/Vue) Ansatz entwickelt.**
+
+Sie dienen als **Baseline und Referenz**, aber:
+- ✅ Können als Ausgangspunkt genutzt werden
+- ⚠️ **MÜSSEN wahrscheinlich angepasst werden** für Mobile-spezifische Requirements
+- 🔄 API Endpoints, Datenmodelle und Relations können sich noch ändern
+- 📝 Diese Doku beschreibt den **IST-Zustand** der API, nicht das finale Design
+
+**Während der EXPO Entwicklung:**
+- Backend-Änderungen sind erlaubt und erwartet
+- Neue Endpoints können hinzugefügt werden
+- Relations können angepasst werden
+- Datenmodelle können erweitert werden
+
+**Diese Dokumentation dient als:**
+- 📚 Referenz für vorhandene API-Struktur
+- 🎯 Ausgangspunkt für Mobile App Entwicklung
+- 📝 Living Document - wird mit Backend-Änderungen aktualisiert
+
+---
+
 ### 🎯 Entwicklungsfokus
 
 ```
@@ -84,6 +107,24 @@ C:\SAPDevelop\trainingplanerMAIN\
 ---
 
 ## 2. Backend API Referenz
+
+### ⚠️ API Status: Baseline / In Development
+
+**Diese API-Beschreibung basiert auf dem existierenden Strapi Backend, das ursprünglich für das Web Frontend entwickelt wurde.**
+
+**Wichtig:**
+- Diese Endpoints sind der **aktuelle Stand** und dienen als **Baseline**
+- Während der Mobile App Entwicklung **werden wahrscheinlich Anpassungen nötig sein**
+- Nicht alle Endpoints sind zwingend optimal für Mobile Use Cases
+- Neue Endpoints können hinzugefügt, bestehende angepasst werden
+
+**Vorgehen bei Backend-Änderungen:**
+1. Ändere/erweitere das Strapi Backend nach Bedarf
+2. Teste die Änderungen
+3. Aktualisiere diese Dokumentation
+4. Committe Backend + Doku Updates zusammen
+
+---
 
 ### Base URL
 
@@ -229,6 +270,24 @@ GET /api/methodical-series?populate[exercises][populate]=*
 ---
 
 ## 3. Mockup zu Implementation Guide
+
+### 💡 Über die API Mappings
+
+**Die API-Mappings in dieser Sektion basieren auf der bestehenden Backend-Struktur.**
+
+**Während der Implementierung:**
+- Wenn ein API Endpoint nicht optimal ist → Backend anpassen
+- Wenn Daten fehlen oder falsch strukturiert sind → Backend erweitern
+- Wenn Relations nicht passen → Backend-Schema ändern
+- Die Mockups zeigen das **Ziel**, die API ist das **Mittel**
+
+**Beispiele für mögliche Anpassungen:**
+- Neue Endpoints für Mobile-spezifische Queries
+- Optimierte Populate-Strategien für weniger Requests
+- Neue Relations für bessere Datenstrukturen
+- Custom Endpoints für komplexe Business Logic
+
+---
 
 ### 📱 MVP Mockup Übersicht
 
@@ -872,7 +931,77 @@ curl -H "Authorization: Bearer YOUR_JWT" http://localhost:1337/api/players
 
 ---
 
+---
+
 ## 📞 Hilfe & Ressourcen
+
+### Backend Development Workflow
+
+**Wenn du Backend-Änderungen brauchst:**
+
+```bash
+# 1. Backend lokal starten
+cd ../trainingsplaner
+npm run develop
+
+# 2. Admin Panel öffnen
+http://localhost:1337/admin
+
+# 3. Änderungen machen:
+#    - Content Types anpassen (Schema)
+#    - Neue Endpoints erstellen
+#    - Relations ändern
+#    - Permissions setzen
+
+# 4. Testen
+curl http://localhost:1337/api/[endpoint]
+
+# 5. In Production deployen
+npm run build
+# Deploy to Render.com (automatisch via Git Push)
+
+# 6. Diese Dokumentation aktualisieren
+# docs/DEVELOPMENT_GUIDE.md → API Referenz Section
+```
+
+**Typische Backend-Anpassungen:**
+
+**Neue Endpoint hinzufügen:**
+```bash
+cd trainingsplaner
+# Strapi Admin → Content-Type Builder → Create new collection type
+# Oder per CLI:
+npm run strapi generate
+```
+
+**Relation ändern:**
+```bash
+# Admin Panel → Content-Type Builder → Edit Type → Add/Edit Relation
+```
+
+**Custom Controller/Service:**
+```javascript
+// trainingsplaner/src/api/[entity]/controllers/[entity].js
+module.exports = {
+  async customEndpoint(ctx) {
+    // Custom logic here
+    return { data: "custom response" };
+  }
+};
+```
+
+**Diese Doku aktualisieren:**
+```bash
+cd trainingsplanerEXPO
+# Edit docs/DEVELOPMENT_GUIDE.md
+# → Section 2: Backend API Referenz updaten
+
+git add docs/DEVELOPMENT_GUIDE.md
+git commit -m "docs: update API after backend changes"
+git push
+```
+
+---
 
 ### Bei Fragen zu...
 
