@@ -1,23 +1,17 @@
-import { Platform, View, Text, ScrollView, Pressable, ActivityIndicator, Alert } from 'react-native';
+import { Platform, View, ActivityIndicator, Alert, ScrollView, Pressable } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
+import { Screen, Text, Button, Card, Badge, Avatar, Icon } from '@/components/ui';
 import {
   useTrainingDetail,
   useDeleteTraining,
   useStartTraining,
   useRemoveExerciseFromTraining,
 } from '@/lib/queries/useTrainings';
-import { cn } from '@/lib/utils/cn';
 
-const STATUS_LABELS = {
-  draft: 'Entwurf',
-  in_progress: 'Läuft',
-  completed: 'Abgeschlossen',
-};
-
-const STATUS_COLORS = {
-  draft: 'bg-muted text-muted-foreground',
-  in_progress: 'bg-warning/10 text-warning border-warning',
-  completed: 'bg-success/10 text-success border-success',
+const statusBadge = {
+  draft: { variant: 'muted' as const, label: 'Entwurf' },
+  in_progress: { variant: 'warning-soft' as const, label: 'Läuft' },
+  completed: { variant: 'success-soft' as const, label: 'Abgeschlossen' },
 };
 
 export default function TrainingDetailScreen() {
@@ -73,87 +67,88 @@ export default function TrainingDetailScreen() {
 
   if (isLoading) {
     return (
-      <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator size="large" color="#6c47ff" />
-      </View>
+      <Screen>
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color="#8b5cf6" />
+        </View>
+      </Screen>
     );
   }
 
   if (!training) {
     return (
-      <View className="flex-1 bg-background items-center justify-center p-5">
-        <Text className="text-muted-foreground text-center">Training nicht gefunden</Text>
-      </View>
+      <Screen padding="base">
+        <View className="flex-1 items-center justify-center">
+          <Text variant="footnote" color="muted">Training nicht gefunden</Text>
+        </View>
+      </Screen>
     );
   }
 
   return (
-    <ScrollView className="flex-1 bg-background">
+    <Screen scroll>
       {/* Header */}
-      <View className="p-5 pb-4">
+      <View className="px-5 pt-2 pb-4">
         <View className="flex-row justify-between items-start mb-3">
-          <Text className="text-2xl font-bold text-foreground flex-1 mr-3">
+          <Text variant="title1" weight="bold" className="flex-1 mr-3">
             {training.Name}
           </Text>
-          <View className={cn('px-3 py-1.5 rounded border', STATUS_COLORS[training.training_status])}>
-            <Text className="text-xs font-semibold">
-              {STATUS_LABELS[training.training_status]}
-            </Text>
-          </View>
+          <Badge variant={statusBadge[training.training_status].variant}>
+            {statusBadge[training.training_status].label}
+          </Badge>
         </View>
-
-        <Text className="text-base text-muted-foreground">
-          {new Date(training.Date).toLocaleDateString('de-DE', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })}
-        </Text>
+        <View className="flex-row items-center gap-2">
+          <Icon name="calendar-outline" size={14} color="muted" />
+          <Text variant="body" color="muted">
+            {new Date(training.Date).toLocaleDateString('de-DE', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })}
+          </Text>
+        </View>
       </View>
 
       {/* Players */}
       <View className="px-5 pb-4">
-        <Text className="text-base font-semibold text-foreground mb-3">
+        <Text variant="headline" className="mb-3">
           Spieler ({training.players?.length || 0})
         </Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row gap-3">
-          {training.players?.map((player) => (
-            <View key={player.documentId} className="items-center">
-              <View className="w-14 h-14 rounded-full bg-primary/10 items-center justify-center mb-2">
-                <Text className="text-lg font-bold text-primary">
-                  {player.firstname[0]}{player.Name[0]}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View className="flex-row gap-3">
+            {training.players?.map((player) => (
+              <View key={player.documentId} className="items-center">
+                <Avatar
+                  initials={(player.firstname?.[0] ?? '') + (player.Name?.[0] ?? '')}
+                  size="md"
+                  className="mb-2"
+                />
+                <Text variant="caption1" numberOfLines={1} className="max-w-[60px] text-center">
+                  {player.firstname}
                 </Text>
+                {player.requiresInviteAcceptance && (
+                  <Icon name="lock-closed-outline" size={10} color="warning" />
+                )}
               </View>
-              <Text className="text-xs text-foreground text-center max-w-[60px]" numberOfLines={1}>
-                {player.firstname}
-              </Text>
-              {player.requiresInviteAcceptance && (
-                <Text className="text-[10px] text-warning mt-0.5">🔒</Text>
-              )}
-            </View>
-          ))}
+            ))}
+          </View>
         </ScrollView>
       </View>
 
       {/* Exercises */}
       <View className="px-5 pb-4">
-        <Text className="text-base font-semibold text-foreground mb-3">
+        <Text variant="headline" className="mb-3">
           Übungen ({training.exercises?.length || 0})
         </Text>
         {training.exercises?.map((exercise, idx) => (
-          <View
-            key={exercise.documentId}
-            className="bg-card rounded-xl p-4 mb-3 border border-border flex-row items-center"
-          >
+          <Card key={exercise.documentId} className="mb-3 flex-row items-center">
             <View className="flex-1">
               <View className="flex-row justify-between items-start">
-                <Text className="text-sm font-semibold text-foreground flex-1 mr-2">
+                <Text variant="subhead" weight="semibold" className="flex-1 mr-2">
                   {idx + 1}. {exercise.Name}
                 </Text>
-                <Text className="text-xs text-muted-foreground">
-                  {exercise.Minutes} Min
-                </Text>
+                <Text variant="caption1" color="muted">{exercise.Minutes} Min</Text>
               </View>
             </View>
             {canEditExercises && (
@@ -162,67 +157,49 @@ export default function TrainingDetailScreen() {
                 disabled={removeExercise.isPending}
                 className="ml-3 w-8 h-8 rounded-full bg-destructive/10 items-center justify-center active:opacity-70 disabled:opacity-40"
               >
-                <Text className="text-destructive text-base font-bold">×</Text>
+                <Icon name="close" size={16} color="destructive" />
               </Pressable>
             )}
-          </View>
+          </Card>
         ))}
 
         {canEditExercises && (
-          <Pressable
+          <Button
+            variant="secondary"
+            leftIcon="add"
             onPress={() => router.push(`/trainings/${id}/add-exercises`)}
-            className="border border-dashed border-primary rounded-xl p-4 mt-1 active:opacity-70"
           >
-            <Text className="text-center text-sm font-semibold text-primary">
-              + Übung hinzufügen
-            </Text>
-          </Pressable>
+            Übung hinzufügen
+          </Button>
         )}
       </View>
 
       {/* Actions */}
       <View className="p-5 gap-3">
         {training.training_status === 'draft' && (
-          <Pressable
-            onPress={handleStart}
-            disabled={startTraining.isPending}
-            className="bg-primary rounded-xl p-4 disabled:opacity-50"
-          >
-            {startTraining.isPending ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text className="text-center text-sm font-semibold text-primary-foreground">
-                Training starten
-              </Text>
-            )}
-          </Pressable>
+          <Button size="lg" loading={startTraining.isPending} onPress={handleStart}>
+            Training starten
+          </Button>
         )}
-
         {training.training_status === 'in_progress' && (
-          <Pressable
+          <Button
+            size="lg"
+            variant="primary"
             onPress={() => router.push(`/trainings/${id}/execute`)}
-            className="bg-warning rounded-xl p-4"
           >
-            <Text className="text-center text-sm font-semibold text-background">
-              Fortsetzen
-            </Text>
-          </Pressable>
+            Fortsetzen
+          </Button>
         )}
-
-        <Pressable
+        <Button
+          size="lg"
+          variant="destructive"
+          leftIcon="trash-outline"
+          loading={deleteTraining.isPending}
           onPress={handleDelete}
-          disabled={deleteTraining.isPending}
-          className="border border-destructive rounded-xl p-4 disabled:opacity-50"
         >
-          {deleteTraining.isPending ? (
-            <ActivityIndicator color="#ef4444" />
-          ) : (
-            <Text className="text-center text-sm font-semibold text-destructive">
-              Training löschen
-            </Text>
-          )}
-        </Pressable>
+          Training löschen
+        </Button>
       </View>
-    </ScrollView>
+    </Screen>
   );
 }
