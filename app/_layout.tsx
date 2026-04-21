@@ -7,6 +7,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { useAuthStore } from '@/lib/store';
 import { useAppFonts } from '@/lib/fonts';
+import { Toaster } from '@/components/ui';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -59,6 +60,18 @@ export default function RootLayout() {
       <QueryClientProvider client={queryClient}>
         <BottomSheetModalProvider>
           <RootLayoutNav />
+          <Toaster
+            position="top-center"
+            offset={60}
+            duration={3000}
+            toastOptions={{
+              style: {
+                backgroundColor: 'hsl(0, 0%, 13%)',
+                borderWidth: 1,
+                borderColor: 'hsl(0, 0%, 15%)',
+              },
+            }}
+          />
         </BottomSheetModalProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>

@@ -27,3 +27,5 @@ export type { AvatarProps } from './Avatar';
 
 export { BottomSheet } from './BottomSheet';
 export type { BottomSheetRef, BottomSheetProps } from './BottomSheet';
+
+export { Toaster, toast } from './Toast';
