@@ -45,6 +45,7 @@ export interface Training {
   documentId: string;
   Name: string;
   Date: string;
+  createdAt?: string;
   training_status: 'draft' | 'in_progress' | 'completed';
   startedAt?: string;
   completedAt?: string;

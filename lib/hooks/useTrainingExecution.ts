@@ -24,20 +24,32 @@ export function useTrainingExecution(exercises: Exercise[]) {
 
   const currentExercise = exerciseStates.find((ex) => ex.isActive);
 
-  // Re-seed exerciseStates when exercises arrive after mount
-  // (e.g. useTrainingDetail still loading on initial render)
+  // Sync exerciseStates with incoming exercises (initial load, additions, removals).
+  // Preserve completed/active/paused flags for exercises that are already tracked.
   useEffect(() => {
-    if (exercises.length > 0 && exerciseStates.length === 0) {
-      setExerciseStates(
-        exercises.map((ex) => ({
-          ...ex,
-          completed: false,
-          isActive: false,
-          isPaused: false,
-        }))
-      );
-    }
-  }, [exercises.length]);
+    setExerciseStates((prev) => {
+      const prevById = new Map(prev.map((ex) => [ex.documentId, ex]));
+      const next = exercises.map((ex) => {
+        const existing = prevById.get(ex.documentId);
+        if (existing) {
+          return {
+            ...ex,
+            completed: existing.completed,
+            isActive: existing.isActive,
+            isPaused: existing.isPaused,
+          };
+        }
+        return { ...ex, completed: false, isActive: false, isPaused: false };
+      });
+      if (
+        next.length === prev.length &&
+        next.every((ex, i) => ex.documentId === prev[i].documentId)
+      ) {
+        return prev;
+      }
+      return next;
+    });
+  }, [exercises]);
 
   // Session Timer (always runs)
   useEffect(() => {

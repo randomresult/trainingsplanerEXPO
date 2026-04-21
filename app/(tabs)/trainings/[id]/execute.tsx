@@ -193,6 +193,15 @@ export default function ExecuteTrainingScreen() {
             </Text>
           </View>
 
+          <Pressable
+            onPress={() => router.push(`/trainings/${id}/add-exercises`)}
+            className="rounded-lg p-3 mb-1.5 border border-dashed border-primary items-center active:opacity-70"
+          >
+            <Text className="text-xs font-semibold text-primary">
+              + Übung hinzufügen
+            </Text>
+          </Pressable>
+
           {exerciseStates.map((ex, idx) => (
             <Pressable
               key={ex.documentId}

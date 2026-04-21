@@ -18,9 +18,15 @@ export const useTrainings = () => {
         params: { populate: '*' },
       });
 
-      return data.data.filter((t: any) =>
-        t.clubs?.some((c: any) => c.documentId === clubId)
-      );
+      return data.data
+        .filter((t: any) =>
+          t.clubs?.some((c: any) => c.documentId === clubId)
+        )
+        .sort((a: any, b: any) => {
+          const aTime = new Date(a.createdAt || a.Date).getTime();
+          const bTime = new Date(b.createdAt || b.Date).getTime();
+          return bTime - aTime;
+        });
     },
     enabled: !!clubId,
   });
@@ -89,7 +95,51 @@ export const useDeleteTraining = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trainings'] });
-      router.back();
+      router.replace('/trainings');
+    },
+  });
+};
+
+export const useAddExerciseToTraining = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: { trainingId: string; exerciseId: string }) => {
+      const { data } = await apiClient.put<StrapiResponse<Training>>(
+        `/trainings/${input.trainingId}`,
+        {
+          data: {
+            exercises: { connect: [{ documentId: input.exerciseId }] },
+          },
+        }
+      );
+      return data.data;
+    },
+    onSuccess: (_data, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['trainings', vars.trainingId] });
+      queryClient.invalidateQueries({ queryKey: ['trainings'] });
+    },
+  });
+};
+
+export const useRemoveExerciseFromTraining = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: { trainingId: string; exerciseId: string }) => {
+      const { data } = await apiClient.put<StrapiResponse<Training>>(
+        `/trainings/${input.trainingId}`,
+        {
+          data: {
+            exercises: { disconnect: [{ documentId: input.exerciseId }] },
+          },
+        }
+      );
+      return data.data;
+    },
+    onSuccess: (_data, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['trainings', vars.trainingId] });
+      queryClient.invalidateQueries({ queryKey: ['trainings'] });
     },
   });
 };
@@ -137,9 +187,9 @@ export const useCompleteTraining = () => {
       });
       return input.trainingId;
     },
-    onSuccess: (trainingId) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trainings'] });
-      router.replace(`/trainings/${trainingId}`);
+      router.replace('/trainings');
     },
   });
 };

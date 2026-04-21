@@ -14,7 +14,7 @@ export default function TrainingsLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: 'Trainings',
+          headerShown: false,
         }}
       />
       <Stack.Screen
@@ -36,6 +36,14 @@ export default function TrainingsLayout() {
         name="[id]/execute"
         options={{
           headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="[id]/add-exercises"
+        options={{
+          title: 'Übungen hinzufügen',
+          headerBackTitle: 'Zurück',
+          presentation: 'modal',
         }}
       />
     </Stack>

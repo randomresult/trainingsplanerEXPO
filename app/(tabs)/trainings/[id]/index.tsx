@@ -1,6 +1,11 @@
-import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert } from 'react-native';
+import { Platform, View, Text, ScrollView, Pressable, ActivityIndicator, Alert } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
-import { useTrainingDetail, useDeleteTraining, useStartTraining } from '@/lib/queries/useTrainings';
+import {
+  useTrainingDetail,
+  useDeleteTraining,
+  useStartTraining,
+  useRemoveExerciseFromTraining,
+} from '@/lib/queries/useTrainings';
 import { cn } from '@/lib/utils/cn';
 
 const STATUS_LABELS = {
@@ -20,20 +25,45 @@ export default function TrainingDetailScreen() {
   const { data: training, isLoading } = useTrainingDetail(id);
   const deleteTraining = useDeleteTraining();
   const startTraining = useStartTraining();
+  const removeExercise = useRemoveExerciseFromTraining();
+
+  const canEditExercises =
+    training?.training_status === 'draft' || training?.training_status === 'in_progress';
+
+  const confirmRemoveExercise = (exerciseId: string, exerciseName: string) => {
+    const msg = `Übung "${exerciseName}" aus dem Training entfernen?`;
+    if (Platform.OS === 'web') {
+      if (typeof window !== 'undefined' && window.confirm(msg)) {
+        removeExercise.mutate({ trainingId: id, exerciseId });
+      }
+      return;
+    }
+    Alert.alert('Übung entfernen', msg, [
+      { text: 'Abbrechen', style: 'cancel' },
+      {
+        text: 'Entfernen',
+        style: 'destructive',
+        onPress: () => removeExercise.mutate({ trainingId: id, exerciseId }),
+      },
+    ]);
+  };
 
   const handleDelete = () => {
-    Alert.alert(
-      'Training löschen',
-      `"${training?.Name}" wirklich löschen?`,
-      [
-        { text: 'Abbrechen', style: 'cancel' },
-        {
-          text: 'Löschen',
-          style: 'destructive',
-          onPress: () => deleteTraining.mutate(id),
-        },
-      ]
-    );
+    const msg = `"${training?.Name}" wirklich löschen?`;
+    if (Platform.OS === 'web') {
+      if (typeof window !== 'undefined' && window.confirm(msg)) {
+        deleteTraining.mutate(id);
+      }
+      return;
+    }
+    Alert.alert('Training löschen', msg, [
+      { text: 'Abbrechen', style: 'cancel' },
+      {
+        text: 'Löschen',
+        style: 'destructive',
+        onPress: () => deleteTraining.mutate(id),
+      },
+    ]);
   };
 
   const handleStart = async () => {
@@ -114,18 +144,40 @@ export default function TrainingDetailScreen() {
         {training.exercises?.map((exercise, idx) => (
           <View
             key={exercise.documentId}
-            className="bg-card rounded-xl p-4 mb-3 border border-border"
+            className="bg-card rounded-xl p-4 mb-3 border border-border flex-row items-center"
           >
-            <View className="flex-row justify-between items-start">
-              <Text className="text-sm font-semibold text-foreground flex-1 mr-2">
-                {idx + 1}. {exercise.Name}
-              </Text>
-              <Text className="text-xs text-muted-foreground">
-                {exercise.Minutes} Min
-              </Text>
+            <View className="flex-1">
+              <View className="flex-row justify-between items-start">
+                <Text className="text-sm font-semibold text-foreground flex-1 mr-2">
+                  {idx + 1}. {exercise.Name}
+                </Text>
+                <Text className="text-xs text-muted-foreground">
+                  {exercise.Minutes} Min
+                </Text>
+              </View>
             </View>
+            {canEditExercises && (
+              <Pressable
+                onPress={() => confirmRemoveExercise(exercise.documentId, exercise.Name)}
+                disabled={removeExercise.isPending}
+                className="ml-3 w-8 h-8 rounded-full bg-destructive/10 items-center justify-center active:opacity-70 disabled:opacity-40"
+              >
+                <Text className="text-destructive text-base font-bold">×</Text>
+              </Pressable>
+            )}
           </View>
         ))}
+
+        {canEditExercises && (
+          <Pressable
+            onPress={() => router.push(`/trainings/${id}/add-exercises`)}
+            className="border border-dashed border-primary rounded-xl p-4 mt-1 active:opacity-70"
+          >
+            <Text className="text-center text-sm font-semibold text-primary">
+              + Übung hinzufügen
+            </Text>
+          </Pressable>
+        )}
       </View>
 
       {/* Actions */}
