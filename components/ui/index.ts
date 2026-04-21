@@ -21,3 +21,6 @@ export type { ChipProps } from './Chip';
 
 export { ListItem } from './ListItem';
 export type { ListItemProps } from './ListItem';
+
+export { Avatar } from './Avatar';
+export type { AvatarProps } from './Avatar';
