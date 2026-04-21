@@ -1,6 +1,8 @@
+import { useRef } from 'react';
 import { Platform, View, ActivityIndicator, Alert, ScrollView, Pressable } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Screen, Text, Button, Card, Badge, Avatar, Icon } from '@/components/ui';
+import { AddExercisesSheet, AddExercisesSheetRef } from '@/components/sheets/AddExercisesSheet';
 import {
   useTrainingDetail,
   useDeleteTraining,
@@ -20,6 +22,8 @@ export default function TrainingDetailScreen() {
   const deleteTraining = useDeleteTraining();
   const startTraining = useStartTraining();
   const removeExercise = useRemoveExerciseFromTraining();
+
+  const addSheetRef = useRef<AddExercisesSheetRef>(null);
 
   const canEditExercises =
     training?.training_status === 'draft' || training?.training_status === 'in_progress';
@@ -167,7 +171,7 @@ export default function TrainingDetailScreen() {
           <Button
             variant="secondary"
             leftIcon="add"
-            onPress={() => router.push(`/trainings/${id}/add-exercises`)}
+            onPress={() => addSheetRef.current?.present()}
           >
             Übung hinzufügen
           </Button>
@@ -200,6 +204,8 @@ export default function TrainingDetailScreen() {
           Training löschen
         </Button>
       </View>
+
+      <AddExercisesSheet ref={addSheetRef} trainingId={id} />
     </Screen>
   );
 }

@@ -30,14 +30,6 @@ export default function TrainingsLayout() {
           headerShown: false,
         }}
       />
-      <Stack.Screen
-        name="[id]/add-exercises"
-        options={{
-          title: 'Übungen hinzufügen',
-          headerBackTitle: 'Zurück',
-          presentation: 'modal',
-        }}
-      />
     </Stack>
   );
 }

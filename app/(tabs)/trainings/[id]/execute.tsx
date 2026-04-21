@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { View, ScrollView, Pressable, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -7,12 +7,14 @@ import { useTrainingExecution } from '@/lib/hooks/useTrainingExecution';
 import { formatTime } from '@/lib/utils/formatTime';
 import { cn } from '@/lib/utils/cn';
 import { Text, Icon, Button, Card } from '@/components/ui';
+import { AddExercisesSheet, AddExercisesSheetRef } from '@/components/sheets/AddExercisesSheet';
 
 export default function ExecuteTrainingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: training, isLoading } = useTrainingDetail(id);
   const [expanded, setExpanded] = useState(false);
   const completeTraining = useCompleteTraining();
+  const addSheetRef = useRef<AddExercisesSheetRef>(null);
 
   const {
     sessionElapsed,
@@ -209,7 +211,7 @@ export default function ExecuteTrainingScreen() {
             variant="secondary"
             leftIcon="add"
             size="sm"
-            onPress={() => router.push(`/trainings/${id}/add-exercises`)}
+            onPress={() => addSheetRef.current?.present()}
             className="mb-1.5 border-dashed border-primary"
           >
             Übung hinzufügen
@@ -297,6 +299,8 @@ export default function ExecuteTrainingScreen() {
           Training beenden
         </Button>
       </View>
+
+      <AddExercisesSheet ref={addSheetRef} trainingId={id} />
     </SafeAreaView>
   );
 }
