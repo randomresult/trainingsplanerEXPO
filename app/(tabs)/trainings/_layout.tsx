@@ -18,14 +18,6 @@ export default function TrainingsLayout() {
         }}
       />
       <Stack.Screen
-        name="create"
-        options={{
-          title: 'Training erstellen',
-          headerBackTitle: 'Zurück',
-          presentation: 'modal',
-        }}
-      />
-      <Stack.Screen
         name="[id]/index"
         options={{
           title: 'Training',

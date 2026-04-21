@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { View, FlatList, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
 import { Screen, Text, Button, Chip, Card, Badge, Icon } from '@/components/ui';
+import { CreateTrainingSheet, CreateTrainingSheetRef } from '@/components/sheets/CreateTrainingSheet';
 import { useTrainings } from '@/lib/queries/useTrainings';
 import type { Training } from '@/lib/types/models';
 
@@ -30,6 +31,7 @@ const formatDate = (iso: string) => {
 export default function TrainingsScreen() {
   const { data: trainings, isLoading } = useTrainings();
   const [filter, setFilter] = useState<FilterKey>('upcoming');
+  const createSheetRef = useRef<CreateTrainingSheetRef>(null);
 
   const filtered = useMemo(() => {
     if (!trainings) return [];
@@ -91,7 +93,7 @@ export default function TrainingsScreen() {
     <Screen>
       <View className="px-5 pt-5 pb-4 border-b border-border">
         <Text variant="largeTitle" weight="bold" className="mb-4">Training</Text>
-        <Button leftIcon="add" size="md" onPress={() => router.push('/trainings/create')}>
+        <Button leftIcon="add" size="md" onPress={() => createSheetRef.current?.present()}>
           Neues Training erstellen
         </Button>
       </View>
@@ -135,6 +137,8 @@ export default function TrainingsScreen() {
           }
         />
       )}
+
+      <CreateTrainingSheet ref={createSheetRef} />
     </Screen>
   );
 }
