@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert, Platform } from 'react-native';
+import { View, ScrollView, Pressable, Alert, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useTrainingDetail, useCompleteTraining } from '@/lib/queries/useTrainings';
 import { useTrainingExecution } from '@/lib/hooks/useTrainingExecution';
 import { formatTime } from '@/lib/utils/formatTime';
 import { cn } from '@/lib/utils/cn';
+import { Text, Icon, Button, Card } from '@/components/ui';
 
 export default function ExecuteTrainingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -63,25 +65,27 @@ export default function ExecuteTrainingScreen() {
 
   if (isLoading) {
     return (
-      <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator size="large" color="#6c47ff" />
-      </View>
+      <SafeAreaView edges={['top', 'bottom']} className="flex-1 bg-background items-center justify-center">
+        <Icon name="reload-outline" size={32} color="primary" />
+      </SafeAreaView>
     );
   }
 
   return (
-    <View className="flex-1 bg-background">
+    <SafeAreaView edges={['top', 'bottom']} className="flex-1 bg-background">
       {/* Header (Sticky) */}
       <View className="bg-background border-b border-border px-5 py-4">
         {/* Back + Session Timer + Stop */}
         <View className="flex-row justify-between items-center mb-3">
-          <Pressable onPress={() => router.back()}>
-            <Text className="text-xl text-muted-foreground">←</Text>
+          <Pressable onPress={() => router.back()} className="p-2">
+            <Icon name="chevron-back" size={24} color="muted" />
           </Pressable>
 
           <View className="flex-1 items-center">
-            <Text className="text-sm font-semibold mb-0.5">{training?.Name}</Text>
-            <Text className="text-2xl font-bold text-warning">
+            <Text variant="subhead" weight="semibold" className="mb-0.5">
+              {training?.Name}
+            </Text>
+            <Text variant="title1" weight="bold" color="warning">
               {formatTime(sessionElapsed)}
             </Text>
           </View>
@@ -90,12 +94,12 @@ export default function ExecuteTrainingScreen() {
             onPress={handleFinishTraining}
             className="bg-destructive/10 px-3 py-1.5 rounded-lg"
           >
-            <Text className="text-destructive font-bold text-xs">■</Text>
+            <Icon name="stop" size={14} color="destructive" />
           </Pressable>
         </View>
 
         {/* Progress */}
-        <Text className="text-xs font-bold text-success mb-2">
+        <Text variant="caption1" color="success" weight="bold" className="mb-2">
           {completedCount}/{exerciseStates.length} Übungen
         </Text>
 
@@ -111,43 +115,50 @@ export default function ExecuteTrainingScreen() {
       <ScrollView className="flex-1">
         {/* Current Exercise Card (Accordion) */}
         {!currentExercise ? (
-          <View className="bg-card rounded-xl p-3.5 mx-5 mt-5 border border-border">
-            <Text className="text-center text-sm text-muted-foreground">
+          <Card variant="elevated" className="mx-5 mt-5">
+            <Text variant="subhead" color="muted" className="text-center">
               Wähle eine Übung aus der Liste, um zu starten
             </Text>
-          </View>
+          </Card>
         ) : (
-          <View className="bg-card rounded-xl p-3.5 mx-5 mt-5 border border-primary">
+          <Card variant="elevated" className="mx-5 mt-5 border-primary">
             <View className="flex-row justify-between items-center mb-2.5">
-              <Text className="text-[11px] font-bold text-primary uppercase">
+              <Text variant="caption2" weight="bold" color="primary" className="uppercase">
                 Aktuelle Übung
               </Text>
-              <Text className="text-xs font-bold text-warning">
-                ⏱ {formatTime(exerciseElapsed)}
-              </Text>
+              <View className="flex-row items-center gap-1">
+                <Icon name="time-outline" size={12} color="warning" />
+                <Text variant="caption1" weight="bold" color="warning">
+                  {formatTime(exerciseElapsed)}
+                </Text>
+              </View>
             </View>
 
             <Pressable
               onPress={() => setExpanded(!expanded)}
               className="flex-row justify-between items-start mb-2"
             >
-              <Text className="text-base font-semibold flex-1">
+              <Text variant="callout" weight="semibold" className="flex-1">
                 {currentExercise.Name}
               </Text>
               <View className="bg-muted rounded px-2 py-1">
-                <Text className="text-lg text-muted-foreground">
-                  {expanded ? '⌃' : '⌄'}
-                </Text>
+                {expanded
+                  ? <Icon name="chevron-up" size={20} color="muted" />
+                  : <Icon name="chevron-down" size={20} color="muted" />
+                }
               </View>
             </Pressable>
 
-            <Text className="text-xs text-muted-foreground leading-relaxed">
+            <Text variant="caption1" color="muted" className="leading-relaxed">
               {currentExercise.Description}
             </Text>
 
             {expanded && (
               <View className="border-t border-border pt-3 mt-3">
-                <Text className="text-xs font-bold mb-2">📋 Anleitung:</Text>
+                <View className="flex-row items-center gap-1 mb-2">
+                  <Icon name="list-outline" size={12} color="foreground" />
+                  <Text variant="caption1" weight="bold">Anleitung:</Text>
+                </View>
                 {currentExercise.Steps?.map((step: any, idx: number) => {
                   const text =
                     typeof step === 'string'
@@ -155,10 +166,10 @@ export default function ExecuteTrainingScreen() {
                       : [step?.Name, step?.Description].filter(Boolean).join(' — ');
                   return (
                     <View key={step?.id ?? idx} className="flex-row mb-1.5">
-                      <Text className="text-xs text-muted-foreground mr-2">
+                      <Text variant="caption1" color="muted" className="mr-2">
                         {idx + 1}.
                       </Text>
-                      <Text className="text-xs text-muted-foreground flex-1">
+                      <Text variant="caption1" color="muted" className="flex-1">
                         {text}
                       </Text>
                     </View>
@@ -167,11 +178,12 @@ export default function ExecuteTrainingScreen() {
 
                 {currentExercise.Hint && (
                   <>
-                    <Text className="text-xs font-bold mt-3 mb-1.5">
-                      💡 Trainer-Hinweis:
-                    </Text>
+                    <View className="flex-row items-center gap-1 mt-3 mb-1.5">
+                      <Icon name="bulb-outline" size={12} color="foreground" />
+                      <Text variant="caption1" weight="bold">Trainer-Hinweis:</Text>
+                    </View>
                     <View className="bg-warning/10 rounded px-2 py-2">
-                      <Text className="text-xs text-foreground">
+                      <Text variant="caption1">
                         {currentExercise.Hint}
                       </Text>
                     </View>
@@ -179,28 +191,29 @@ export default function ExecuteTrainingScreen() {
                 )}
               </View>
             )}
-          </View>
+          </Card>
         )}
 
         {/* Exercise List */}
         <View className="bg-muted/40 rounded-xl p-3 mx-5 mt-3 mb-20 border-l-[3px] border-primary">
           <View className="flex-row justify-between items-center mb-2 px-1">
-            <Text className="text-[11px] font-bold text-primary uppercase">
+            <Text variant="caption2" weight="bold" color="primary" className="uppercase">
               Übungen
             </Text>
-            <Text className="text-[11px] font-bold text-primary">
+            <Text variant="caption2" weight="bold" color="primary">
               {completedCount}/{exerciseStates.length}
             </Text>
           </View>
 
-          <Pressable
+          <Button
+            variant="secondary"
+            leftIcon="add"
+            size="sm"
             onPress={() => router.push(`/trainings/${id}/add-exercises`)}
-            className="rounded-lg p-3 mb-1.5 border border-dashed border-primary items-center active:opacity-70"
+            className="mb-1.5 border-dashed border-primary"
           >
-            <Text className="text-xs font-semibold text-primary">
-              + Übung hinzufügen
-            </Text>
-          </Pressable>
+            Übung hinzufügen
+          </Button>
 
           {exerciseStates.map((ex, idx) => (
             <Pressable
@@ -226,16 +239,16 @@ export default function ExecuteTrainingScreen() {
                 )}
               >
                 {ex.completed && (
-                  <Text className="text-xs font-bold text-background">✓</Text>
+                  <Icon name="checkmark" size={12} color="inverse" />
                 )}
               </Pressable>
 
               <View className="flex-1">
                 <Text
-                  className={cn(
-                    'text-sm font-semibold',
-                    ex.completed && 'line-through text-muted-foreground'
-                  )}
+                  variant="subhead"
+                  weight="semibold"
+                  color={ex.completed ? 'muted' : 'foreground'}
+                  className={cn(ex.completed && 'line-through')}
                 >
                   {ex.Name}
                 </Text>
@@ -246,10 +259,14 @@ export default function ExecuteTrainingScreen() {
                       e.stopPropagation();
                       togglePause();
                     }}
-                    className="mt-1 self-start"
+                    className="mt-1 self-start flex-row items-center gap-1"
                   >
-                    <Text className="text-[11px] text-primary font-semibold">
-                      {ex.isPaused ? '▶ Fortsetzen' : '⏸ Pause'}
+                    {ex.isPaused
+                      ? <Icon name="play" size={12} color="primary" />
+                      : <Icon name="pause" size={12} color="primary" />
+                    }
+                    <Text variant="caption2" color="primary" weight="semibold">
+                      {ex.isPaused ? 'Fortsetzen' : 'Pause'}
                     </Text>
                   </Pressable>
                 )}
@@ -257,10 +274,8 @@ export default function ExecuteTrainingScreen() {
 
               <View className="bg-background/80 border border-border rounded px-2.5 py-1">
                 <Text
-                  className={cn(
-                    'text-[11px]',
-                    ex.isActive && 'text-warning'
-                  )}
+                  variant="caption2"
+                  color={ex.isActive ? 'warning' : 'foreground'}
                 >
                   {ex.Minutes}:00
                 </Text>
@@ -272,20 +287,16 @@ export default function ExecuteTrainingScreen() {
 
       {/* Bottom Bar */}
       <View className="absolute bottom-0 left-0 right-0 p-5 bg-card border-t border-border">
-        <Pressable
+        <Button
+          variant="destructive"
+          size="lg"
+          loading={completeTraining.isPending}
           onPress={handleFinishTraining}
-          disabled={completeTraining.isPending}
-          className="w-full p-3.5 bg-destructive rounded-xl disabled:opacity-50"
+          className="w-full"
         >
-          {completeTraining.isPending ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text className="text-center text-sm font-semibold text-destructive-foreground">
-              Training beenden
-            </Text>
-          )}
-        </Pressable>
+          Training beenden
+        </Button>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
