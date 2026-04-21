@@ -18,3 +18,6 @@ export type { BadgeProps } from './Badge';
 
 export { Chip } from './Chip';
 export type { ChipProps } from './Chip';
+
+export { ListItem } from './ListItem';
+export type { ListItemProps } from './ListItem';
