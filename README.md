@@ -1,8 +1,36 @@
-# 🏓 TT Trainingsplaner - EXPO Mobile App
+# TT Trainingsplaner EXPO
 
-React Native mobile app for table tennis training management.
+Mobile app for table tennis training management built with Expo and React Native.
 
-## 📁 Expected Project Structure
+## Tech Stack
+
+- **Expo SDK 55** - Latest stable Expo version
+- **Expo Router v4** - File-based routing
+- **NativeWind v4** - Tailwind CSS for React Native
+- **TanStack Query v5** - Data fetching and caching
+- **Zustand** - Global state management
+- **MMKV** - Fast persistent storage
+- **Axios** - HTTP client with JWT interceptor
+
+## Project Structure
+
+```
+trainingsplanerEXPO/
+├── app/                    # Expo Router screens
+│   ├── _layout.tsx        # Root layout with QueryClient & guards
+│   ├── (auth)/            # Authentication screens
+│   └── (tabs)/            # Main app tabs
+├── lib/                   # Core libraries
+│   ├── api.ts            # Axios client
+│   ├── store.ts          # Zustand auth store
+│   ├── queries/          # TanStack Query hooks
+│   ├── hooks/            # Custom React hooks
+│   └── utils/            # Utility functions
+├── components/           # Reusable components
+└── docs/                # Documentation
+```
+
+### Multi-Project Layout
 
 This repo is part of a multi-project setup:
 
@@ -13,71 +41,61 @@ trainingplanerMAIN/              # Local container folder
 └── trainingsplanerEXPO/         # Mobile App (Expo) - Git Repo (This project)
 ```
 
-## 📚 Documentation
+## Setup
 
-**Complete development documentation:**
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-- **[DEVELOPMENT_GUIDE.md](docs/DEVELOPMENT_GUIDE.md)** - Complete guide with API reference, mockup mappings, code examples, and workflow
-- **[DOCUMENTATION_CONSOLIDATION.md](docs/DOCUMENTATION_CONSOLIDATION.md)** - Explains the documentation structure
+2. **Start development server:**
+   ```bash
+   npm start
+   ```
 
-## 🚀 Quick Start
+3. **Run on device/simulator:**
+   - iOS: `npm run ios`
+   - Android: `npm run android`
+   - Web: `npm run web`
 
-### Prerequisites
-- Node.js 18+
-- Expo CLI: `npm install -g expo-cli`
-- Backend running (local or production)
+## Features (Sub-Project 1)
 
-### Setup
+- [x] Authentication (Login/Register)
+- [x] Exercise Library (Read-only)
+- [x] Training CRUD (Create, View, Delete)
+- [x] Training Execution with dual timers
+- [x] Manual exercise control (no auto-advance)
+- [x] Player management backend integration
+
+## Backend API
+
+- Base URL: `https://trainingsplaner-strapi.onrender.com/api`
+- Authentication: JWT Bearer Token
+- Main endpoints: `/auth/local`, `/exercises`, `/trainings`, `/players`
+
+### Local Backend (optional)
+
 ```bash
-# Install dependencies
-npm install
-
-# Start development
-npx expo start
-```
-
-### Backend Access
-```bash
-# Production API
-https://trainingsplaner-strapi.onrender.com/api
-
-# Local Backend (in sibling folder)
 cd ../trainingsplaner
 npm run develop
 # → http://localhost:1337/api
 ```
 
-### Web Frontend Reference (optional)
-```bash
-# Reference only - not actively developed
-cd ../trainingsplanerFE
-npm run dev
-# → http://localhost:3000
-```
+## Development
 
-## 🎯 Development Focus
+- Dark theme by default
+- Session persistence with MMKV
+- Automatic JWT refresh on 401
+- Navigation guards for auth flows
 
-- **✅ Active:** Backend (Strapi) + Mobile App (EXPO)
-- **📚 Reference:** Web Frontend (Nuxt/Vue)
+## Documentation
 
-## 📋 MVP Mockups
+- **[DEVELOPMENT_GUIDE.md](docs/DEVELOPMENT_GUIDE.md)** - Complete development guide with API reference, mockup mappings, and code examples
+- **[DOCUMENTATION_CONSOLIDATION.md](docs/DOCUMENTATION_CONSOLIDATION.md)** - Documentation structure overview
 
-All 16 MVP mockup screens are in:
-```
-.superpowers/brainstorm/19484-1776630674/content/mvp-*.html
-```
+## Next Steps (Sub-Project 2)
 
-Open them in a browser to see the UI designs.
-
-## 🗺️ Roadmap
-
-**Phase 1 (Week 1-2):** Auth + Navigation  
-**Phase 2 (Week 3):** Exercise Library  
-**Phase 3 (Week 4-5):** Training Features  
-**Phase 4 (Week 6-8):** Advanced Features + Polish  
-
-See [DEVELOPMENT_GUIDE.md](docs/DEVELOPMENT_GUIDE.md) for details.
-
----
-
-**For full documentation:** → [docs/DEVELOPMENT_GUIDE.md](docs/DEVELOPMENT_GUIDE.md)
+- Dashboard with statistics
+- Profile customization
+- Full player CRUD UI (Verein-Tab)
+- Advanced training analytics
