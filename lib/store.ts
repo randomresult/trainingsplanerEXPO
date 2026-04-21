@@ -6,41 +6,47 @@ interface AuthState {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
-  login: (token: string, user: User) => void;
-  logout: () => void;
-  restoreSession: () => void;
+  isRestored: boolean;
+  login: (token: string, user: User) => Promise<void>;
+  logout: () => Promise<void>;
+  restoreSession: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   token: null,
   isAuthenticated: false,
+  isRestored: false,
 
-  login: (token: string, user: User) => {
-    storage.set('jwt', token);
-    storage.set('user', JSON.stringify(user));
+  login: async (token: string, user: User) => {
+    await Promise.all([
+      storage.set('jwt', token),
+      storage.set('user', JSON.stringify(user)),
+    ]);
     set({ token, user, isAuthenticated: true });
   },
 
-  logout: () => {
-    storage.remove('jwt');
-    storage.remove('user');
+  logout: async () => {
+    await Promise.all([storage.remove('jwt'), storage.remove('user')]);
     set({ token: null, user: null, isAuthenticated: false });
   },
 
-  restoreSession: () => {
+  restoreSession: async () => {
     try {
-      const token = storage.getString('jwt');
-      const userJson = storage.getString('user');
+      const [token, userJson] = await Promise.all([
+        storage.get('jwt'),
+        storage.get('user'),
+      ]);
 
       if (token && userJson) {
         const user = JSON.parse(userJson) as User;
-        set({ token, user, isAuthenticated: true });
+        set({ token, user, isAuthenticated: true, isRestored: true });
+        return;
       }
     } catch (error) {
       console.error('Failed to restore session:', error);
-      storage.remove('jwt');
-      storage.remove('user');
+      await Promise.all([storage.remove('jwt'), storage.remove('user')]);
     }
+    set({ isRestored: true });
   },
 }));

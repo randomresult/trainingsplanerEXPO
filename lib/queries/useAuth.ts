@@ -48,8 +48,8 @@ export const useLogin = () => {
       const fullUser = await fetchFullUser(data.jwt);
       return { jwt: data.jwt, user: fullUser };
     },
-    onSuccess: (data) => {
-      login(data.jwt, data.user);
+    onSuccess: async (data) => {
+      await login(data.jwt, data.user);
       router.replace('/(tabs)');
     },
   });
@@ -64,8 +64,8 @@ export const useRegister = () => {
       const fullUser = await fetchFullUser(data.jwt);
       return { jwt: data.jwt, user: fullUser };
     },
-    onSuccess: (data) => {
-      login(data.jwt, data.user);
+    onSuccess: async (data) => {
+      await login(data.jwt, data.user);
       router.replace('/(tabs)');
     },
   });

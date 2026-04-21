@@ -1,6 +1,6 @@
 import axios from 'axios';
 import qs from 'qs';
-import { storage } from './storage';
+import { useAuthStore } from './store';
 
 const BASE_URL = 'https://trainingsplaner-strapi.onrender.com/api';
 
@@ -13,27 +13,22 @@ export const apiClient = axios.create({
   paramsSerializer: (params) => qs.stringify(params, { encodeValuesOnly: true }),
 });
 
-// JWT Request Interceptor
 apiClient.interceptors.request.use(
   (config) => {
-    const token = storage.getString('jwt');
+    const token = useAuthStore.getState().token;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// 401 Response Interceptor
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      storage.remove('jwt');
-      storage.remove('user');
+      useAuthStore.getState().logout();
     }
     return Promise.reject(error);
   }

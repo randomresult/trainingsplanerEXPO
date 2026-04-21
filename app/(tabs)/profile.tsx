@@ -5,8 +5,8 @@ import { useAuthStore } from '@/lib/store';
 export default function ProfileScreen() {
   const { user, logout } = useAuthStore();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.replace('/(auth)/login');
   };
 
