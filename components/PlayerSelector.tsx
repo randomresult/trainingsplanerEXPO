@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { View, Text, Modal, Pressable, FlatList, ActivityIndicator } from 'react-native';
+import { View, Modal, Pressable, FlatList, ActivityIndicator } from 'react-native';
 import { usePlayers } from '@/lib/queries/usePlayers';
+import { Text } from '@/components/ui/Text';
 import { Icon } from '@/components/ui/Icon';
 import type { Player } from '@/lib/types/models';
 
@@ -27,7 +28,7 @@ export function PlayerSelector({ selectedIds, onSelectionChange }: PlayerSelecto
         onPress={() => setModalVisible(true)}
         className="bg-card border border-border rounded-lg px-4 py-3"
       >
-        <Text className="text-foreground">
+        <Text variant="body">
           {selectedIds.length > 0
             ? `${selectedIds.length} Spieler ausgewählt`
             : 'Spieler auswählen'}
@@ -43,12 +44,12 @@ export function PlayerSelector({ selectedIds, onSelectionChange }: PlayerSelecto
         <View className="flex-1 bg-background">
           <View className="p-5 border-b border-border">
             <View className="flex-row justify-between items-center">
-              <Text className="text-xl font-bold text-foreground">Spieler auswählen</Text>
+              <Text variant="title3" weight="bold">Spieler auswählen</Text>
               <Pressable onPress={() => setModalVisible(false)}>
-                <Text className="text-primary font-semibold">Fertig</Text>
+                <Text variant="body" weight="semibold" color="primary">Fertig</Text>
               </Pressable>
             </View>
-            <Text className="text-sm text-muted-foreground mt-1">
+            <Text variant="subhead" color="muted" className="mt-1">
               {selectedIds.length} ausgewählt
             </Text>
           </View>
@@ -77,13 +78,13 @@ export function PlayerSelector({ selectedIds, onSelectionChange }: PlayerSelecto
                       )}
                     </View>
                     <View className="flex-1">
-                      <Text className="text-sm font-semibold text-foreground mb-1">
+                      <Text variant="subhead" weight="semibold" className="mb-1">
                         {item.firstname} {item.Name}
                       </Text>
                       {item.requiresInviteAcceptance && (
                         <View className="flex-row items-center gap-1 mt-0.5">
                           <Icon name="lock-closed-outline" size={12} color="warning" />
-                          <Text className="text-xs text-warning">Einladung wird gesendet</Text>
+                          <Text variant="caption1" color="warning">Einladung wird gesendet</Text>
                         </View>
                       )}
                     </View>

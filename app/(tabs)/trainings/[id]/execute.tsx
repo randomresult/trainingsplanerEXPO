@@ -123,7 +123,7 @@ export default function ExecuteTrainingScreen() {
             </Text>
           </Card>
         ) : (
-          <Card variant="elevated" className="mx-5 mt-5 border-primary">
+          <Card variant="elevated" className="mx-5 mt-5 !border-primary">
             <View className="flex-row justify-between items-center mb-2.5">
               <Text variant="caption2" weight="bold" color="primary" className="uppercase">
                 Aktuelle Übung
@@ -212,7 +212,7 @@ export default function ExecuteTrainingScreen() {
             leftIcon="add"
             size="sm"
             onPress={() => addSheetRef.current?.present()}
-            className="mb-1.5 border-dashed border-primary"
+            className="mb-1.5 !border-dashed !border-primary"
           >
             Übung hinzufügen
           </Button>
