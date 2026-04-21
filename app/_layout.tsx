@@ -3,7 +3,10 @@ import { useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { useAuthStore } from '@/lib/store';
+import { useAppFonts } from '@/lib/fonts';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,6 +21,7 @@ function RootLayoutNav() {
   const segments = useSegments();
   const router = useRouter();
   const { isAuthenticated, isRestored, restoreSession } = useAuthStore();
+  const { loaded: fontsLoaded } = useAppFonts();
 
   useEffect(() => {
     restoreSession();
@@ -33,7 +37,7 @@ function RootLayoutNav() {
     }
   }, [isAuthenticated, isRestored, segments]);
 
-  if (!isRestored) {
+  if (!isRestored || !fontsLoaded) {
     return (
       <View className="flex-1 items-center justify-center bg-background">
         <ActivityIndicator size="large" color="#8b5cf6" />
@@ -51,8 +55,12 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <RootLayoutNav />
-    </QueryClientProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <QueryClientProvider client={queryClient}>
+        <BottomSheetModalProvider>
+          <RootLayoutNav />
+        </BottomSheetModalProvider>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 }

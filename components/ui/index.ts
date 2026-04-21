@@ -24,3 +24,6 @@ export type { ListItemProps } from './ListItem';
 
 export { Avatar } from './Avatar';
 export type { AvatarProps } from './Avatar';
+
+export { BottomSheet } from './BottomSheet';
+export type { BottomSheetRef, BottomSheetProps } from './BottomSheet';
