@@ -1,5 +1,3 @@
-const { Platform } = require('react-native');
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./app/**/*.{js,jsx,ts,tsx}', './components/**/*.{js,jsx,ts,tsx}'],
@@ -27,22 +25,10 @@ module.exports = {
         info: 'hsl(199, 89%, 48%)',
       },
       fontFamily: {
-        sans: Platform.select({
-          ios: ['System'],
-          default: ['Inter-Regular', 'System'],
-        }),
-        'sans-medium': Platform.select({
-          ios: ['System'],
-          default: ['Inter-Medium', 'System'],
-        }),
-        'sans-semibold': Platform.select({
-          ios: ['System'],
-          default: ['Inter-SemiBold', 'System'],
-        }),
-        'sans-bold': Platform.select({
-          ios: ['System'],
-          default: ['Inter-Bold', 'System'],
-        }),
+        sans: ['Inter-Regular', 'System'],
+        'sans-medium': ['Inter-Medium', 'System'],
+        'sans-semibold': ['Inter-SemiBold', 'System'],
+        'sans-bold': ['Inter-Bold', 'System'],
       },
       fontSize: {
         largeTitle: ['34px', { lineHeight: '41px', fontWeight: '400' }],
