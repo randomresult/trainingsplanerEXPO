@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, Modal, Pressable, FlatList, ActivityIndicator } from 'react-native';
 import { useExercises } from '@/lib/queries/useExercises';
+import { Icon } from '@/components/ui/Icon';
 import type { Exercise } from '@/lib/types/models';
 
 interface ExerciseSelectorProps {
@@ -72,7 +73,7 @@ export function ExerciseSelector({ selectedIds, onSelectionChange }: ExerciseSel
                       isSelected ? 'bg-primary border-primary' : 'border-muted-foreground'
                     }`}>
                       {isSelected && (
-                        <Text className="text-xs font-bold text-primary-foreground">✓</Text>
+                        <Icon name="checkmark" size={14} color="inverse" />
                       )}
                     </View>
                     <View className="flex-1">

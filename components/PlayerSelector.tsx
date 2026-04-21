@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, Modal, Pressable, FlatList, ActivityIndicator } from 'react-native';
 import { usePlayers } from '@/lib/queries/usePlayers';
+import { Icon } from '@/components/ui/Icon';
 import type { Player } from '@/lib/types/models';
 
 interface PlayerSelectorProps {
@@ -72,7 +73,7 @@ export function PlayerSelector({ selectedIds, onSelectionChange }: PlayerSelecto
                       isSelected ? 'bg-primary border-primary' : 'border-muted-foreground'
                     }`}>
                       {isSelected && (
-                        <Text className="text-xs font-bold text-primary-foreground">✓</Text>
+                        <Icon name="checkmark" size={14} color="inverse" />
                       )}
                     </View>
                     <View className="flex-1">
@@ -80,9 +81,10 @@ export function PlayerSelector({ selectedIds, onSelectionChange }: PlayerSelecto
                         {item.firstname} {item.Name}
                       </Text>
                       {item.requiresInviteAcceptance && (
-                        <Text className="text-xs text-warning">
-                          🔒 Einladung wird gesendet
-                        </Text>
+                        <View className="flex-row items-center gap-1 mt-0.5">
+                          <Icon name="lock-closed-outline" size={12} color="warning" />
+                          <Text className="text-xs text-warning">Einladung wird gesendet</Text>
+                        </View>
                       )}
                     </View>
                   </Pressable>
