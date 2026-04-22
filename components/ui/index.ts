@@ -38,3 +38,9 @@ export type { PlayerCardProps } from './PlayerCard';
 
 export { TrainingCard } from './TrainingCard';
 export type { TrainingCardProps, TrainingCardVariant } from './TrainingCard';
+
+export { MediaThumbnail } from './MediaThumbnail';
+export type { MediaThumbnailProps } from './MediaThumbnail';
+
+export { MediaViewer } from './MediaViewer';
+export type { MediaViewerProps } from './MediaViewer';
