@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { apiClient } from '../api';
 import { useAuthStore } from '../store';
@@ -212,5 +212,40 @@ export const useCompleteTraining = () => {
       queryClient.invalidateQueries({ queryKey: ['trainings'] });
       router.replace('/trainings');
     },
+  });
+};
+
+const HISTORY_PAGE_SIZE = 30;
+
+export const useTrainingsHistory = () => {
+  const user = useAuthStore((s) => s.user);
+  const clubId = user?.clubs?.[0]?.documentId;
+
+  return useInfiniteQuery({
+    queryKey: ['trainings', 'history', clubId],
+    queryFn: async ({ pageParam = 1 }) => {
+      const { data } = await apiClient.get<
+        StrapiResponse<Training[]> & { meta?: { pagination?: { page: number; pageCount: number } } }
+      >('/trainings', {
+        params: {
+          populate: '*',
+          pagination: { page: pageParam, pageSize: HISTORY_PAGE_SIZE },
+          sort: ['Date:desc'],
+          filters: { training_status: { $eq: 'completed' } },
+        },
+      });
+      const filtered = data.data.filter((t: any) =>
+        t.clubs?.some((c: any) => c.documentId === clubId)
+      );
+      return {
+        items: filtered,
+        page: data.meta?.pagination?.page ?? pageParam,
+        pageCount: data.meta?.pagination?.pageCount ?? 1,
+      };
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.page < lastPage.pageCount ? lastPage.page + 1 : undefined,
+    enabled: !!clubId,
   });
 };
