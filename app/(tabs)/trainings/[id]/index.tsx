@@ -1,8 +1,9 @@
 import { useRef } from 'react';
-import { Platform, View, ActivityIndicator, Alert, ScrollView, Pressable } from 'react-native';
+import { Platform, View, ActivityIndicator, Alert, Pressable } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
-import { Screen, Text, Button, Card, Badge, Avatar, Icon } from '@/components/ui';
+import { Screen, Text, Button, Card, Badge, Icon, PlayerCard } from '@/components/ui';
 import { AddExercisesSheet, AddExercisesSheetRef } from '@/components/sheets/AddExercisesSheet';
+import { AddPlayersSheet, AddPlayersSheetRef } from '@/components/sheets/AddPlayersSheet';
 import {
   useTrainingDetail,
   useDeleteTraining,
@@ -24,6 +25,7 @@ export default function TrainingDetailScreen() {
   const removeExercise = useRemoveExerciseFromTraining();
 
   const addSheetRef = useRef<AddExercisesSheetRef>(null);
+  const addPlayerSheetRef = useRef<AddPlayersSheetRef>(null);
 
   const canEditExercises =
     training?.training_status === 'draft' || training?.training_status === 'in_progress';
@@ -116,28 +118,22 @@ export default function TrainingDetailScreen() {
 
       {/* Players */}
       <View className="px-5 pb-4">
-        <Text variant="headline" className="mb-3">
-          Spieler ({training.players?.length || 0})
-        </Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View className="flex-row gap-3">
-            {training.players?.map((player) => (
-              <View key={player.documentId} className="items-center">
-                <Avatar
-                  initials={(player.firstname?.[0] ?? '') + (player.Name?.[0] ?? '')}
-                  size="md"
-                  className="mb-2"
-                />
-                <Text variant="caption1" numberOfLines={1} className="max-w-[60px] text-center">
-                  {player.firstname}
-                </Text>
-                {player.requiresInviteAcceptance && (
-                  <Icon name="lock-closed-outline" size={10} color="warning" />
-                )}
-              </View>
-            ))}
-          </View>
-        </ScrollView>
+        <View className="flex-row justify-between items-center mb-3">
+          <Text variant="headline">Spieler ({training.players?.length || 0})</Text>
+          {canEditExercises && (
+            <Button
+              variant="ghost"
+              size="sm"
+              leftIcon="add"
+              onPress={() => addPlayerSheetRef.current?.present()}
+            >
+              Hinzufügen
+            </Button>
+          )}
+        </View>
+        {training.players?.map((p) => (
+          <PlayerCard key={p.documentId} player={p} compact className="mb-2" />
+        ))}
       </View>
 
       {/* Exercises */}
@@ -206,6 +202,7 @@ export default function TrainingDetailScreen() {
       </View>
 
       <AddExercisesSheet ref={addSheetRef} trainingId={id} />
+      <AddPlayersSheet ref={addPlayerSheetRef} trainingId={id} />
     </Screen>
   );
 }
