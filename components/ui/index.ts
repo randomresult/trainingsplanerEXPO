@@ -35,3 +35,6 @@ export type { ExerciseCardProps } from './ExerciseCard';
 
 export { PlayerCard } from './PlayerCard';
 export type { PlayerCardProps } from './PlayerCard';
+
+export { TrainingCard } from './TrainingCard';
+export type { TrainingCardProps, TrainingCardVariant } from './TrainingCard';
