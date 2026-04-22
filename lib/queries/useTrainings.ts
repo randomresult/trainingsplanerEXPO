@@ -79,9 +79,8 @@ export const useCreateTraining = () => {
 
       return data.data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trainings'] });
-      router.push(`/trainings/${data.documentId}`);
     },
   });
 };

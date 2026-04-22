@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { View, Text, TextInput, FlatList, Pressable, ActivityIndicator } from 'react-native';
+import { View, TextInput, FlatList, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
+import { Screen, Text, Card, Icon } from '@/components/ui';
 import { useExercises } from '@/lib/queries/useExercises';
 
 export default function LibraryScreen() {
@@ -8,52 +9,38 @@ export default function LibraryScreen() {
   const { data: exercises, isLoading } = useExercises(searchQuery);
 
   const renderExercise = ({ item }: { item: any }) => (
-    <Pressable
-      onPress={() => router.push(`/library/${item.documentId}`)}
-      className="bg-card rounded-xl p-4 mb-3 border border-border active:opacity-70"
-    >
-      <View className="flex-row justify-between items-start mb-2">
-        <Text className="text-base font-semibold text-foreground flex-1 mr-2">
-          {item.Name}
-        </Text>
-        {item.Difficulty && (
-          <View className="bg-primary/10 px-2 py-1 rounded">
-            <Text className="text-xs font-semibold text-primary">
-              {item.Difficulty}
-            </Text>
-          </View>
-        )}
-      </View>
-
-      <Text className="text-sm text-muted-foreground mb-3" numberOfLines={2}>
+    <Card onPress={() => router.push(`/library/${item.documentId}`)} className="mb-3">
+      <Text variant="headline" className="mb-1" numberOfLines={1}>
+        {item.Name}
+      </Text>
+      <Text variant="footnote" color="muted" numberOfLines={2} className="mb-2">
         {item.Description}
       </Text>
-
       <View className="flex-row items-center gap-4">
-        <View className="flex-row items-center">
-          <Text className="text-xs text-muted-foreground">⏱ {item.Minutes} Min</Text>
+        <View className="flex-row items-center gap-1">
+          <Icon name="time-outline" size={14} color="muted" />
+          <Text variant="caption1" color="muted">{item.Minutes} Min</Text>
         </View>
-
-        {item.focus && item.focus.length > 0 && (
-          <View className="flex-row items-center">
-            <Text className="text-xs text-muted-foreground">
-              🎯 {item.focus.length} Fokus
-            </Text>
+        {item.Difficulty && (
+          <View className="flex-row items-center gap-1">
+            <Icon name="trending-up-outline" size={14} color="muted" />
+            <Text variant="caption1" color="muted">{item.Difficulty}</Text>
           </View>
         )}
       </View>
-    </Pressable>
+    </Card>
   );
 
   return (
-    <View className="flex-1 bg-background">
-      <View className="p-5 pb-3">
+    <Screen>
+      <View className="px-5 pt-4 pb-2">
+        <Text variant="largeTitle" weight="bold" className="mb-2 mt-2">Bibliothek</Text>
         <TextInput
           value={searchQuery}
           onChangeText={setSearchQuery}
           placeholder="Übungen durchsuchen..."
           placeholderTextColor="#666"
-          className="bg-card border border-border rounded-lg px-4 py-3 text-foreground"
+          className="bg-card border border-border rounded-lg px-4 py-3 text-foreground mb-4"
         />
       </View>
 
@@ -66,16 +53,15 @@ export default function LibraryScreen() {
           data={exercises}
           renderItem={renderExercise}
           keyExtractor={(item) => item.documentId}
-          contentContainerStyle={{ padding: 20, paddingTop: 8 }}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}
           ListEmptyComponent={
-            <View className="items-center justify-center py-12">
-              <Text className="text-muted-foreground text-center">
-                Keine Übungen gefunden
-              </Text>
+            <View className="items-center justify-center py-12 gap-3">
+              <Icon name="search-outline" size={40} color="muted" />
+              <Text variant="footnote" color="muted">Keine Übungen gefunden</Text>
             </View>
           }
         />
       )}
-    </View>
+    </Screen>
   );
 }

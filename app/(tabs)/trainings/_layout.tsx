@@ -18,14 +18,6 @@ export default function TrainingsLayout() {
         }}
       />
       <Stack.Screen
-        name="create"
-        options={{
-          title: 'Training erstellen',
-          headerBackTitle: 'Zurück',
-          presentation: 'modal',
-        }}
-      />
-      <Stack.Screen
         name="[id]/index"
         options={{
           title: 'Training',
@@ -36,14 +28,6 @@ export default function TrainingsLayout() {
         name="[id]/execute"
         options={{
           headerShown: false,
-        }}
-      />
-      <Stack.Screen
-        name="[id]/add-exercises"
-        options={{
-          title: 'Übungen hinzufügen',
-          headerBackTitle: 'Zurück',
-          presentation: 'modal',
         }}
       />
     </Stack>
