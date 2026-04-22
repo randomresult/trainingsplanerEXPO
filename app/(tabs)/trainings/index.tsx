@@ -1,140 +1,87 @@
-import { useMemo, useRef, useState } from 'react';
-import { View, FlatList, ActivityIndicator } from 'react-native';
+import { useMemo, useRef } from 'react';
+import { View, FlatList, ActivityIndicator, Pressable } from 'react-native';
 import { router } from 'expo-router';
-import { Screen, Text, Button, Chip, Card, Badge, Icon } from '@/components/ui';
-import { CreateTrainingSheet, CreateTrainingSheetRef } from '@/components/sheets/CreateTrainingSheet';
+import {
+  Screen,
+  Text,
+  Icon,
+  TrainingCard,
+} from '@/components/ui';
 import { useTrainings } from '@/lib/queries/useTrainings';
+import { CreateTrainingSheet, CreateTrainingSheetRef } from '@/components/sheets/CreateTrainingSheet';
 import type { Training } from '@/lib/types/models';
-
-type FilterKey = 'upcoming' | 'completed';
-
-const FILTERS: { key: FilterKey; label: string }[] = [
-  { key: 'upcoming', label: 'Anstehend' },
-  { key: 'completed', label: 'Abgeschlossen' },
-];
-
-const formatDate = (iso: string) => {
-  const d = new Date(iso);
-  const today = new Date();
-  const isSameDay =
-    d.getFullYear() === today.getFullYear() &&
-    d.getMonth() === today.getMonth() &&
-    d.getDate() === today.getDate();
-  if (isSameDay) return 'Heute';
-  return d.toLocaleDateString('de-DE', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-  });
-};
 
 export default function TrainingsScreen() {
   const { data: trainings, isLoading } = useTrainings();
-  const [filter, setFilter] = useState<FilterKey>('upcoming');
   const createSheetRef = useRef<CreateTrainingSheetRef>(null);
+  const listRef = useRef<FlatList>(null);
 
-  const filtered = useMemo(() => {
+  const upcoming = useMemo(() => {
     if (!trainings) return [];
-    if (filter === 'completed') {
-      return trainings.filter((t) => t.training_status === 'completed');
-    }
-    return trainings.filter(
-      (t) => t.training_status === 'draft' || t.training_status === 'in_progress'
-    );
-  }, [trainings, filter]);
+    return trainings
+      .filter((t) => t.training_status === 'draft' || t.training_status === 'in_progress')
+      .sort((a: any, b: any) => new Date(a.Date).getTime() - new Date(b.Date).getTime());
+  }, [trainings]);
 
-  const renderTraining = ({ item }: { item: Training }) => {
-    const isActive = item.training_status === 'in_progress';
-    const isCompleted = item.training_status === 'completed';
+  const renderHeader = () => (
+    <View className="px-5 pt-4 pb-4 flex-row justify-between items-center">
+      <Text variant="largeTitle" weight="bold">Training</Text>
+      <View className="flex-row gap-2">
+        <Pressable
+          onPress={() => router.push('/trainings/history')}
+          className="w-10 h-10 rounded-full bg-surface-1 items-center justify-center"
+        >
+          <Icon name="time-outline" size={20} color="foreground" />
+        </Pressable>
+        <Pressable
+          onPress={() => createSheetRef.current?.present()}
+          className="w-10 h-10 rounded-full bg-primary items-center justify-center"
+        >
+          <Icon name="add" size={22} color="inverse" />
+        </Pressable>
+      </View>
+    </View>
+  );
 
-    return (
-      <Card
-        accent="left"
-        accentColor={isActive ? 'warning' : isCompleted ? 'success' : 'primary'}
-        onPress={() => router.push(`/trainings/${item.documentId}`)}
-        className="mb-4"
-      >
-        {isActive && (
-          <View className="absolute top-4 right-4">
-            <Badge variant="warning-soft">Läuft</Badge>
-          </View>
-        )}
-        <Text variant="headline" className="mb-2 pr-20">{item.Name}</Text>
-        <Badge variant="primary-soft" className="mb-3">Du bist Trainer</Badge>
-
-        <View className="flex-row items-center gap-1.5 mb-2">
-          <Icon name="calendar-outline" size={14} color="muted" />
-          <Text variant="footnote" color="muted">{formatDate(item.Date)}</Text>
-        </View>
-
-        <View className="flex-row items-center gap-1.5 mb-4">
-          <Icon name="people-outline" size={14} color="muted" />
-          <Text variant="caption1" color="muted">
-            {item.players?.length || 0} Teilnehmer
-          </Text>
-        </View>
-
-        <View className="flex-row justify-between items-center">
-          <Text variant="footnote" color="muted">
-            {item.exercises?.length || 0} Übungen
-            {item.actualDuration ? ` • ${Math.round(item.actualDuration / 60)} Min` : ''}
-          </Text>
-          <View className="bg-primary rounded-lg px-4 py-2">
-            <Text variant="subhead" weight="semibold" color="inverse">
-              {isActive ? 'Fortsetzen' : isCompleted ? 'Ansehen' : 'Öffnen'}
-            </Text>
-          </View>
-        </View>
-      </Card>
-    );
-  };
+  const renderItem = ({ item, index }: { item: Training; index: number }) => (
+    <TrainingCard
+      training={item}
+      variant={index === 0 ? 'hero' : 'compact'}
+      onPress={() => router.push(`/trainings/${item.documentId}`)}
+      className="mb-4"
+    />
+  );
 
   return (
     <Screen>
-      <View className="px-5 pt-5 pb-4 border-b border-border">
-        <Text variant="largeTitle" weight="bold" className="mb-4">Training</Text>
-        <Button leftIcon="add" size="md" onPress={() => createSheetRef.current?.present()}>
-          Neues Training erstellen
-        </Button>
-      </View>
-
-      <View className="flex-row px-5 py-3.5 gap-2.5 border-b border-border bg-background">
-        {FILTERS.map((f) => (
-          <Chip
-            key={f.key}
-            active={filter === f.key}
-            onPress={() => setFilter(f.key)}
-          >
-            {f.label}
-          </Chip>
-        ))}
-      </View>
+      {renderHeader()}
 
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#8b5cf6" />
         </View>
+      ) : upcoming.length === 0 ? (
+        <View className="flex-1 items-center justify-center px-5">
+          <Pressable
+            onPress={() => createSheetRef.current?.present()}
+            className="w-full rounded-2xl border-2 border-dashed border-primary/40 p-10 items-center"
+          >
+            <View className="w-16 h-16 rounded-full bg-primary/20 items-center justify-center mb-4">
+              <Icon name="add" size={28} color="primary" />
+            </View>
+            <Text variant="headline" color="primary">Dein erstes Training erstellen</Text>
+            <Text variant="footnote" color="muted" className="mt-1 text-center">
+              Tippe hier um loszulegen
+            </Text>
+          </Pressable>
+        </View>
       ) : (
         <FlatList
-          data={filtered}
-          renderItem={renderTraining}
+          ref={listRef}
+          data={upcoming}
           keyExtractor={(item) => item.documentId}
-          contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
-          ListEmptyComponent={
-            <View className="items-center justify-center py-12 gap-3">
-              <Icon name="calendar-outline" size={40} color="muted" />
-              <Text variant="body" color="muted" className="text-center">
-                {filter === 'completed'
-                  ? 'Noch keine abgeschlossenen Trainings'
-                  : 'Noch keine Trainings geplant'}
-              </Text>
-              {filter === 'upcoming' && (
-                <Text variant="footnote" color="muted" className="text-center">
-                  Erstelle dein erstes Training!
-                </Text>
-              )}
-            </View>
-          }
+          renderItem={renderItem}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
         />
       )}
 
