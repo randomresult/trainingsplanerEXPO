@@ -17,7 +17,11 @@ export default function LibraryListScreen() {
 
   return (
     <Screen>
-      <View className="px-5 pt-3 pb-2">
+      <View className="px-5 pt-4 pb-4 flex-row justify-between items-center">
+        <Text variant="largeTitle" weight="bold">Bibliothek</Text>
+      </View>
+
+      <View className="px-5 pb-2">
         <TextInput
           value={search}
           onChangeText={setSearch}

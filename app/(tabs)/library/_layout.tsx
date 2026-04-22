@@ -9,7 +9,7 @@ export default function LibraryLayout() {
         headerShadowVisible: false,
       }}
     >
-      <Stack.Screen name="index" options={{ title: 'Bibliothek' }} />
+      <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen
         name="[id]"
         options={{ title: 'Übung', headerBackTitle: 'Zurück' }}
