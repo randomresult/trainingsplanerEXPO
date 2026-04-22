@@ -82,10 +82,26 @@ export default function TrainingsScreen() {
           keyExtractor={(item) => item.documentId}
           renderItem={renderItem}
           contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
+          onScrollToIndexFailed={({ index }) => {
+            setTimeout(() => {
+              listRef.current?.scrollToIndex({ index, animated: true });
+            }, 300);
+          }}
         />
       )}
 
-      <CreateTrainingSheet ref={createSheetRef} />
+      <CreateTrainingSheet
+        ref={createSheetRef}
+        onCreated={(newId) => {
+          // Wait one frame for refetch to update list, then scroll
+          setTimeout(() => {
+            const idx = upcoming.findIndex((t) => t.documentId === newId);
+            if (idx >= 0 && listRef.current) {
+              listRef.current.scrollToIndex({ index: idx, animated: true });
+            }
+          }, 300);
+        }}
+      />
     </Screen>
   );
 }

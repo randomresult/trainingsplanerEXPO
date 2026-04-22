@@ -15,8 +15,12 @@ export interface CreateTrainingSheetRef {
   present: () => void;
 }
 
-export const CreateTrainingSheet = forwardRef<CreateTrainingSheetRef>(
-  function CreateTrainingSheet(_, ref) {
+interface Props {
+  onCreated?: (newTrainingId: string) => void;
+}
+
+export const CreateTrainingSheet = forwardRef<CreateTrainingSheetRef, Props>(
+  function CreateTrainingSheet({ onCreated }, ref) {
     const sheetRef = useRef<BottomSheetRef>(null);
     const [name, setName] = useState('');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -39,10 +43,11 @@ export const CreateTrainingSheet = forwardRef<CreateTrainingSheetRef>(
       createTraining.mutate(
         { name, date, exerciseIds, playerIds },
         {
-          onSuccess: () => {
+          onSuccess: (newTraining) => {
             toast.success('Training erstellt');
             sheetRef.current?.dismiss();
             reset();
+            onCreated?.(newTraining.documentId);
           },
           onError: () => toast.error('Training konnte nicht erstellt werden'),
         }
