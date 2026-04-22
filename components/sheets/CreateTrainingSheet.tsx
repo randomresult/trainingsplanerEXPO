@@ -101,6 +101,7 @@ export const CreateTrainingSheet = forwardRef<CreateTrainingSheetRef>(
             loading={createTraining.isPending}
             disabled={!canCreate}
             onPress={handleCreate}
+            className="mb-8"
           >
             Training erstellen
           </Button>
