@@ -208,9 +208,9 @@ export const useCompleteTraining = () => {
       });
       return input.trainingId;
     },
-    onSuccess: () => {
+    onSuccess: (trainingId) => {
       queryClient.invalidateQueries({ queryKey: ['trainings'] });
-      router.replace('/trainings');
+      router.replace(`/trainings/completed/${trainingId}`);
     },
   });
 };
