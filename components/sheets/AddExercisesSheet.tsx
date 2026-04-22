@@ -5,7 +5,7 @@ import {
   BottomSheetRef,
   Button,
   Text,
-  Card,
+  ExerciseCard,
   toast,
 } from '@/components/ui';
 import {
@@ -75,25 +75,19 @@ export const AddExercisesSheet = forwardRef<AddExercisesSheetRef, Props>(
               </Text>
             }
             renderItem={({ item }: { item: any }) => (
-              <Card className="flex-row items-center gap-3">
-                <View className="flex-1">
-                  <Text variant="subhead" weight="semibold" numberOfLines={1}>
-                    {item.Name}
-                  </Text>
-                  <Text variant="caption1" color="muted">
-                    {item.Minutes} Min
-                    {item.Difficulty ? ` • ${item.Difficulty}` : ''}
-                  </Text>
-                </View>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  loading={addExercise.isPending}
-                  onPress={() => handleAdd(item.documentId)}
-                >
-                  Hinzufügen
-                </Button>
-              </Card>
+              <ExerciseCard
+                exercise={item}
+                trailing={
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    loading={addExercise.isPending}
+                    onPress={() => handleAdd(item.documentId)}
+                  >
+                    Hinzufügen
+                  </Button>
+                }
+              />
             )}
           />
         </View>
