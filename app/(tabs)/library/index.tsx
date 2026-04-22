@@ -1,66 +1,59 @@
 import { useState } from 'react';
-import { View, TextInput, FlatList, ActivityIndicator } from 'react-native';
+import {
+  View,
+  TextInput,
+  FlatList,
+  ActivityIndicator,
+  Keyboard,
+  Pressable,
+} from 'react-native';
 import { router } from 'expo-router';
-import { Screen, Text, Card, Icon } from '@/components/ui';
+import { Screen, Text, ExerciseCard, Icon } from '@/components/ui';
 import { useExercises } from '@/lib/queries/useExercises';
 
-export default function LibraryScreen() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const { data: exercises, isLoading } = useExercises(searchQuery);
-
-  const renderExercise = ({ item }: { item: any }) => (
-    <Card onPress={() => router.push(`/library/${item.documentId}`)} className="mb-3">
-      <Text variant="headline" className="mb-1" numberOfLines={1}>
-        {item.Name}
-      </Text>
-      <Text variant="footnote" color="muted" numberOfLines={2} className="mb-2">
-        {item.Description}
-      </Text>
-      <View className="flex-row items-center gap-4">
-        <View className="flex-row items-center gap-1">
-          <Icon name="time-outline" size={14} color="muted" />
-          <Text variant="caption1" color="muted">{item.Minutes} Min</Text>
-        </View>
-        {item.Difficulty && (
-          <View className="flex-row items-center gap-1">
-            <Icon name="trending-up-outline" size={14} color="muted" />
-            <Text variant="caption1" color="muted">{item.Difficulty}</Text>
-          </View>
-        )}
-      </View>
-    </Card>
-  );
+export default function LibraryListScreen() {
+  const [search, setSearch] = useState('');
+  const { data: exercises, isLoading } = useExercises(search);
 
   return (
     <Screen>
-      <View className="px-5 pt-4 pb-2">
-        <Text variant="largeTitle" weight="bold" className="mb-2 mt-2">Bibliothek</Text>
+      <View className="px-5 pt-3 pb-2">
         <TextInput
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholder="Übungen durchsuchen..."
+          value={search}
+          onChangeText={setSearch}
+          placeholder="Übung suchen..."
           placeholderTextColor="#666"
-          className="bg-card border border-border rounded-lg px-4 py-3 text-foreground mb-4"
+          className="bg-card border border-border rounded-lg px-4 py-3 text-foreground"
         />
       </View>
 
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#6c47ff" />
+          <ActivityIndicator size="large" color="#8b5cf6" />
         </View>
       ) : (
-        <FlatList
-          data={exercises}
-          renderItem={renderExercise}
-          keyExtractor={(item) => item.documentId}
-          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}
-          ListEmptyComponent={
-            <View className="items-center justify-center py-12 gap-3">
-              <Icon name="search-outline" size={40} color="muted" />
-              <Text variant="footnote" color="muted">Keine Übungen gefunden</Text>
-            </View>
-          }
-        />
+        <Pressable onPress={Keyboard.dismiss} className="flex-1">
+          <FlatList
+            data={exercises ?? []}
+            keyExtractor={(item: any) => item.documentId}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ padding: 20, paddingBottom: 40, gap: 12 }}
+            ListEmptyComponent={
+              <View className="items-center justify-center py-12">
+                <Icon name="search-outline" size={40} color="muted" />
+                <Text variant="footnote" color="muted" className="mt-3">
+                  {search ? 'Keine Übungen gefunden' : 'Keine Übungen vorhanden'}
+                </Text>
+              </View>
+            }
+            renderItem={({ item }: { item: any }) => (
+              <ExerciseCard
+                exercise={item}
+                onPress={() => router.push(`/library/${item.documentId}`)}
+              />
+            )}
+          />
+        </Pressable>
       )}
     </Screen>
   );
