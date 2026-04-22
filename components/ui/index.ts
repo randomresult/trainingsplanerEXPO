@@ -29,3 +29,6 @@ export { BottomSheet } from './BottomSheet';
 export type { BottomSheetRef, BottomSheetProps } from './BottomSheet';
 
 export { Toaster, toast } from './Toast';
+
+export { ExerciseCard } from './ExerciseCard';
+export type { ExerciseCardProps } from './ExerciseCard';
