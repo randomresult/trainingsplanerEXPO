@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   Platform,
   View,
@@ -24,30 +24,63 @@ import {
   useTrainingDetail,
   useCompleteTraining,
   useRemoveExerciseFromTraining,
+  useAddExercisesToTraining,
+  useAddPlayersToTraining,
 } from '@/lib/queries/useTrainings';
 import { useTrainingExecution } from '@/lib/hooks/useTrainingExecution';
 import { formatTime } from '@/lib/utils/formatTime';
 import { triggerHaptic } from '@/lib/haptics';
 import { COLORS } from '@/lib/theme';
-import {
-  AddExercisesSheet,
-  AddExercisesSheetRef,
-} from '@/components/sheets/AddExercisesSheet';
-import {
-  AddPlayersSheet,
-  AddPlayersSheetRef,
-} from '@/components/sheets/AddPlayersSheet';
+import { usePickModeStore } from '@/lib/store/pickModeStore';
 
 export default function ExecuteTrainingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: training, isLoading } = useTrainingDetail(id);
   const completeTraining = useCompleteTraining();
   const removeExercise = useRemoveExerciseFromTraining();
+  const addExercises = useAddExercisesToTraining();
+  const addPlayers = useAddPlayersToTraining();
   const insets = useSafeAreaInsets();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [viewerUri, setViewerUri] = useState<string | null>(null);
-  const addExerciseSheetRef = useRef<AddExercisesSheetRef>(null);
-  const addPlayerSheetRef = useRef<AddPlayersSheetRef>(null);
+
+  const handleAddExercises = () => {
+    if (!training) return;
+    const existingIds = training.exercises?.map((e) => e.documentId) ?? [];
+    usePickModeStore.getState().start([], async (newIds) => {
+      if (newIds.length === 0) return;
+      try {
+        await addExercises.mutateAsync({ trainingId: id, exerciseIds: newIds });
+        toast.success(
+          newIds.length === 1
+            ? 'Übung hinzugefügt'
+            : `${newIds.length} Übungen hinzugefügt`
+        );
+      } catch {
+        toast.error('Übungen konnten nicht hinzugefügt werden');
+      }
+    });
+    router.push(`/exercise-picker?excludeIds=${existingIds.join(',')}`);
+  };
+
+  const handleAddPlayers = () => {
+    if (!training) return;
+    const existingIds = training.players?.map((p) => p.documentId) ?? [];
+    usePickModeStore.getState().start([], async (newIds) => {
+      if (newIds.length === 0) return;
+      try {
+        await addPlayers.mutateAsync({ trainingId: id, playerIds: newIds });
+        toast.success(
+          newIds.length === 1
+            ? 'Spieler hinzugefügt'
+            : `${newIds.length} Spieler hinzugefügt`
+        );
+      } catch {
+        toast.error('Spieler konnten nicht hinzugefügt werden');
+      }
+    });
+    router.push(`/player-picker?excludeIds=${existingIds.join(',')}`);
+  };
 
   const confirmRemoveExercise = (exerciseId: string, exerciseName: string) => {
     const msg = `Übung "${exerciseName}" aus dem Training entfernen?`;
@@ -311,14 +344,14 @@ export default function ExecuteTrainingScreen() {
           <Button
             variant="secondary"
             leftIcon="add"
-            onPress={() => addExerciseSheetRef.current?.present()}
+            onPress={handleAddExercises}
           >
             Übung hinzufügen
           </Button>
           <Button
             variant="secondary"
             leftIcon="person-add-outline"
-            onPress={() => addPlayerSheetRef.current?.present()}
+            onPress={handleAddPlayers}
           >
             Spieler hinzufügen
           </Button>
@@ -348,8 +381,6 @@ export default function ExecuteTrainingScreen() {
       </View>
 
       <MediaViewer uri={viewerUri} onClose={() => setViewerUri(null)} />
-      <AddExercisesSheet ref={addExerciseSheetRef} trainingId={id} />
-      <AddPlayersSheet ref={addPlayerSheetRef} trainingId={id} />
     </SafeAreaView>
   );
 }

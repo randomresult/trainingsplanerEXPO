@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   View,
   ScrollView,
@@ -10,10 +10,6 @@ import {
 import { router, useLocalSearchParams, Stack } from 'expo-router';
 import { Screen, Text, Button, toast, ExerciseCard, Icon } from '@/components/ui';
 import { usePickModeStore } from '@/lib/store/pickModeStore';
-import {
-  PlayerPickerSheet,
-  PlayerPickerSheetRef,
-} from '@/components/sheets/PlayerPickerSheet';
 import { useCreateTraining } from '@/lib/queries/useTrainings';
 import { useExercises } from '@/lib/queries/useExercises';
 import { usePlayers } from '@/lib/queries/usePlayers';
@@ -28,7 +24,6 @@ export default function NewTrainingScreen() {
   );
   const [playerIds, setPlayerIds] = useState<string[]>([]);
   const createTraining = useCreateTraining();
-  const playerSheetRef = useRef<PlayerPickerSheetRef>(null);
 
   const { data: allExercises } = useExercises('');
 
@@ -59,6 +54,11 @@ export default function NewTrainingScreen() {
   const handleOpenExercisePicker = () => {
     usePickModeStore.getState().start(exerciseIds, setExerciseIds);
     router.push('/exercise-picker');
+  };
+
+  const handleOpenPlayerPicker = () => {
+    usePickModeStore.getState().start(playerIds, setPlayerIds);
+    router.push('/player-picker');
   };
 
   const handleCreate = () => {
@@ -167,7 +167,7 @@ export default function NewTrainingScreen() {
                 variant="ghost"
                 size="sm"
                 leftIcon="search-outline"
-                onPress={() => playerSheetRef.current?.present()}
+                onPress={handleOpenPlayerPicker}
               >
                 Auswählen
               </Button>
@@ -212,12 +212,6 @@ export default function NewTrainingScreen() {
           </Button>
         </View>
       </KeyboardAvoidingView>
-
-      <PlayerPickerSheet
-        ref={playerSheetRef}
-        selectedIds={playerIds}
-        onChange={setPlayerIds}
-      />
     </Screen>
   );
 }
