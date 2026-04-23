@@ -143,6 +143,28 @@ export const useAddPlayerToTraining = () => {
   });
 };
 
+export const useRemovePlayerFromTraining = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: { trainingId: string; playerId: string }) => {
+      const { data } = await apiClient.put<StrapiResponse<Training>>(
+        `/trainings/${input.trainingId}`,
+        {
+          data: {
+            players: { disconnect: [{ documentId: input.playerId }] },
+          },
+        }
+      );
+      return data.data;
+    },
+    onSuccess: (_data, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['trainings', vars.trainingId] });
+      queryClient.invalidateQueries({ queryKey: ['trainings'] });
+    },
+  });
+};
+
 export const useRemoveExerciseFromTraining = () => {
   const queryClient = useQueryClient();
 

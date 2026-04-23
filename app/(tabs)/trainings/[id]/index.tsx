@@ -9,6 +9,7 @@ import {
   useDeleteTraining,
   useStartTraining,
   useRemoveExerciseFromTraining,
+  useRemovePlayerFromTraining,
 } from '@/lib/queries/useTrainings';
 
 const statusBadge = {
@@ -23,6 +24,7 @@ export default function TrainingDetailScreen() {
   const deleteTraining = useDeleteTraining();
   const startTraining = useStartTraining();
   const removeExercise = useRemoveExerciseFromTraining();
+  const removePlayer = useRemovePlayerFromTraining();
 
   const addSheetRef = useRef<AddExercisesSheetRef>(null);
   const addPlayerSheetRef = useRef<AddPlayersSheetRef>(null);
@@ -44,6 +46,24 @@ export default function TrainingDetailScreen() {
         text: 'Entfernen',
         style: 'destructive',
         onPress: () => removeExercise.mutate({ trainingId: id, exerciseId }),
+      },
+    ]);
+  };
+
+  const confirmRemovePlayer = (playerId: string, playerName: string) => {
+    const msg = `Spieler "${playerName}" aus dem Training entfernen?`;
+    if (Platform.OS === 'web') {
+      if (typeof window !== 'undefined' && window.confirm(msg)) {
+        removePlayer.mutate({ trainingId: id, playerId });
+      }
+      return;
+    }
+    Alert.alert('Spieler entfernen', msg, [
+      { text: 'Abbrechen', style: 'cancel' },
+      {
+        text: 'Entfernen',
+        style: 'destructive',
+        onPress: () => removePlayer.mutate({ trainingId: id, playerId }),
       },
     ]);
   };
@@ -132,15 +152,37 @@ export default function TrainingDetailScreen() {
           )}
         </View>
         {training.players?.map((p) => (
-          <PlayerCard key={p.documentId} player={p} compact className="mb-2" />
+          <PlayerCard
+            key={p.documentId}
+            player={p}
+            compact
+            className="mb-2"
+            showRemove={canEditExercises}
+            onRemove={() =>
+              confirmRemovePlayer(
+                p.documentId,
+                [p.firstname, p.Name].filter(Boolean).join(' ') || 'Spieler'
+              )
+            }
+          />
         ))}
       </View>
 
       {/* Exercises */}
       <View className="px-5 pb-4">
-        <Text variant="headline" className="mb-3">
-          Übungen ({training.exercises?.length || 0})
-        </Text>
+        <View className="flex-row justify-between items-center mb-3">
+          <Text variant="headline">Übungen ({training.exercises?.length || 0})</Text>
+          {canEditExercises && (
+            <Button
+              variant="ghost"
+              size="sm"
+              leftIcon="add"
+              onPress={() => addSheetRef.current?.present()}
+            >
+              Hinzufügen
+            </Button>
+          )}
+        </View>
         {training.exercises?.map((exercise, idx) => (
           <Card key={exercise.documentId} className="mb-3 flex-row items-center">
             <View className="flex-1">
@@ -162,16 +204,6 @@ export default function TrainingDetailScreen() {
             )}
           </Card>
         ))}
-
-        {canEditExercises && (
-          <Button
-            variant="secondary"
-            leftIcon="add"
-            onPress={() => addSheetRef.current?.present()}
-          >
-            Übung hinzufügen
-          </Button>
-        )}
       </View>
 
       {/* Actions */}

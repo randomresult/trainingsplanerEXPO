@@ -15,6 +15,7 @@ import {
   Button,
   Card,
   Icon,
+  Avatar,
   MediaThumbnail,
   MediaViewer,
   toast,
@@ -113,16 +114,45 @@ export default function ExecuteTrainingScreen() {
           disabled={completeTraining.isPending}
         >
           {completeTraining.isPending ? (
-            <ActivityIndicator color="#8b5cf6" />
+            <ActivityIndicator color="#ef4444" />
           ) : (
-            <Icon name="flag-outline" size={24} color="primary" />
+            <Icon name="stop-circle" size={28} color="destructive" />
           )}
         </Pressable>
       </View>
 
-      <Text variant="caption1" color="success" weight="bold" className="px-5 py-2">
-        {completedCount}/{exerciseStates.length} Übungen abgehakt
-      </Text>
+      <View className="px-5 py-2 flex-row justify-between items-center">
+        <Text variant="caption1" color="success" weight="bold">
+          {completedCount}/{exerciseStates.length} Übungen abgehakt
+        </Text>
+        {(training.players?.length ?? 0) > 0 && (
+          <View className="flex-row items-center">
+            {training.players!.slice(0, 4).map((p, idx) => (
+              <View
+                key={p.documentId}
+                className={idx > 0 ? '-ml-1.5' : ''}
+                style={{ zIndex: 4 - idx }}
+              >
+                <Avatar
+                  initials={(p.firstname?.[0] ?? '') + (p.Name?.[0] ?? '')}
+                  size="sm"
+                  className="border-2 border-background"
+                />
+              </View>
+            ))}
+            {(training.players!.length - 4) > 0 && (
+              <View className="-ml-1.5 w-8 h-8 rounded-full bg-muted items-center justify-center border-2 border-background">
+                <Text variant="caption2" weight="bold" color="foreground">
+                  +{training.players!.length - 4}
+                </Text>
+              </View>
+            )}
+            <Text variant="caption1" color="muted" className="ml-2">
+              {training.players!.length} Teilnehmer
+            </Text>
+          </View>
+        )}
+      </View>
 
       <ScrollView className="flex-1" contentContainerStyle={{ padding: 20, paddingBottom: 80 }}>
         {exerciseStates.map((ex, idx) => {
@@ -135,11 +165,16 @@ export default function ExecuteTrainingScreen() {
                     triggerHaptic('light');
                     toggleComplete(idx);
                   }}
-                  className={`w-7 h-7 rounded-full border-2 items-center justify-center mt-0.5 ${
-                    ex.completed ? 'bg-success border-success' : 'border-muted'
-                  }`}
+                  hitSlop={8}
+                  className="w-12 h-12 -ml-2 -mt-2 items-center justify-center"
                 >
-                  {ex.completed && <Icon name="checkmark" size={16} color="inverse" />}
+                  <View
+                    className={`w-10 h-10 rounded-full border-2 items-center justify-center ${
+                      ex.completed ? 'bg-success border-success' : 'border-muted'
+                    }`}
+                  >
+                    {ex.completed && <Icon name="checkmark" size={22} color="inverse" />}
+                  </View>
                 </Pressable>
 
                 <Pressable
@@ -255,6 +290,21 @@ export default function ExecuteTrainingScreen() {
           </Button>
         </View>
       </ScrollView>
+
+      <View className="px-5 pb-3 pt-2 border-t border-border">
+        <Button
+          size="lg"
+          variant="destructive"
+          leftIcon="stop-circle"
+          loading={completeTraining.isPending}
+          onPress={() => {
+            triggerHaptic('medium');
+            confirmFinish();
+          }}
+        >
+          Training beenden
+        </Button>
+      </View>
 
       <MediaViewer uri={viewerUri} onClose={() => setViewerUri(null)} />
       <AddExercisesSheet ref={addExerciseSheetRef} trainingId={id} />
