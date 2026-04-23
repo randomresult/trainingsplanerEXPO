@@ -10,7 +10,10 @@ export const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
   timeout: 30000,
-  paramsSerializer: (params) => qs.stringify(params, { encodeValuesOnly: true }),
+  // encode: false emits raw brackets/specials so iOS URLSession does a
+  // single clean pass of URL-encoding instead of double-encoding the
+  // already-percent-escaped characters produced by encodeValuesOnly.
+  paramsSerializer: (params) => qs.stringify(params, { encode: false }),
 });
 
 apiClient.interceptors.request.use(
