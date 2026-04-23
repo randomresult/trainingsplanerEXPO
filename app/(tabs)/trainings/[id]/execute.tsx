@@ -261,8 +261,10 @@ export default function ExecuteTrainingScreen() {
                       setMinutes(idx, Number.isFinite(n) ? n : 0);
                     }}
                     keyboardType="number-pad"
-                    className="text-foreground min-w-[30px] text-right"
-                    style={{ padding: 0 }}
+                    className="text-foreground text-right"
+                    // Fixed width — on RN Web a TextInput otherwise expands to fill
+                    // the remaining row space and swallows the name column.
+                    style={{ padding: 0, width: 28 }}
                   />
                   <Text variant="caption1" color="muted" className="ml-1">
                     min
