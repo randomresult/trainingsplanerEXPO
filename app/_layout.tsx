@@ -78,6 +78,16 @@ function RootLayoutNav() {
           headerShadowVisible: false,
         }}
       />
+      <Stack.Screen
+        name="exercise-detail/[id]"
+        options={{
+          presentation: 'modal',
+          headerStyle: { backgroundColor: '#0a0a0f' },
+          headerTintColor: '#fff',
+          headerShadowVisible: false,
+          title: 'Übung',
+        }}
+      />
     </Stack>
   );
 }

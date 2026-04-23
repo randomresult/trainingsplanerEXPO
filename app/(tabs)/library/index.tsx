@@ -156,7 +156,7 @@ export default function LibraryListScreen() {
             renderItem={({ item }: { item: any }) => (
               <ExerciseCard
                 exercise={item}
-                onPress={() => router.push(`/library/${item.documentId}`)}
+                onPress={() => router.push({ pathname: '/exercise-detail/[id]', params: { id: item.documentId } })}
                 trailing={
                   <Pressable
                     onPress={(e) => {

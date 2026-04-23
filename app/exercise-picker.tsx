@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   TextInput,
@@ -7,8 +7,7 @@ import {
   Keyboard,
   Pressable,
 } from 'react-native';
-import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { useFocusEffect } from '@react-navigation/native';
+import { router, Stack, useLocalSearchParams, useNavigation } from 'expo-router';
 import { Screen, Text, ExerciseCard, Icon, FilterChip } from '@/components/ui';
 import {
   LibraryFilterSheet,
@@ -84,14 +83,16 @@ export default function ExercisePickerScreen() {
     setFilters((s) => ({ ...s, [key]: s[key].filter((v) => v !== name) }));
   const clearDuration = () => setFilters((s) => ({ ...s, duration: null }));
 
-  useFocusEffect(
-    useCallback(() => {
-      return () => {
-        const store = usePickModeStore.getState();
-        if (store.active) store.cancel();
-      };
-    }, [])
-  );
+  // Cancel on actual removal (back/swipe-dismiss) — NOT on focus loss, so
+  // pushing /exercise-detail on top and returning preserves the selection.
+  const navigation = useNavigation();
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', () => {
+      const store = usePickModeStore.getState();
+      if (store.active) store.cancel();
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   const handleConfirm = () => {
     confirm();
@@ -192,11 +193,29 @@ export default function ExercisePickerScreen() {
                   exercise={item}
                   onPress={() => toggle(item.documentId)}
                   trailing={
-                    <Icon
-                      name={selected ? 'checkmark-circle' : 'ellipse-outline'}
-                      color={selected ? 'primary' : 'muted'}
-                      size={24}
-                    />
+                    <View className="flex-row items-center gap-2">
+                      <Pressable
+                        onPress={(e) => {
+                          e.stopPropagation?.();
+                          router.push({
+                            pathname: '/exercise-detail/[id]',
+                            params: { id: item.documentId },
+                          });
+                        }}
+                        hitSlop={6}
+                      >
+                        <Icon
+                          name="information-circle-outline"
+                          size={22}
+                          color="muted"
+                        />
+                      </Pressable>
+                      <Icon
+                        name={selected ? 'checkmark-circle' : 'ellipse-outline'}
+                        color={selected ? 'primary' : 'muted'}
+                        size={24}
+                      />
+                    </View>
                   }
                 />
               );
