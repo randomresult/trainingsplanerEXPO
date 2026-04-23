@@ -70,19 +70,21 @@ export default function TrainingDetailScreen() {
 
   const handleDelete = () => {
     const msg = `"${training?.Name}" wirklich löschen?`;
+    const proceed = () => {
+      deleteTraining.mutate(id, {
+        onSuccess: () => {
+          if (router.canGoBack()) router.back();
+          else router.replace('/trainings');
+        },
+      });
+    };
     if (Platform.OS === 'web') {
-      if (typeof window !== 'undefined' && window.confirm(msg)) {
-        deleteTraining.mutate(id);
-      }
+      if (typeof window !== 'undefined' && window.confirm(msg)) proceed();
       return;
     }
     Alert.alert('Training löschen', msg, [
       { text: 'Abbrechen', style: 'cancel' },
-      {
-        text: 'Löschen',
-        style: 'destructive',
-        onPress: () => deleteTraining.mutate(id),
-      },
+      { text: 'Löschen', style: 'destructive', onPress: proceed },
     ]);
   };
 

@@ -91,10 +91,11 @@ export const useDeleteTraining = () => {
   return useMutation({
     mutationFn: async (id: string) => {
       await apiClient.delete(`/trainings/${id}`);
+      return id;
     },
-    onSuccess: () => {
+    onSuccess: (id) => {
+      queryClient.removeQueries({ queryKey: ['trainings', id] });
       queryClient.invalidateQueries({ queryKey: ['trainings'] });
-      router.replace('/trainings');
     },
   });
 };
@@ -253,11 +254,12 @@ export const useTrainingsHistory = () => {
           populate: '*',
           pagination: { page: pageParam, pageSize: HISTORY_PAGE_SIZE },
           sort: ['Date:desc'],
-          filters: { training_status: { $eq: 'completed' } },
         },
       });
-      const filtered = data.data.filter((t: any) =>
-        t.clubs?.some((c: any) => c.documentId === clubId)
+      const filtered = data.data.filter(
+        (t: any) =>
+          t.training_status === 'completed' &&
+          t.clubs?.some((c: any) => c.documentId === clubId)
       );
       return {
         items: filtered,

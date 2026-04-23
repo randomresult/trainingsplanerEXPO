@@ -291,11 +291,12 @@ export default function ExecuteTrainingScreen() {
         </View>
       </ScrollView>
 
-      <View className="px-5 pb-3 pt-2 border-t border-border">
+      <View className="px-5 py-3 border-t border-border">
         <Button
           size="lg"
           variant="destructive"
           leftIcon="stop-circle"
+          className="w-full"
           loading={completeTraining.isPending}
           onPress={() => {
             triggerHaptic('medium');

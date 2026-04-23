@@ -94,6 +94,7 @@ export default function NewTrainingScreen() {
         <View className="px-5 pt-3 pb-4 border-t border-border bg-background">
           <Button
             size="lg"
+            className="w-full"
             loading={createTraining.isPending}
             disabled={!canCreate}
             onPress={handleCreate}

@@ -87,7 +87,7 @@ export function Button({
         onPressOut={handlePressOut}
         onPress={handlePress}
         disabled={isDisabled}
-        className={cn('flex-row items-center justify-center gap-2 w-full', v.bg, SIZE[size])}
+        className={cn('flex-row items-center justify-center gap-2', v.bg, SIZE[size], className)}
         {...rest}
       >
         {loading ? (
