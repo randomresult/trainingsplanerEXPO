@@ -4,7 +4,6 @@ import { Text } from './Text';
 import { Icon } from './Icon';
 import { Card } from './Card';
 import { Badge } from './Badge';
-import { focusColorFromName, type FocusColor } from '@/lib/utils/focusColor';
 import { cn } from '@/lib/utils/cn';
 import type { Exercise } from '@/lib/types/models';
 
@@ -16,14 +15,15 @@ export interface ExerciseCardProps {
   className?: string;
 }
 
-function badgeVariant(color: FocusColor) {
-  return (color === 'muted' ? 'muted' : `${color}-soft`) as
-    | 'muted'
-    | 'primary-soft'
-    | 'info-soft'
-    | 'success-soft'
-    | 'warning-soft'
-    | 'destructive-soft';
+// Playerlevels are the one dimension with real semantic meaning — Beginner/
+// Intermediate/Advanced/Expert map to a severity gradient. Falling back
+// through the English and German variants the Strapi content uses.
+function levelVariant(name: string) {
+  const lower = name.toLowerCase();
+  if (/(beginner|anfänger)/.test(lower)) return 'success-soft' as const;
+  if (/(intermediate|mittel|fortgeschritten)/.test(lower)) return 'warning-soft' as const;
+  if (/(advanced|expert|experte|profi)/.test(lower)) return 'destructive-soft' as const;
+  return 'muted' as const;
 }
 
 export function ExerciseCard({
@@ -38,44 +38,40 @@ export function ExerciseCard({
   const categories = exercise.categories ?? [];
 
   return (
-    <Card onPress={onPress} className={cn('flex-row items-start gap-3', className)}>
-      <View className="flex-1">
-        <Text variant="headline" numberOfLines={1}>
+    <Card onPress={onPress} className={cn('gap-2.5', className)}>
+      <View className="flex-row items-start gap-3">
+        <Text variant="headline" numberOfLines={2} className="flex-1">
           {exercise.Name}
         </Text>
-        {!compact && exercise.Description && (
-          <Text variant="footnote" color="muted" numberOfLines={2} className="mt-0.5">
-            {exercise.Description}
-          </Text>
-        )}
+        {trailing}
+      </View>
 
-        <View className="flex-row flex-wrap items-center gap-1.5 mt-2">
-          <View className="self-start rounded-md px-2.5 py-1 bg-muted flex-row items-center gap-1">
-            <Icon name="time-outline" size={11} color="muted" />
+      {!compact && (
+        <View className="flex-row items-center flex-wrap gap-1.5">
+          <View className="flex-row items-center gap-1 pr-2.5 border-r border-border">
+            <Icon name="time-outline" size={12} color="muted" />
             <Text variant="caption1" weight="semibold" color="muted">
               {exercise.Minutes} Min
             </Text>
           </View>
 
           {playerlevels.map((lvl) => (
-            <Badge key={lvl.documentId} variant={badgeVariant(focusColorFromName(lvl.Name))}>
+            <Badge key={lvl.documentId} variant={levelVariant(lvl.Name)}>
               {lvl.Name}
             </Badge>
           ))}
-          {focusareas.map((f) => (
-            <Badge key={f.documentId} variant={badgeVariant(focusColorFromName(f.Name))}>
-              {f.Name}
-            </Badge>
-          ))}
           {categories.map((c) => (
-            <Badge key={c.documentId} variant={badgeVariant(focusColorFromName(c.Name))}>
+            <Badge key={c.documentId} variant="primary-soft">
               {c.Name}
             </Badge>
           ))}
+          {focusareas.map((f) => (
+            <Badge key={f.documentId} variant="muted">
+              {f.Name}
+            </Badge>
+          ))}
         </View>
-      </View>
-
-      {trailing && <View className="ml-1">{trailing}</View>}
+      )}
     </Card>
   );
 }
