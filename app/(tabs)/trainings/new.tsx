@@ -6,7 +6,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Screen, Text, Button, toast } from '@/components/ui';
 import {
   ExercisePickerSheet,
@@ -19,9 +19,16 @@ import {
 import { useCreateTraining } from '@/lib/queries/useTrainings';
 
 export default function NewTrainingScreen() {
+  const { preselect, returnTo } = useLocalSearchParams<{
+    preselect?: string;
+    returnTo?: string;
+  }>();
+
   const [name, setName] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [exerciseIds, setExerciseIds] = useState<string[]>([]);
+  const [exerciseIds, setExerciseIds] = useState<string[]>(
+    preselect ? [preselect] : []
+  );
   const [playerIds, setPlayerIds] = useState<string[]>([]);
   const createTraining = useCreateTraining();
   const exerciseSheetRef = useRef<ExercisePickerSheetRef>(null);
@@ -35,10 +42,14 @@ export default function NewTrainingScreen() {
       {
         onSuccess: (newTraining) => {
           toast.success('Training erstellt');
-          router.replace({
-            pathname: '/trainings',
-            params: { scrollToId: newTraining.documentId },
-          });
+          if (returnTo === 'library') {
+            router.replace('/library');
+          } else {
+            router.replace({
+              pathname: '/trainings',
+              params: { scrollToId: newTraining.documentId },
+            });
+          }
         },
         onError: () => toast.error('Training konnte nicht erstellt werden'),
       }
