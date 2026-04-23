@@ -52,8 +52,10 @@ export const TrainingPickerSheet = forwardRef<TrainingPickerSheetRef, Props>(
       if (!exerciseId) return;
       try {
         await addExercise.mutateAsync({ trainingId, exerciseId });
-        toast.success(`Zu "${trainingName}" hinzugefügt`);
         sheetRef.current?.dismiss();
+        // Dismiss first, then toast — otherwise the sheet's closing animation
+        // can visually swallow the toast on web / slow devices.
+        toast.success(`Zu "${trainingName}" hinzugefügt`);
       } catch {
         toast.error('Hinzufügen fehlgeschlagen');
       }
