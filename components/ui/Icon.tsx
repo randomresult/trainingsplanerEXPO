@@ -1,6 +1,7 @@
 import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
+import { COLORS } from '@/lib/theme';
 
 type IoniconsName = ComponentProps<typeof Ionicons>['name'];
 
@@ -15,14 +16,14 @@ type IconColor =
   | 'inverse';
 
 const COLOR_HEX: Record<IconColor, string> = {
-  foreground: '#ffffff',
-  muted: '#999999',
-  primary: '#8b5cf6',
-  destructive: '#ef4444',
-  success: '#22c55e',
-  warning: '#f59e0b',
-  info: '#0ea5e9',
-  inverse: '#0a0a0f',
+  foreground: COLORS.foreground,
+  muted:      COLORS.muted,
+  primary:    COLORS.primary,
+  destructive: COLORS.destructive,
+  success:    COLORS.success,
+  warning:    COLORS.warning,
+  info:       COLORS.info,
+  inverse:    COLORS.inverse,
 };
 
 export interface IconProps {

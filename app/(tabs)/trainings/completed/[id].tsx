@@ -2,6 +2,7 @@ import { View, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Screen, Text, Button, Icon, Avatar } from '@/components/ui';
 import { useTrainingDetail } from '@/lib/queries/useTrainings';
+import { COLORS } from '@/lib/theme';
 
 function formatDuration(seconds: number | undefined | null): string {
   if (!seconds) return '–';
@@ -17,7 +18,7 @@ export default function CompletedTrainingScreen() {
     return (
       <Screen>
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#8b5cf6" />
+          <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
       </Screen>
     );

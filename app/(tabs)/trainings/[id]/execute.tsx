@@ -28,6 +28,7 @@ import {
 import { useTrainingExecution } from '@/lib/hooks/useTrainingExecution';
 import { formatTime } from '@/lib/utils/formatTime';
 import { triggerHaptic } from '@/lib/haptics';
+import { COLORS } from '@/lib/theme';
 import {
   AddExercisesSheet,
   AddExercisesSheetRef,
@@ -108,7 +109,7 @@ export default function ExecuteTrainingScreen() {
     return (
       <SafeAreaView edges={['top']} className="flex-1 bg-background">
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#8b5cf6" />
+          <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
       </SafeAreaView>
     );

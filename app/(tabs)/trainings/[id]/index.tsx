@@ -11,6 +11,7 @@ import {
   useRemoveExerciseFromTraining,
   useRemovePlayerFromTraining,
 } from '@/lib/queries/useTrainings';
+import { COLORS } from '@/lib/theme';
 
 const statusBadge = {
   draft: { variant: 'muted' as const, label: 'Entwurf' },
@@ -97,7 +98,7 @@ export default function TrainingDetailScreen() {
     return (
       <Screen>
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#8b5cf6" />
+          <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
       </Screen>
     );

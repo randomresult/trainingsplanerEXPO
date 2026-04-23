@@ -10,6 +10,7 @@ import {
 import { router } from 'expo-router';
 import { Screen, Text, ExerciseCard, Icon } from '@/components/ui';
 import { useExercises } from '@/lib/queries/useExercises';
+import { COLORS } from '@/lib/theme';
 
 export default function LibraryListScreen() {
   const [search, setSearch] = useState('');
@@ -33,7 +34,7 @@ export default function LibraryListScreen() {
 
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#8b5cf6" />
+          <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
       ) : (
         <Pressable onPress={Keyboard.dismiss} className="flex-1">

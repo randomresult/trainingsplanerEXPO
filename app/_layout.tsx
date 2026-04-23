@@ -8,6 +8,7 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { useAuthStore } from '@/lib/store';
 import { useAppFonts } from '@/lib/fonts';
 import { Toaster } from '@/components/ui';
+import { COLORS } from '@/lib/theme';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -41,7 +42,7 @@ function RootLayoutNav() {
   if (!isRestored || !fontsLoaded) {
     return (
       <View className="flex-1 items-center justify-center bg-background">
-        <ActivityIndicator size="large" color="#8b5cf6" />
+        <ActivityIndicator size="large" color={COLORS.primary} />
       </View>
     );
   }

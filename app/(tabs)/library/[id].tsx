@@ -2,6 +2,7 @@ import { View, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { Screen, Text, Badge, Card, Icon } from '@/components/ui';
 import { useExerciseDetail } from '@/lib/queries/useExercises';
+import { COLORS } from '@/lib/theme';
 
 export default function ExerciseDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -11,7 +12,7 @@ export default function ExerciseDetailScreen() {
     return (
       <Screen>
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#8b5cf6" />
+          <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
       </Screen>
     );
