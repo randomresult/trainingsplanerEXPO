@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   View,
   TextInput,
@@ -7,8 +7,7 @@ import {
   Keyboard,
   Pressable,
 } from 'react-native';
-import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { useFocusEffect } from '@react-navigation/native';
+import { router, Stack, useLocalSearchParams, useNavigation } from 'expo-router';
 import { Screen, Text, PlayerCard, Icon, FilterChip } from '@/components/ui';
 import { usePlayers } from '@/lib/queries/usePlayers';
 import { usePickModeStore } from '@/lib/store/pickModeStore';
@@ -45,18 +44,26 @@ export default function PlayerPickerScreen() {
 
   const activeFilterCount = pendingOnly ? 1 : 0;
 
-  useFocusEffect(
-    useCallback(() => {
-      return () => {
-        const store = usePickModeStore.getState();
-        if (store.active) store.cancel();
-      };
-    }, [])
-  );
+  const navigation = useNavigation();
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', () => {
+      const store = usePickModeStore.getState();
+      if (store.active) store.cancel();
+    });
+    return unsubscribe;
+  }, [navigation]);
 
-  const handleConfirm = () => {
-    confirm();
-    router.back();
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleConfirm = async () => {
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      await confirm();
+      router.back();
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -66,13 +73,18 @@ export default function PlayerPickerScreen() {
           headerShown: true,
           title: 'Spieler auswählen',
           headerBackTitle: 'Abbrechen',
-          headerRight: () => (
-            <Pressable onPress={handleConfirm} className="px-2">
-              <Text variant="body" weight="semibold" color="primary">
-                Fertig ({selectedIds.length})
-              </Text>
-            </Pressable>
-          ),
+          headerRight: () =>
+            submitting ? (
+              <View className="px-2">
+                <ActivityIndicator color={COLORS.primary} />
+              </View>
+            ) : (
+              <Pressable onPress={handleConfirm} className="px-2">
+                <Text variant="body" weight="semibold" color="primary">
+                  Fertig ({selectedIds.length})
+                </Text>
+              </Pressable>
+            ),
         }}
       />
 

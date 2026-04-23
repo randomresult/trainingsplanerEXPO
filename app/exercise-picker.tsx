@@ -94,9 +94,17 @@ export default function ExercisePickerScreen() {
     return unsubscribe;
   }, [navigation]);
 
-  const handleConfirm = () => {
-    confirm();
-    router.back();
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleConfirm = async () => {
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      await confirm();
+      router.back();
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -106,13 +114,18 @@ export default function ExercisePickerScreen() {
           headerShown: true,
           title: 'Übungen auswählen',
           headerBackTitle: 'Abbrechen',
-          headerRight: () => (
-            <Pressable onPress={handleConfirm} className="px-2">
-              <Text variant="body" weight="semibold" color="primary">
-                Fertig ({selectedIds.length})
-              </Text>
-            </Pressable>
-          ),
+          headerRight: () =>
+            submitting ? (
+              <View className="px-2">
+                <ActivityIndicator color={COLORS.primary} />
+              </View>
+            ) : (
+              <Pressable onPress={handleConfirm} className="px-2">
+                <Text variant="body" weight="semibold" color="primary">
+                  Fertig ({selectedIds.length})
+                </Text>
+              </Pressable>
+            ),
         }}
       />
 
