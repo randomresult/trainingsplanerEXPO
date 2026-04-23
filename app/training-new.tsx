@@ -52,8 +52,13 @@ export default function NewTrainingScreen() {
   const canCreate = name.trim() && exerciseIds.length > 0 && playerIds.length > 0;
 
   const handleOpenExercisePicker = () => {
-    usePickModeStore.getState().start(exerciseIds, setExerciseIds);
-    router.push('/exercise-picker');
+    usePickModeStore.getState().startAdd((id) => {
+      setExerciseIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+    });
+    router.push({
+      pathname: '/exercise-picker',
+      params: { excludeIds: exerciseIds.join(',') },
+    });
   };
 
   const handleOpenPlayerPicker = () => {

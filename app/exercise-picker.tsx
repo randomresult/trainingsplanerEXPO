@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  Platform,
   View,
   TextInput,
   FlatList,
@@ -22,7 +23,7 @@ import { COLORS } from '@/lib/theme';
 
 export default function ExercisePickerScreen() {
   const { excludeIds } = useLocalSearchParams<{ excludeIds?: string }>();
-  const excluded = useMemo(
+  const initiallyAdded = useMemo(
     () => new Set((excludeIds ?? '').split(',').filter(Boolean)),
     [excludeIds]
   );
@@ -30,9 +31,13 @@ export default function ExercisePickerScreen() {
   const [search, setSearch] = useState('');
   const { data: exercises, isLoading } = useExercises(search);
 
-  const selectedIds = usePickModeStore((s) => s.selectedIds);
-  const toggle = usePickModeStore((s) => s.toggle);
-  const confirm = usePickModeStore((s) => s.confirm);
+  const onAdd = usePickModeStore((s) => s.onAdd);
+
+  // Per-card ephemeral state: which is mid-mutation, which has just been added
+  // during this picker session. initiallyAdded comes from the caller as a
+  // query param and covers the "already in training" case.
+  const [addingId, setAddingId] = useState<string | null>(null);
+  const [sessionAddedIds, setSessionAddedIds] = useState<Set<string>>(new Set());
 
   const [filters, setFilters] = useState<LibraryFilterState>(EMPTY_FILTERS);
   const filterSheetRef = useRef<LibraryFilterSheetRef>(null);
@@ -59,7 +64,6 @@ export default function ExercisePickerScreen() {
       return names.some((n) => selected.includes(n));
     };
     return (exercises ?? []).filter((ex: any) => {
-      if (excluded.has(ex.documentId)) return false;
       if (!matchesMulti(filters.focusareas, ex.focusareas)) return false;
       if (!matchesMulti(filters.playerlevels, ex.playerlevels)) return false;
       if (!matchesMulti(filters.categories, ex.categories)) return false;
@@ -71,7 +75,7 @@ export default function ExercisePickerScreen() {
       }
       return true;
     });
-  }, [exercises, filters, excluded]);
+  }, [exercises, filters]);
 
   const activeFilterCount =
     filters.focusareas.length +
@@ -84,7 +88,7 @@ export default function ExercisePickerScreen() {
   const clearDuration = () => setFilters((s) => ({ ...s, duration: null }));
 
   // Cancel on actual removal (back/swipe-dismiss) — NOT on focus loss, so
-  // pushing /exercise-detail on top and returning preserves the selection.
+  // pushing /exercise-detail on top and returning preserves the session.
   const navigation = useNavigation();
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', () => {
@@ -94,16 +98,18 @@ export default function ExercisePickerScreen() {
     return unsubscribe;
   }, [navigation]);
 
-  const [submitting, setSubmitting] = useState(false);
-
-  const handleConfirm = async () => {
-    if (submitting) return;
-    setSubmitting(true);
+  const handleAdd = async (exerciseId: string) => {
+    if (!onAdd || addingId === exerciseId) return;
+    setAddingId(exerciseId);
     try {
-      await confirm();
-      router.back();
+      await onAdd(exerciseId);
+      setSessionAddedIds((prev) => {
+        const next = new Set(prev);
+        next.add(exerciseId);
+        return next;
+      });
     } finally {
-      setSubmitting(false);
+      setAddingId(null);
     }
   };
 
@@ -112,20 +118,20 @@ export default function ExercisePickerScreen() {
       <Stack.Screen
         options={{
           headerShown: true,
-          title: 'Übungen auswählen',
-          headerBackTitle: 'Abbrechen',
-          headerRight: () =>
-            submitting ? (
-              <View className="px-2">
-                <ActivityIndicator color={COLORS.primary} />
-              </View>
-            ) : (
-              <Pressable onPress={handleConfirm} className="px-2">
-                <Text variant="body" weight="semibold" color="primary">
-                  Fertig ({selectedIds.length})
-                </Text>
-              </Pressable>
-            ),
+          title: 'Übungen',
+          headerLeft: () => (
+            <Pressable
+              onPress={() => router.back()}
+              className="px-2 py-1"
+              hitSlop={8}
+            >
+              <Icon
+                name={Platform.OS === 'web' ? 'close' : 'chevron-back'}
+                size={22}
+                color="foreground"
+              />
+            </Pressable>
+          ),
         }}
       />
 
@@ -200,35 +206,44 @@ export default function ExercisePickerScreen() {
               </View>
             }
             renderItem={({ item }: { item: any }) => {
-              const selected = selectedIds.includes(item.documentId);
+              const alreadyThere = initiallyAdded.has(item.documentId);
+              const sessionAdded = sessionAddedIds.has(item.documentId);
+              const isAdded = alreadyThere || sessionAdded;
+              const isAdding = addingId === item.documentId;
+
               return (
                 <ExerciseCard
                   exercise={item}
-                  onPress={() => toggle(item.documentId)}
+                  onPress={() =>
+                    router.push({
+                      pathname: '/exercise-detail/[id]',
+                      params: { id: item.documentId },
+                    })
+                  }
                   trailing={
-                    <View className="flex-row items-center gap-2">
-                      <Pressable
-                        onPress={(e) => {
-                          e.stopPropagation?.();
-                          router.push({
-                            pathname: '/exercise-detail/[id]',
-                            params: { id: item.documentId },
-                          });
-                        }}
-                        hitSlop={6}
-                      >
+                    <Pressable
+                      onPress={(e) => {
+                        e.stopPropagation?.();
+                        if (!isAdded && !isAdding) handleAdd(item.documentId);
+                      }}
+                      hitSlop={8}
+                      disabled={isAdded || isAdding}
+                      className={
+                        isAdded
+                          ? 'w-8 h-8 rounded-full bg-success/15 items-center justify-center'
+                          : 'w-8 h-8 rounded-full bg-primary/15 items-center justify-center'
+                      }
+                    >
+                      {isAdding ? (
+                        <ActivityIndicator size="small" color={COLORS.primary} />
+                      ) : (
                         <Icon
-                          name="information-circle-outline"
-                          size={22}
-                          color="muted"
+                          name={isAdded ? 'checkmark' : 'add'}
+                          size={18}
+                          color={isAdded ? 'success' : 'primary'}
                         />
-                      </Pressable>
-                      <Icon
-                        name={selected ? 'checkmark-circle' : 'ellipse-outline'}
-                        color={selected ? 'primary' : 'muted'}
-                        size={24}
-                      />
-                    </View>
+                      )}
+                    </Pressable>
                   }
                 />
               );

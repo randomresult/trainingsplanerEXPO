@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Platform, View, ActivityIndicator, Pressable } from 'react-native';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
 import {
@@ -22,15 +22,17 @@ export default function ExerciseDetailScreen() {
   const { data: exercise, isLoading } = useExerciseDetail(id);
   const trainingPickerRef = useRef<TrainingPickerSheetRef>(null);
 
-  // Hide the "add to training" CTA when opened from inside an active pick
-  // flow (e.g. live-training add-exercise picker). The user is already
-  // mid-add — offering a *second* add to some other training would be wrong.
-  const pickerActive = usePickModeStore((s) => s.active);
+  // If the picker is open with an onAdd callback, the user is already inside
+  // a single-add flow (live-training or training-new) — the CTA should feed
+  // that flow directly rather than asking "which training?" again.
+  const onAdd = usePickModeStore((s) => s.onAdd);
+  const [directAdding, setDirectAdding] = useState(false);
+  const [directAdded, setDirectAdded] = useState(false);
 
   const headerOptions = {
     title: 'Übung',
-    // Modal has no native back chevron on either platform — the web close-
-    // button pattern matches the rest of the app's modal routes.
+    // Modal has no native back chevron on either platform — provide one
+    // explicitly so the user always sees a way out.
     headerLeft: () => (
       <Pressable onPress={() => router.back()} className="px-2 py-1" hitSlop={8}>
         <Icon
@@ -63,6 +65,17 @@ export default function ExerciseDetailScreen() {
       </Screen>
     );
   }
+
+  const handleDirectAdd = async () => {
+    if (!onAdd || directAdding || directAdded) return;
+    setDirectAdding(true);
+    try {
+      await onAdd(exercise.documentId);
+      setDirectAdded(true);
+    } finally {
+      setDirectAdding(false);
+    }
+  };
 
   return (
     <Screen>
@@ -124,8 +137,19 @@ export default function ExerciseDetailScreen() {
         )}
       </Screen>
 
-      {!pickerActive && (
-        <View className="px-5 py-3 border-t border-border bg-background">
+      <View className="px-5 py-3 border-t border-border bg-background">
+        {onAdd ? (
+          <Button
+            size="lg"
+            className="w-full"
+            leftIcon={directAdded ? 'checkmark' : 'add'}
+            loading={directAdding}
+            disabled={directAdded}
+            onPress={handleDirectAdd}
+          >
+            {directAdded ? 'Hinzugefügt' : 'Zum Training hinzufügen'}
+          </Button>
+        ) : (
           <Button
             size="lg"
             className="w-full"
@@ -134,8 +158,8 @@ export default function ExerciseDetailScreen() {
           >
             Zum Training hinzufügen
           </Button>
-        </View>
-      )}
+        )}
+      </View>
 
       <TrainingPickerSheet ref={trainingPickerRef} />
     </Screen>

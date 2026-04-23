@@ -7,7 +7,7 @@ import {
   useStartTraining,
   useRemoveExerciseFromTraining,
   useRemovePlayerFromTraining,
-  useAddExercisesToTraining,
+  useAddExerciseToTraining,
   useAddPlayersToTraining,
 } from '@/lib/queries/useTrainings';
 import { usePickModeStore } from '@/lib/store/pickModeStore';
@@ -26,7 +26,7 @@ export default function TrainingDetailScreen() {
   const startTraining = useStartTraining();
   const removeExercise = useRemoveExerciseFromTraining();
   const removePlayer = useRemovePlayerFromTraining();
-  const addExercises = useAddExercisesToTraining();
+  const addExercise = useAddExerciseToTraining();
   const addPlayers = useAddPlayersToTraining();
 
   const canEditExercises =
@@ -96,20 +96,18 @@ export default function TrainingDetailScreen() {
   const handleAddExercises = () => {
     if (!training) return;
     const existingIds = training.exercises?.map((e) => e.documentId) ?? [];
-    usePickModeStore.getState().start([], async (newIds) => {
-      if (newIds.length === 0) return;
+    usePickModeStore.getState().startAdd(async (exerciseId) => {
       try {
-        await addExercises.mutateAsync({ trainingId: id, exerciseIds: newIds });
-        toast.success(
-          newIds.length === 1
-            ? 'Übung hinzugefügt'
-            : `${newIds.length} Übungen hinzugefügt`
-        );
+        await addExercise.mutateAsync({ trainingId: id, exerciseId });
+        toast.success('Übung hinzugefügt');
       } catch {
-        toast.error('Übungen konnten nicht hinzugefügt werden');
+        toast.error('Übung konnte nicht hinzugefügt werden');
       }
     });
-    router.push(`/exercise-picker?excludeIds=${existingIds.join(',')}`);
+    router.push({
+      pathname: '/exercise-picker',
+      params: { excludeIds: existingIds.join(',') },
+    });
   };
 
   const handleAddPlayers = () => {
