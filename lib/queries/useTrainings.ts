@@ -122,6 +122,30 @@ export const useAddExerciseToTraining = () => {
   });
 };
 
+export const useAddExercisesToTraining = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: { trainingId: string; exerciseIds: string[] }) => {
+      const { data } = await apiClient.put<StrapiResponse<Training>>(
+        `/trainings/${input.trainingId}`,
+        {
+          data: {
+            exercises: {
+              connect: input.exerciseIds.map((id) => ({ documentId: id })),
+            },
+          },
+        }
+      );
+      return data.data;
+    },
+    onSuccess: (_data, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['trainings', vars.trainingId] });
+      queryClient.invalidateQueries({ queryKey: ['trainings'] });
+    },
+  });
+};
+
 export const useAddPlayerToTraining = () => {
   const queryClient = useQueryClient();
 
@@ -132,6 +156,30 @@ export const useAddPlayerToTraining = () => {
         {
           data: {
             players: { connect: [{ documentId: input.playerId }] },
+          },
+        }
+      );
+      return data.data;
+    },
+    onSuccess: (_data, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['trainings', vars.trainingId] });
+      queryClient.invalidateQueries({ queryKey: ['trainings'] });
+    },
+  });
+};
+
+export const useAddPlayersToTraining = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: { trainingId: string; playerIds: string[] }) => {
+      const { data } = await apiClient.put<StrapiResponse<Training>>(
+        `/trainings/${input.trainingId}`,
+        {
+          data: {
+            players: {
+              connect: input.playerIds.map((id) => ({ documentId: id })),
+            },
           },
         }
       );
