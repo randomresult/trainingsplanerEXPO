@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import {
   TrainingPickerSheet,
   TrainingPickerSheetRef,
@@ -9,7 +9,6 @@ import {
   LibraryFilterState,
   EMPTY_FILTERS,
   DURATION_LABEL,
-  DurationBucket,
 } from '@/components/sheets/LibraryFilterSheet';
 import {
   View,
@@ -19,25 +18,14 @@ import {
   Keyboard,
   Pressable,
 } from 'react-native';
-import { router, useLocalSearchParams, Stack } from 'expo-router';
-import { useFocusEffect } from '@react-navigation/native';
+import { router } from 'expo-router';
 import { Screen, Text, ExerciseCard, Icon, FilterChip } from '@/components/ui';
 import { useExercises } from '@/lib/queries/useExercises';
-import { usePickModeStore } from '@/lib/store/pickModeStore';
 import { COLORS } from '@/lib/theme';
 
 export default function LibraryListScreen() {
-  const { mode } = useLocalSearchParams<{ mode?: string }>();
-  const isPickMode = mode === 'pick';
-
   const [search, setSearch] = useState('');
   const { data: exercises, isLoading } = useExercises(search);
-
-  // Pick-mode selectors subscribe only when needed — avoids noisy re-renders in normal mode.
-  const selectedIds = usePickModeStore((s) => s.selectedIds);
-  const toggle = usePickModeStore((s) => s.toggle);
-  const confirm = usePickModeStore((s) => s.confirm);
-  const cancel = usePickModeStore((s) => s.cancel);
 
   const trainingPickerRef = useRef<TrainingPickerSheetRef>(null);
 
@@ -91,56 +79,11 @@ export default function LibraryListScreen() {
   const clearDifficulty = () => setFilters((s) => ({ ...s, difficulty: null }));
   const clearDuration = () => setFilters((s) => ({ ...s, duration: null }));
 
-  // Cancel pick-mode if the user navigates away without confirming (back swipe / hardware back).
-  // useFocusEffect's cleanup runs on blur.
-  useFocusEffect(
-    useCallback(() => {
-      return () => {
-        const store = usePickModeStore.getState();
-        if (store.active) store.cancel();
-      };
-    }, [])
-  );
-
-  const handleCardPress = (exerciseId: string) => {
-    if (isPickMode) {
-      toggle(exerciseId);
-    } else {
-      router.push(`/library/${exerciseId}`);
-    }
-  };
-
-  const handleConfirm = () => {
-    confirm();
-    router.back();
-  };
-
   return (
     <Screen>
-      <Stack.Screen
-        options={
-          isPickMode
-            ? {
-                headerShown: true,
-                title: 'Auswählen',
-                headerBackTitle: 'Abbrechen',
-                headerRight: () => (
-                  <Pressable onPress={handleConfirm} className="px-2">
-                    <Text variant="body" weight="semibold" color="primary">
-                      Fertig ({selectedIds.length})
-                    </Text>
-                  </Pressable>
-                ),
-              }
-            : { headerShown: false }
-        }
-      />
-
-      {!isPickMode && (
-        <View className="px-5 pt-4 pb-4 flex-row justify-between items-center">
-          <Text variant="largeTitle" weight="bold">Bibliothek</Text>
-        </View>
-      )}
+      <View className="px-5 pt-4 pb-4 flex-row justify-between items-center">
+        <Text variant="largeTitle" weight="bold">Bibliothek</Text>
+      </View>
 
       <View className="px-5 pb-2">
         <TextInput
@@ -203,35 +146,24 @@ export default function LibraryListScreen() {
                 </Text>
               </View>
             }
-            renderItem={({ item }: { item: any }) => {
-              const selected = isPickMode && selectedIds.includes(item.documentId);
-              return (
-                <ExerciseCard
-                  exercise={item}
-                  onPress={() => handleCardPress(item.documentId)}
-                  trailing={
-                    isPickMode ? (
-                      <Icon
-                        name={selected ? 'checkmark-circle' : 'ellipse-outline'}
-                        color={selected ? 'primary' : 'muted'}
-                        size={24}
-                      />
-                    ) : (
-                      <Pressable
-                        onPress={(e) => {
-                          e.stopPropagation?.();
-                          trainingPickerRef.current?.present(item.documentId, item.Name);
-                        }}
-                        hitSlop={8}
-                        className="w-8 h-8 rounded-full bg-primary/15 items-center justify-center"
-                      >
-                        <Icon name="add" size={18} color="primary" />
-                      </Pressable>
-                    )
-                  }
-                />
-              );
-            }}
+            renderItem={({ item }: { item: any }) => (
+              <ExerciseCard
+                exercise={item}
+                onPress={() => router.push(`/library/${item.documentId}`)}
+                trailing={
+                  <Pressable
+                    onPress={(e) => {
+                      e.stopPropagation?.();
+                      trainingPickerRef.current?.present(item.documentId, item.Name);
+                    }}
+                    hitSlop={8}
+                    className="w-8 h-8 rounded-full bg-primary/15 items-center justify-center"
+                  >
+                    <Icon name="add" size={18} color="primary" />
+                  </Pressable>
+                }
+              />
+            )}
           />
         </Pressable>
       )}
