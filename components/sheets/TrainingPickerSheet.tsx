@@ -64,9 +64,7 @@ export const TrainingPickerSheet = forwardRef<TrainingPickerSheetRef, Props>(
     const handleCreateNew = () => {
       if (!exerciseId) return;
       sheetRef.current?.dismiss();
-      router.push(
-        `/trainings/new?preselect=${encodeURIComponent(exerciseId)}&returnTo=library`
-      );
+      router.push(`/training-new?preselect=${encodeURIComponent(exerciseId)}`);
     };
 
     return (

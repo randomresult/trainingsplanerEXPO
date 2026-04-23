@@ -60,6 +60,15 @@ function RootLayoutNav() {
           headerShadowVisible: false,
         }}
       />
+      <Stack.Screen
+        name="training-new"
+        options={{
+          presentation: 'modal',
+          headerStyle: { backgroundColor: '#0a0a0f' },
+          headerTintColor: '#fff',
+          headerShadowVisible: false,
+        }}
+      />
     </Stack>
   );
 }

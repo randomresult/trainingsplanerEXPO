@@ -7,7 +7,7 @@ import {
   Platform,
   Pressable,
 } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams, Stack } from 'expo-router';
 import { Screen, Text, Button, toast, ExerciseCard, Icon } from '@/components/ui';
 import { usePickModeStore } from '@/lib/store/pickModeStore';
 import {
@@ -19,10 +19,7 @@ import { useExercises } from '@/lib/queries/useExercises';
 import { usePlayers } from '@/lib/queries/usePlayers';
 
 export default function NewTrainingScreen() {
-  const { preselect, returnTo } = useLocalSearchParams<{
-    preselect?: string;
-    returnTo?: string;
-  }>();
+  const { preselect } = useLocalSearchParams<{ preselect?: string }>();
 
   const [name, setName] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -68,16 +65,11 @@ export default function NewTrainingScreen() {
     createTraining.mutate(
       { name, date, exerciseIds, playerIds },
       {
-        onSuccess: (newTraining) => {
+        onSuccess: () => {
+          // The modal closes and the caller (library-detail or trainings-index)
+          // is restored — no cross-tab dance needed.
+          router.back();
           toast.success('Training erstellt');
-          if (returnTo === 'library') {
-            router.replace('/library');
-          } else {
-            router.replace({
-              pathname: '/trainings',
-              params: { scrollToId: newTraining.documentId },
-            });
-          }
         },
         onError: () => toast.error('Training konnte nicht erstellt werden'),
       }
@@ -86,6 +78,13 @@ export default function NewTrainingScreen() {
 
   return (
     <Screen>
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          title: 'Training erstellen',
+          headerBackTitle: 'Abbrechen',
+        }}
+      />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         className="flex-1"

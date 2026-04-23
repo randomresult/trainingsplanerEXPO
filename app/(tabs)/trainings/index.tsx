@@ -44,7 +44,7 @@ export default function TrainingsScreen() {
           <Icon name="time-outline" size={20} color="foreground" />
         </Pressable>
         <Pressable
-          onPress={() => router.push('/trainings/new')}
+          onPress={() => router.push('/training-new')}
           className="w-10 h-10 rounded-full bg-primary items-center justify-center"
         >
           <Icon name="add" size={22} color="inverse" />
@@ -73,7 +73,7 @@ export default function TrainingsScreen() {
       ) : upcoming.length === 0 ? (
         <View className="flex-1 items-center justify-center px-5">
           <Pressable
-            onPress={() => router.push('/trainings/new')}
+            onPress={() => router.push('/training-new')}
             className="w-full rounded-2xl border-2 border-dashed border-primary/40 p-10 items-center"
           >
             <View className="w-16 h-16 rounded-full bg-primary/20 items-center justify-center mb-4">
