@@ -3,7 +3,6 @@ import { View, TextInput, FlatList, Pressable } from 'react-native';
 import {
   BottomSheet,
   BottomSheetRef,
-  Button,
   ExerciseCard,
   Icon,
   Text,
@@ -23,13 +22,11 @@ interface Props {
 export const ExercisePickerSheet = forwardRef<ExercisePickerSheetRef, Props>(
   function ExercisePickerSheet({ selectedIds, onChange }, ref) {
     const sheetRef = useRef<BottomSheetRef>(null);
-    const [temp, setTemp] = useState<string[]>(selectedIds);
     const [search, setSearch] = useState('');
     const { data: exercises } = useExercises(search);
 
     useImperativeHandle(ref, () => ({
       present: () => {
-        setTemp(selectedIds);
         setSearch('');
         sheetRef.current?.present();
       },
@@ -37,18 +34,19 @@ export const ExercisePickerSheet = forwardRef<ExercisePickerSheetRef, Props>(
 
     const toggle = (id: string) => {
       triggerHaptic('selection');
-      setTemp((prev) =>
-        prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      onChange(
+        selectedIds.includes(id)
+          ? selectedIds.filter((x) => x !== id)
+          : [...selectedIds, id]
       );
     };
 
-    const handleConfirm = () => {
-      onChange(temp);
-      sheetRef.current?.dismiss();
-    };
-
     return (
-      <BottomSheet ref={sheetRef} snapPoints={['90%']} title="Übungen auswählen">
+      <BottomSheet
+        ref={sheetRef}
+        snapPoints={['90%']}
+        title={`Übungen auswählen (${selectedIds.length})`}
+      >
         <View className="flex-1">
           <TextInput
             value={search}
@@ -60,15 +58,14 @@ export const ExercisePickerSheet = forwardRef<ExercisePickerSheetRef, Props>(
           <FlatList
             data={exercises ?? []}
             keyExtractor={(item: any) => item.documentId}
-            contentContainerStyle={{ paddingBottom: 16, gap: 8 }}
-            className="flex-1"
+            contentContainerStyle={{ paddingBottom: 24, gap: 8 }}
             ListEmptyComponent={
               <Text variant="footnote" color="muted" className="text-center py-8">
                 {search ? 'Keine Übungen gefunden' : 'Keine Übungen vorhanden'}
               </Text>
             }
             renderItem={({ item }: { item: any }) => {
-              const selected = temp.includes(item.documentId);
+              const selected = selectedIds.includes(item.documentId);
               return (
                 <ExerciseCard
                   exercise={item}
@@ -87,9 +84,6 @@ export const ExercisePickerSheet = forwardRef<ExercisePickerSheetRef, Props>(
               );
             }}
           />
-          <Button size="lg" className="w-full mt-2 mb-2" onPress={handleConfirm}>
-            Fertig ({temp.length})
-          </Button>
         </View>
       </BottomSheet>
     );

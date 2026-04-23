@@ -3,7 +3,6 @@ import { View, TextInput, FlatList, Pressable } from 'react-native';
 import {
   BottomSheet,
   BottomSheetRef,
-  Button,
   Icon,
   PlayerCard,
   Text,
@@ -23,13 +22,11 @@ interface Props {
 export const PlayerPickerSheet = forwardRef<PlayerPickerSheetRef, Props>(
   function PlayerPickerSheet({ selectedIds, onChange }, ref) {
     const sheetRef = useRef<BottomSheetRef>(null);
-    const [temp, setTemp] = useState<string[]>(selectedIds);
     const [search, setSearch] = useState('');
     const { data: players } = usePlayers();
 
     useImperativeHandle(ref, () => ({
       present: () => {
-        setTemp(selectedIds);
         setSearch('');
         sheetRef.current?.present();
       },
@@ -48,18 +45,19 @@ export const PlayerPickerSheet = forwardRef<PlayerPickerSheetRef, Props>(
 
     const toggle = (id: string) => {
       triggerHaptic('selection');
-      setTemp((prev) =>
-        prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      onChange(
+        selectedIds.includes(id)
+          ? selectedIds.filter((x) => x !== id)
+          : [...selectedIds, id]
       );
     };
 
-    const handleConfirm = () => {
-      onChange(temp);
-      sheetRef.current?.dismiss();
-    };
-
     return (
-      <BottomSheet ref={sheetRef} snapPoints={['90%']} title="Spieler auswählen">
+      <BottomSheet
+        ref={sheetRef}
+        snapPoints={['90%']}
+        title={`Spieler auswählen (${selectedIds.length})`}
+      >
         <View className="flex-1">
           <TextInput
             value={search}
@@ -71,15 +69,14 @@ export const PlayerPickerSheet = forwardRef<PlayerPickerSheetRef, Props>(
           <FlatList
             data={filtered}
             keyExtractor={(item: any) => item.documentId}
-            contentContainerStyle={{ paddingBottom: 16, gap: 8 }}
-            className="flex-1"
+            contentContainerStyle={{ paddingBottom: 24, gap: 8 }}
             ListEmptyComponent={
               <Text variant="footnote" color="muted" className="text-center py-8">
                 {search ? 'Keine Spieler gefunden' : 'Keine Spieler vorhanden'}
               </Text>
             }
             renderItem={({ item }: { item: any }) => {
-              const selected = temp.includes(item.documentId);
+              const selected = selectedIds.includes(item.documentId);
               return (
                 <PlayerCard
                   player={item}
@@ -98,9 +95,6 @@ export const PlayerPickerSheet = forwardRef<PlayerPickerSheetRef, Props>(
               );
             }}
           />
-          <Button size="lg" className="w-full mt-2 mb-2" onPress={handleConfirm}>
-            Fertig ({temp.length})
-          </Button>
         </View>
       </BottomSheet>
     );
