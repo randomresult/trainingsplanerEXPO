@@ -4,7 +4,7 @@ import { Text } from './Text';
 import { Icon } from './Icon';
 import { Card } from './Card';
 import { Badge } from './Badge';
-import { focusColorFromName } from '@/lib/utils/focusColor';
+import { focusColorFromName, type FocusColor } from '@/lib/utils/focusColor';
 import { cn } from '@/lib/utils/cn';
 import type { Exercise } from '@/lib/types/models';
 
@@ -16,6 +16,24 @@ export interface ExerciseCardProps {
   className?: string;
 }
 
+// Anfänger → success (grün), Fortgeschritten → warning (gelb), Experte → destructive (rot).
+// Keeps the severity metaphor obvious at a glance.
+const DIFFICULTY_COLOR: Record<NonNullable<Exercise['Difficulty']>, FocusColor> = {
+  'Anfänger': 'success',
+  'Fortgeschritten': 'warning',
+  'Experte': 'destructive',
+};
+
+function badgeVariant(color: FocusColor) {
+  return (color === 'muted' ? 'muted' : `${color}-soft`) as
+    | 'muted'
+    | 'primary-soft'
+    | 'info-soft'
+    | 'success-soft'
+    | 'warning-soft'
+    | 'destructive-soft';
+}
+
 export function ExerciseCard({
   exercise,
   onPress,
@@ -23,28 +41,11 @@ export function ExerciseCard({
   compact,
   className,
 }: ExerciseCardProps) {
-  const focusName = exercise.focus?.[0]?.Name;
-  const focusColor = focusColorFromName(focusName);
-  const initial = exercise.Name?.[0]?.toUpperCase() ?? '?';
+  const focuses = exercise.focus ?? [];
+  const difficulty = exercise.Difficulty;
 
   return (
-    <Card onPress={onPress} className={cn('flex-row items-center gap-3', className)}>
-      <View
-        className={cn(
-          'w-10 h-10 rounded-full items-center justify-center',
-          focusColor === 'primary' && 'bg-primary/20',
-          focusColor === 'info' && 'bg-info/20',
-          focusColor === 'success' && 'bg-success/20',
-          focusColor === 'warning' && 'bg-warning/20',
-          focusColor === 'destructive' && 'bg-destructive/20',
-          focusColor === 'muted' && 'bg-muted'
-        )}
-      >
-        <Text variant="subhead" weight="bold" color={focusColor === 'muted' ? 'foreground' : focusColor}>
-          {initial}
-        </Text>
-      </View>
-
+    <Card onPress={onPress} className={cn('flex-row items-start gap-3', className)}>
       <View className="flex-1">
         <Text variant="headline" numberOfLines={1}>
           {exercise.Name}
@@ -54,27 +55,30 @@ export function ExerciseCard({
             {exercise.Description}
           </Text>
         )}
-        <View className="flex-row items-center gap-3 mt-1.5">
-          <View className="flex-row items-center gap-1">
-            <Icon name="time-outline" size={12} color="muted" />
-            <Text variant="caption1" color="muted">
+
+        <View className="flex-row flex-wrap items-center gap-1.5 mt-2">
+          <View className="self-start rounded-md px-2.5 py-1 bg-muted flex-row items-center gap-1">
+            <Icon name="time-outline" size={11} color="muted" />
+            <Text variant="caption1" weight="semibold" color="muted">
               {exercise.Minutes} Min
             </Text>
           </View>
-          {exercise.Difficulty && (
-            <Text variant="caption1" color="muted">
-              · {exercise.Difficulty}
-            </Text>
-          )}
-          {focusName && (
-            <Badge variant={`${focusColor}-soft` as any} className="ml-auto">
-              {focusName}
+
+          {difficulty && (
+            <Badge variant={badgeVariant(DIFFICULTY_COLOR[difficulty])}>
+              {difficulty}
             </Badge>
           )}
+
+          {focuses.map((f) => (
+            <Badge key={f.documentId} variant={badgeVariant(focusColorFromName(f.Name))}>
+              {f.Name}
+            </Badge>
+          ))}
         </View>
       </View>
 
-      {trailing}
+      {trailing && <View className="ml-1">{trailing}</View>}
     </Card>
   );
 }
