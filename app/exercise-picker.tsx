@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import {
   View,
   TextInput,
@@ -7,14 +7,27 @@ import {
   Keyboard,
   Pressable,
 } from 'react-native';
-import { router, Stack } from 'expo-router';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
-import { Screen, Text, ExerciseCard, Icon } from '@/components/ui';
+import { Screen, Text, ExerciseCard, Icon, FilterChip } from '@/components/ui';
+import {
+  LibraryFilterSheet,
+  LibraryFilterSheetRef,
+  LibraryFilterState,
+  EMPTY_FILTERS,
+  DURATION_LABEL,
+} from '@/components/sheets/LibraryFilterSheet';
 import { useExercises } from '@/lib/queries/useExercises';
 import { usePickModeStore } from '@/lib/store/pickModeStore';
 import { COLORS } from '@/lib/theme';
 
 export default function ExercisePickerScreen() {
+  const { excludeIds } = useLocalSearchParams<{ excludeIds?: string }>();
+  const excluded = useMemo(
+    () => new Set((excludeIds ?? '').split(',').filter(Boolean)),
+    [excludeIds]
+  );
+
   const [search, setSearch] = useState('');
   const { data: exercises, isLoading } = useExercises(search);
 
@@ -22,8 +35,56 @@ export default function ExercisePickerScreen() {
   const toggle = usePickModeStore((s) => s.toggle);
   const confirm = usePickModeStore((s) => s.confirm);
 
-  // Cleanup runs on blur — cancels if the user backed out without confirming.
-  // If confirm() already ran, active is false and cancel is a no-op.
+  const [filters, setFilters] = useState<LibraryFilterState>(EMPTY_FILTERS);
+  const filterSheetRef = useRef<LibraryFilterSheetRef>(null);
+
+  const availableFocus = useMemo(() => {
+    const set = new Set<string>();
+    (exercises ?? []).forEach((ex: any) => {
+      (ex.focus ?? []).forEach((f: any) => {
+        if (f?.Name) set.add(f.Name);
+      });
+    });
+    return Array.from(set).sort();
+  }, [exercises]);
+
+  const availableDifficulty = useMemo(() => {
+    const set = new Set<string>();
+    (exercises ?? []).forEach((ex: any) => {
+      if (ex.Difficulty) set.add(ex.Difficulty);
+    });
+    return Array.from(set);
+  }, [exercises]);
+
+  const filtered = useMemo(() => {
+    return (exercises ?? []).filter((ex: any) => {
+      if (excluded.has(ex.documentId)) return false;
+      if (filters.focus.length > 0) {
+        const names = (ex.focus ?? []).map((f: any) => f?.Name).filter(Boolean);
+        const overlap = names.some((n: string) => filters.focus.includes(n));
+        if (!overlap) return false;
+      }
+      if (filters.difficulty && ex.Difficulty !== filters.difficulty) return false;
+      if (filters.duration) {
+        const m = ex.Minutes ?? 0;
+        if (filters.duration === 'short' && m > 10) return false;
+        if (filters.duration === 'medium' && (m <= 10 || m > 20)) return false;
+        if (filters.duration === 'long' && m <= 20) return false;
+      }
+      return true;
+    });
+  }, [exercises, filters, excluded]);
+
+  const activeFilterCount =
+    filters.focus.length +
+    (filters.difficulty ? 1 : 0) +
+    (filters.duration ? 1 : 0);
+
+  const removeFocus = (name: string) =>
+    setFilters((s) => ({ ...s, focus: s.focus.filter((f) => f !== name) }));
+  const clearDifficulty = () => setFilters((s) => ({ ...s, difficulty: null }));
+  const clearDuration = () => setFilters((s) => ({ ...s, duration: null }));
+
   useFocusEffect(
     useCallback(() => {
       return () => {
@@ -65,6 +126,38 @@ export default function ExercisePickerScreen() {
         />
       </View>
 
+      <View className="flex-row gap-2 px-5 pb-3 flex-wrap">
+        <FilterChip
+          label="Filter"
+          leadingIcon="options-outline"
+          active={activeFilterCount > 0}
+          badge={activeFilterCount}
+          onPress={() => filterSheetRef.current?.present()}
+        />
+        {filters.focus.map((name) => (
+          <FilterChip
+            key={`focus-${name}`}
+            label={name}
+            active
+            onRemove={() => removeFocus(name)}
+          />
+        ))}
+        {filters.difficulty && (
+          <FilterChip
+            label={filters.difficulty}
+            active
+            onRemove={clearDifficulty}
+          />
+        )}
+        {filters.duration && (
+          <FilterChip
+            label={DURATION_LABEL[filters.duration]}
+            active
+            onRemove={clearDuration}
+          />
+        )}
+      </View>
+
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color={COLORS.primary} />
@@ -72,7 +165,7 @@ export default function ExercisePickerScreen() {
       ) : (
         <Pressable onPress={Keyboard.dismiss} className="flex-1">
           <FlatList
-            data={exercises ?? []}
+            data={filtered}
             keyExtractor={(item: any) => item.documentId}
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={{ padding: 20, paddingBottom: 40, gap: 12 }}
@@ -103,6 +196,14 @@ export default function ExercisePickerScreen() {
           />
         </Pressable>
       )}
+
+      <LibraryFilterSheet
+        ref={filterSheetRef}
+        filters={filters}
+        onChange={setFilters}
+        availableFocus={availableFocus}
+        availableDifficulty={availableDifficulty}
+      />
     </Screen>
   );
 }

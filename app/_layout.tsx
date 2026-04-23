@@ -69,6 +69,15 @@ function RootLayoutNav() {
           headerShadowVisible: false,
         }}
       />
+      <Stack.Screen
+        name="player-picker"
+        options={{
+          presentation: 'modal',
+          headerStyle: { backgroundColor: '#0a0a0f' },
+          headerTintColor: '#fff',
+          headerShadowVisible: false,
+        }}
+      />
     </Stack>
   );
 }
