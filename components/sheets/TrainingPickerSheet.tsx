@@ -18,7 +18,7 @@ export interface TrainingPickerSheetRef {
   present: (exerciseId: string, exerciseName: string) => void;
 }
 
-type Props = Record<string, never>;
+type Props = object;
 
 export const TrainingPickerSheet = forwardRef<TrainingPickerSheetRef, Props>(
   function TrainingPickerSheet(_, ref) {

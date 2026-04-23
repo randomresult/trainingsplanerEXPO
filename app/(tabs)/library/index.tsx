@@ -1,4 +1,8 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
+import {
+  TrainingPickerSheet,
+  TrainingPickerSheetRef,
+} from '@/components/sheets/TrainingPickerSheet';
 import {
   View,
   TextInput,
@@ -26,6 +30,8 @@ export default function LibraryListScreen() {
   const toggle = usePickModeStore((s) => s.toggle);
   const confirm = usePickModeStore((s) => s.confirm);
   const cancel = usePickModeStore((s) => s.cancel);
+
+  const trainingPickerRef = useRef<TrainingPickerSheetRef>(null);
 
   // Cancel pick-mode if the user navigates away without confirming (back swipe / hardware back).
   // useFocusEffect's cleanup runs on blur.
@@ -120,7 +126,18 @@ export default function LibraryListScreen() {
                         color={selected ? 'primary' : 'muted'}
                         size={24}
                       />
-                    ) : undefined
+                    ) : (
+                      <Pressable
+                        onPress={(e) => {
+                          e.stopPropagation?.();
+                          trainingPickerRef.current?.present(item.documentId, item.Name);
+                        }}
+                        hitSlop={8}
+                        className="w-8 h-8 rounded-full bg-primary/15 items-center justify-center"
+                      >
+                        <Icon name="add" size={18} color="primary" />
+                      </Pressable>
+                    )
                   }
                 />
               );
@@ -128,6 +145,7 @@ export default function LibraryListScreen() {
           />
         </Pressable>
       )}
+      <TrainingPickerSheet ref={trainingPickerRef} />
     </Screen>
   );
 }
