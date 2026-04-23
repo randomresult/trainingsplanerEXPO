@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import {
   View,
   TextInput,
@@ -7,20 +7,76 @@ import {
   Keyboard,
   Pressable,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams, Stack } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { Screen, Text, ExerciseCard, Icon } from '@/components/ui';
 import { useExercises } from '@/lib/queries/useExercises';
+import { usePickModeStore } from '@/lib/store/pickModeStore';
 import { COLORS } from '@/lib/theme';
 
 export default function LibraryListScreen() {
+  const { mode } = useLocalSearchParams<{ mode?: string }>();
+  const isPickMode = mode === 'pick';
+
   const [search, setSearch] = useState('');
   const { data: exercises, isLoading } = useExercises(search);
 
+  // Pick-mode selectors subscribe only when needed — avoids noisy re-renders in normal mode.
+  const selectedIds = usePickModeStore((s) => s.selectedIds);
+  const toggle = usePickModeStore((s) => s.toggle);
+  const confirm = usePickModeStore((s) => s.confirm);
+  const cancel = usePickModeStore((s) => s.cancel);
+
+  // Cancel pick-mode if the user navigates away without confirming (back swipe / hardware back).
+  // useFocusEffect's cleanup runs on blur.
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        const store = usePickModeStore.getState();
+        if (store.active) store.cancel();
+      };
+    }, [])
+  );
+
+  const handleCardPress = (exerciseId: string) => {
+    if (isPickMode) {
+      toggle(exerciseId);
+    } else {
+      router.push(`/library/${exerciseId}`);
+    }
+  };
+
+  const handleConfirm = () => {
+    confirm();
+    router.back();
+  };
+
   return (
     <Screen>
-      <View className="px-5 pt-4 pb-4 flex-row justify-between items-center">
-        <Text variant="largeTitle" weight="bold">Bibliothek</Text>
-      </View>
+      <Stack.Screen
+        options={
+          isPickMode
+            ? {
+                headerShown: true,
+                title: 'Auswählen',
+                headerBackTitle: 'Abbrechen',
+                headerRight: () => (
+                  <Pressable onPress={handleConfirm} className="px-2">
+                    <Text variant="body" weight="semibold" color="primary">
+                      Fertig ({selectedIds.length})
+                    </Text>
+                  </Pressable>
+                ),
+              }
+            : { headerShown: false }
+        }
+      />
+
+      {!isPickMode && (
+        <View className="px-5 pt-4 pb-4 flex-row justify-between items-center">
+          <Text variant="largeTitle" weight="bold">Bibliothek</Text>
+        </View>
+      )}
 
       <View className="px-5 pb-2">
         <TextInput
@@ -51,12 +107,24 @@ export default function LibraryListScreen() {
                 </Text>
               </View>
             }
-            renderItem={({ item }: { item: any }) => (
-              <ExerciseCard
-                exercise={item}
-                onPress={() => router.push(`/library/${item.documentId}`)}
-              />
-            )}
+            renderItem={({ item }: { item: any }) => {
+              const selected = isPickMode && selectedIds.includes(item.documentId);
+              return (
+                <ExerciseCard
+                  exercise={item}
+                  onPress={() => handleCardPress(item.documentId)}
+                  trailing={
+                    isPickMode ? (
+                      <Icon
+                        name={selected ? 'checkmark-circle' : 'ellipse-outline'}
+                        color={selected ? 'primary' : 'muted'}
+                        size={24}
+                      />
+                    ) : undefined
+                  }
+                />
+              );
+            }}
           />
         </Pressable>
       )}
