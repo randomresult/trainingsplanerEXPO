@@ -89,6 +89,18 @@ Eigener Screen nach "Training beenden"-Bestätigung, bevor Liste kommt. Inhalt:
 - Spieler-Übersicht mit Punkten
 - Actions: "Zurück zur Liste" / "Dieses Training als Template speichern" (Later-Idea)
 
+### Picker-Sheets (Übungen/Spieler im Create-Flow): Fertig-Button nicht erreichbar
+Das `ExercisePickerSheet` / `PlayerPickerSheet` im `/trainings/new`-Screen öffnet sich als 90%-Bottom-Sheet. Auswählen funktioniert, aber der "Fertig (N)"-Footer-Button wird abgeschnitten / nicht sichtbar. Ein Fix-Versuch mit `flex: 1 / minHeight: 0`-Wrapper um den FlatList hat es nicht gelöst (wurde in Commit `fd72dfa` gesetzt und per Reset rückgängig gemacht). Root Cause noch unklar — Layout-Interaktion zwischen `@gorhom/bottom-sheet` + `BottomSheetView` + `FlatList` + NativeWind.
+
+Lösungs-Richtungen zur Diskussion:
+- **A) Auto-Add ohne Confirm** — jeder Tap addet/removed sofort, kein "Fertig"-Button nötig. Schlank, aber fehlt "Mehrfach-Auswahl bestätigen". Matches user's first idea.
+- **B) Top-Right Confirm** — wie ein "Done" in iOS-NavBars, im Sheet-Header rechts neben dem Close-X. Keep-alive unter allen Layout-Zuständen. Meine Empfehlung (falls A zu einschränkend).
+- **C) Eigene Page statt Sheet** — `/trainings/new/pick-exercises` als vollflächiger Screen mit nativem Stack-Header. Gleiches Problem gelöst durch "nicht-Sheet". Konsistent mit `/trainings/new` selbst, das schon ein Screen ist.
+- **D) Gorhom `BottomSheetFlatList` + `BottomSheetFooter`** — offizielle API-Bausteine nutzen statt Plain-FlatList. Löst Layout sauber, aber Abhängigkeit auf Gorhom-interne Components wächst.
+- **E) Fix-Button unten, Liste scrollt darüber** (eigentlich Variante D implementiert) — klingt wie aktuelle Absicht, scheiterte bisher an Sizing.
+
+Vote: **B oder D**. B ist minimaler Aufwand, D ist architekturell sauberer. A nur wenn Multi-Tap ohne Confirm sich gut anfühlt — testen.
+
 ---
 
 ## Motion & Interactions (geplant als C2)
