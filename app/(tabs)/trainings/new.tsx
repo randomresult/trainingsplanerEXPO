@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   View,
   ScrollView,
@@ -8,8 +8,14 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { Screen, Text, Button, toast } from '@/components/ui';
-import { ExerciseSelector } from '@/components/ExerciseSelector';
-import { PlayerSelector } from '@/components/PlayerSelector';
+import {
+  ExercisePickerSheet,
+  ExercisePickerSheetRef,
+} from '@/components/sheets/ExercisePickerSheet';
+import {
+  PlayerPickerSheet,
+  PlayerPickerSheetRef,
+} from '@/components/sheets/PlayerPickerSheet';
 import { useCreateTraining } from '@/lib/queries/useTrainings';
 
 export default function NewTrainingScreen() {
@@ -18,6 +24,8 @@ export default function NewTrainingScreen() {
   const [exerciseIds, setExerciseIds] = useState<string[]>([]);
   const [playerIds, setPlayerIds] = useState<string[]>([]);
   const createTraining = useCreateTraining();
+  const exerciseSheetRef = useRef<ExercisePickerSheetRef>(null);
+  const playerSheetRef = useRef<PlayerPickerSheetRef>(null);
 
   const canCreate = name.trim() && exerciseIds.length > 0 && playerIds.length > 0;
 
@@ -45,7 +53,11 @@ export default function NewTrainingScreen() {
       >
         <ScrollView
           className="flex-1"
-          contentContainerStyle={{ padding: 20, paddingBottom: 32 }}
+          contentContainerStyle={{
+            paddingHorizontal: 20,
+            paddingTop: 12,
+            paddingBottom: 32,
+          }}
           keyboardShouldPersistTaps="handled"
         >
           <View className="mb-5">
@@ -71,23 +83,45 @@ export default function NewTrainingScreen() {
           </View>
 
           <View className="mb-5">
-            <Text variant="subhead" weight="semibold" className="mb-2">
-              Übungen ({exerciseIds.length})
+            <View className="flex-row justify-between items-center mb-2">
+              <Text variant="subhead" weight="semibold">
+                Übungen ({exerciseIds.length})
+              </Text>
+              <Button
+                variant="ghost"
+                size="sm"
+                leftIcon="search-outline"
+                onPress={() => exerciseSheetRef.current?.present()}
+              >
+                Auswählen
+              </Button>
+            </View>
+            <Text variant="footnote" color="muted">
+              {exerciseIds.length === 0
+                ? 'Noch keine Übungen gewählt'
+                : `${exerciseIds.length} ausgewählt`}
             </Text>
-            <ExerciseSelector
-              selectedIds={exerciseIds}
-              onSelectionChange={setExerciseIds}
-            />
           </View>
 
           <View className="mb-2">
-            <Text variant="subhead" weight="semibold" className="mb-2">
-              Spieler ({playerIds.length})
+            <View className="flex-row justify-between items-center mb-2">
+              <Text variant="subhead" weight="semibold">
+                Spieler ({playerIds.length})
+              </Text>
+              <Button
+                variant="ghost"
+                size="sm"
+                leftIcon="search-outline"
+                onPress={() => playerSheetRef.current?.present()}
+              >
+                Auswählen
+              </Button>
+            </View>
+            <Text variant="footnote" color="muted">
+              {playerIds.length === 0
+                ? 'Noch keine Spieler gewählt'
+                : `${playerIds.length} ausgewählt`}
             </Text>
-            <PlayerSelector
-              selectedIds={playerIds}
-              onSelectionChange={setPlayerIds}
-            />
           </View>
         </ScrollView>
 
@@ -103,6 +137,17 @@ export default function NewTrainingScreen() {
           </Button>
         </View>
       </KeyboardAvoidingView>
+
+      <ExercisePickerSheet
+        ref={exerciseSheetRef}
+        selectedIds={exerciseIds}
+        onChange={setExerciseIds}
+      />
+      <PlayerPickerSheet
+        ref={playerSheetRef}
+        selectedIds={playerIds}
+        onChange={setPlayerIds}
+      />
     </Screen>
   );
 }
