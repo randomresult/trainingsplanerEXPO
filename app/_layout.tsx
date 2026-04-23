@@ -51,6 +51,15 @@ function RootLayoutNav() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(auth)" />
       <Stack.Screen name="(tabs)" />
+      <Stack.Screen
+        name="exercise-picker"
+        options={{
+          presentation: 'modal',
+          headerStyle: { backgroundColor: '#0a0a0f' },
+          headerTintColor: '#fff',
+          headerShadowVisible: false,
+        }}
+      />
     </Stack>
   );
 }

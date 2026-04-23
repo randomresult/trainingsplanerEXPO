@@ -61,7 +61,7 @@ export default function NewTrainingScreen() {
 
   const handleOpenExercisePicker = () => {
     usePickModeStore.getState().start(exerciseIds, setExerciseIds);
-    router.push('/library?mode=pick');
+    router.push('/exercise-picker');
   };
 
   const handleCreate = () => {
