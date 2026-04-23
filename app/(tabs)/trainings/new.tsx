@@ -9,10 +9,7 @@ import {
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Screen, Text, Button, toast, ExerciseCard, Icon } from '@/components/ui';
-import {
-  ExercisePickerSheet,
-  ExercisePickerSheetRef,
-} from '@/components/sheets/ExercisePickerSheet';
+import { usePickModeStore } from '@/lib/store/pickModeStore';
 import {
   PlayerPickerSheet,
   PlayerPickerSheetRef,
@@ -34,7 +31,6 @@ export default function NewTrainingScreen() {
   );
   const [playerIds, setPlayerIds] = useState<string[]>([]);
   const createTraining = useCreateTraining();
-  const exerciseSheetRef = useRef<ExercisePickerSheetRef>(null);
   const playerSheetRef = useRef<PlayerPickerSheetRef>(null);
 
   const { data: allExercises } = useExercises('');
@@ -63,9 +59,10 @@ export default function NewTrainingScreen() {
 
   const canCreate = name.trim() && exerciseIds.length > 0 && playerIds.length > 0;
 
-  // Temporary: keep old sheet trigger until Task 7.1 wires the Library picker
-  const handleOpenExercisePicker = () =>
-    exerciseSheetRef.current?.present();
+  const handleOpenExercisePicker = () => {
+    usePickModeStore.getState().start(exerciseIds, setExerciseIds);
+    router.push('/library?mode=pick');
+  };
 
   const handleCreate = () => {
     createTraining.mutate(
@@ -217,11 +214,6 @@ export default function NewTrainingScreen() {
         </View>
       </KeyboardAvoidingView>
 
-      <ExercisePickerSheet
-        ref={exerciseSheetRef}
-        selectedIds={exerciseIds}
-        onChange={setExerciseIds}
-      />
       <PlayerPickerSheet
         ref={playerSheetRef}
         selectedIds={playerIds}
