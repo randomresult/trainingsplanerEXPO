@@ -279,9 +279,20 @@ export const useCompleteTraining = () => {
       });
       return input.trainingId;
     },
-    onSuccess: (trainingId) => {
+    onSuccess: (trainingId, input) => {
       queryClient.invalidateQueries({ queryKey: ['trainings'] });
-      router.replace(`/trainings/completed/${trainingId}`);
+      // Pass the live-training counts through — the completion screen can't
+      // derive them from the persisted Training (which only has total
+      // exercises, not how many were checked off during execution).
+      const completed = input.playerProgressData[0]?.completedExerciseIds.length ?? 0;
+      router.replace({
+        pathname: '/trainings/completed/[id]',
+        params: {
+          id: trainingId,
+          completedCount: String(completed),
+          sessionDuration: String(input.sessionDuration),
+        },
+      });
     },
   });
 };
