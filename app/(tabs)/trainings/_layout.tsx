@@ -24,7 +24,9 @@ export default function TrainingsLayout() {
         headerStyle: { backgroundColor: '#0a0a0f' },
         headerTintColor: '#fff',
         headerShadowVisible: false,
-        headerLeft: webBackButton,
+        // Only override headerLeft on web; setting it to undefined on iOS
+        // disables the default native back button.
+        ...(webBackButton && { headerLeft: webBackButton }),
       }}
     >
       <Stack.Screen name="index" options={{ headerShown: false }} />
