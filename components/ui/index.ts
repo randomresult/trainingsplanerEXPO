@@ -33,6 +33,9 @@ export { Toaster, toast } from './Toast';
 export { ExerciseCard } from './ExerciseCard';
 export type { ExerciseCardProps } from './ExerciseCard';
 
+export { ExercisePills } from './ExercisePills';
+export type { ExercisePillsProps } from './ExercisePills';
+
 export { PlayerCard } from './PlayerCard';
 export type { PlayerCardProps } from './PlayerCard';
 

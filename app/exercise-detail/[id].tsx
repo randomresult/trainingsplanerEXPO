@@ -1,12 +1,20 @@
 import { useRef } from 'react';
-import { View, ActivityIndicator } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
-import { Screen, Text, Badge, Card, Icon, Button } from '@/components/ui';
+import { Platform, View, ActivityIndicator, Pressable } from 'react-native';
+import { useLocalSearchParams, router, Stack } from 'expo-router';
+import {
+  Screen,
+  Text,
+  Card,
+  Icon,
+  Button,
+  ExercisePills,
+} from '@/components/ui';
 import { useExerciseDetail } from '@/lib/queries/useExercises';
 import {
   TrainingPickerSheet,
   TrainingPickerSheetRef,
 } from '@/components/sheets/TrainingPickerSheet';
+import { usePickModeStore } from '@/lib/store/pickModeStore';
 import { COLORS } from '@/lib/theme';
 
 export default function ExerciseDetailScreen() {
@@ -14,9 +22,30 @@ export default function ExerciseDetailScreen() {
   const { data: exercise, isLoading } = useExerciseDetail(id);
   const trainingPickerRef = useRef<TrainingPickerSheetRef>(null);
 
+  // Hide the "add to training" CTA when opened from inside an active pick
+  // flow (e.g. live-training add-exercise picker). The user is already
+  // mid-add — offering a *second* add to some other training would be wrong.
+  const pickerActive = usePickModeStore((s) => s.active);
+
+  const headerOptions = {
+    title: 'Übung',
+    // Modal has no native back chevron on either platform — the web close-
+    // button pattern matches the rest of the app's modal routes.
+    headerLeft: () => (
+      <Pressable onPress={() => router.back()} className="px-2 py-1" hitSlop={8}>
+        <Icon
+          name={Platform.OS === 'web' ? 'close' : 'chevron-back'}
+          size={22}
+          color="foreground"
+        />
+      </Pressable>
+    ),
+  };
+
   if (isLoading) {
     return (
       <Screen>
+        <Stack.Screen options={headerOptions} />
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
@@ -27,6 +56,7 @@ export default function ExerciseDetailScreen() {
   if (!exercise) {
     return (
       <Screen padding="base">
+        <Stack.Screen options={headerOptions} />
         <View className="flex-1 items-center justify-center">
           <Text variant="footnote" color="muted">Übung nicht gefunden</Text>
         </View>
@@ -36,22 +66,15 @@ export default function ExerciseDetailScreen() {
 
   return (
     <Screen>
+      <Stack.Screen options={headerOptions} />
+
       <Screen scroll padding="base">
         <Text variant="largeTitle" weight="bold" className="mb-3 mt-2">
           {exercise.Name}
         </Text>
 
-        <View className="flex-row flex-wrap gap-2 mb-5">
-          <Badge variant="muted">{`${exercise.Minutes} Min`}</Badge>
-          {(exercise.playerlevels ?? []).map((lvl: any) => (
-            <Badge key={lvl.documentId} variant="info-soft">{lvl.Name}</Badge>
-          ))}
-          {(exercise.focusareas ?? []).map((f: any) => (
-            <Badge key={f.documentId} variant="primary-soft">{f.Name}</Badge>
-          ))}
-          {(exercise.categories ?? []).map((c: any) => (
-            <Badge key={c.documentId} variant="success-soft">{c.Name}</Badge>
-          ))}
+        <View className="mb-5">
+          <ExercisePills exercise={exercise} />
         </View>
 
         {exercise.Description && (
@@ -101,16 +124,18 @@ export default function ExerciseDetailScreen() {
         )}
       </Screen>
 
-      <View className="px-5 py-3 border-t border-border bg-background">
-        <Button
-          size="lg"
-          className="w-full"
-          leftIcon="add"
-          onPress={() => trainingPickerRef.current?.present(exercise.documentId, exercise.Name)}
-        >
-          Zum Training hinzufügen
-        </Button>
-      </View>
+      {!pickerActive && (
+        <View className="px-5 py-3 border-t border-border bg-background">
+          <Button
+            size="lg"
+            className="w-full"
+            leftIcon="add"
+            onPress={() => trainingPickerRef.current?.present(exercise.documentId, exercise.Name)}
+          >
+            Zum Training hinzufügen
+          </Button>
+        </View>
+      )}
 
       <TrainingPickerSheet ref={trainingPickerRef} />
     </Screen>

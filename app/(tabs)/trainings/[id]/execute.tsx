@@ -18,6 +18,7 @@ import {
   Avatar,
   MediaThumbnail,
   MediaViewer,
+  ExercisePills,
   toast,
 } from '@/components/ui';
 import {
@@ -241,16 +242,11 @@ export default function ExecuteTrainingScreen() {
                 >
                   <Text
                     variant="headline"
-                    numberOfLines={expanded ? undefined : 1}
+                    numberOfLines={2}
                     className={ex.completed ? 'line-through opacity-60' : ''}
                   >
                     {ex.Name}
                   </Text>
-                  {!expanded && ex.Description && (
-                    <Text variant="footnote" color="muted" numberOfLines={2} className="mt-0.5">
-                      {ex.Description}
-                    </Text>
-                  )}
                 </Pressable>
 
                 <View className="flex-row items-center bg-surface-1 rounded-md px-2 py-1">
@@ -283,6 +279,9 @@ export default function ExecuteTrainingScreen() {
 
               {expanded && (
                 <View className="mt-3 pt-3 border-t border-border">
+                  <View className="mb-3">
+                    <ExercisePills exercise={ex} />
+                  </View>
                   {ex.Description && (
                     <Text variant="footnote" color="muted" className="mb-3">
                       {ex.Description}
