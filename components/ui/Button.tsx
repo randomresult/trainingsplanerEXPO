@@ -81,13 +81,13 @@ export function Button({
   const isDisabled = disabled || loading;
 
   return (
-    <Animated.View style={animatedStyle} className={cn(isDisabled && 'opacity-50')}>
+    <Animated.View style={animatedStyle} className={cn(isDisabled && 'opacity-50', className)}>
       <Pressable
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         onPress={handlePress}
         disabled={isDisabled}
-        className={cn('flex-row items-center justify-center gap-2', v.bg, SIZE[size], className)}
+        className={cn('flex-row items-center justify-center gap-2 w-full', v.bg, SIZE[size])}
         {...rest}
       >
         {loading ? (

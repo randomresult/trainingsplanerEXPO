@@ -68,6 +68,15 @@ export default function CompletedTrainingScreen() {
               Übungen
             </Text>
           </View>
+          <View className="items-center flex-1">
+            <Icon name="star-outline" size={18} color="muted" />
+            <Text variant="body" weight="bold" className="mt-1">
+              {(training.exercises?.length ?? 0) * 10}
+            </Text>
+            <Text variant="caption1" color="muted">
+              Punkte
+            </Text>
+          </View>
         </View>
 
         {playersToShow.length > 0 && (

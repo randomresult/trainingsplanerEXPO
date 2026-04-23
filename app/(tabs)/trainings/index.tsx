@@ -8,12 +8,10 @@ import {
   TrainingCard,
 } from '@/components/ui';
 import { useTrainings } from '@/lib/queries/useTrainings';
-import { CreateTrainingSheet, CreateTrainingSheetRef } from '@/components/sheets/CreateTrainingSheet';
 import type { Training } from '@/lib/types/models';
 
 export default function TrainingsScreen() {
   const { data: trainings, isLoading } = useTrainings();
-  const createSheetRef = useRef<CreateTrainingSheetRef>(null);
   const listRef = useRef<FlatList>(null);
 
   const upcoming = useMemo(() => {
@@ -34,7 +32,7 @@ export default function TrainingsScreen() {
           <Icon name="time-outline" size={20} color="foreground" />
         </Pressable>
         <Pressable
-          onPress={() => createSheetRef.current?.present()}
+          onPress={() => router.push('/trainings/new')}
           className="w-10 h-10 rounded-full bg-primary items-center justify-center"
         >
           <Icon name="add" size={22} color="inverse" />
@@ -63,7 +61,7 @@ export default function TrainingsScreen() {
       ) : upcoming.length === 0 ? (
         <View className="flex-1 items-center justify-center px-5">
           <Pressable
-            onPress={() => createSheetRef.current?.present()}
+            onPress={() => router.push('/trainings/new')}
             className="w-full rounded-2xl border-2 border-dashed border-primary/40 p-10 items-center"
           >
             <View className="w-16 h-16 rounded-full bg-primary/20 items-center justify-center mb-4">
@@ -90,18 +88,6 @@ export default function TrainingsScreen() {
         />
       )}
 
-      <CreateTrainingSheet
-        ref={createSheetRef}
-        onCreated={(newId) => {
-          // Wait one frame for refetch to update list, then scroll
-          setTimeout(() => {
-            const idx = upcoming.findIndex((t) => t.documentId === newId);
-            if (idx >= 0 && listRef.current) {
-              listRef.current.scrollToIndex({ index: idx, animated: true });
-            }
-          }, 300);
-        }}
-      />
     </Screen>
   );
 }

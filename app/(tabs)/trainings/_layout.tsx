@@ -11,6 +11,10 @@ export default function TrainingsLayout() {
     >
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen
+        name="new"
+        options={{ title: 'Training erstellen', headerBackTitle: 'Zurück' }}
+      />
+      <Stack.Screen
         name="history"
         options={{ title: 'Verlauf', headerBackTitle: 'Zurück' }}
       />
