@@ -89,6 +89,18 @@ Eigener Screen nach "Training beenden"-Bestätigung, bevor Liste kommt. Inhalt:
 - Spieler-Übersicht mit Punkten
 - Actions: "Zurück zur Liste" / "Dieses Training als Template speichern" (Later-Idea)
 
+### Tab-Bar im Apple-Fitness-Stil
+Aktuell: flache Tab-Bar mit dunklem soliden Hintergrund, Icons + Label, aktive Tab nur grün getönt.
+
+Ziel (per User-Screenshot aus Apple Fitness iOS):
+- **Floating Pill** — horizontaler Margin, voll abgerundete Enden
+- **Translucent Background mit Blur** (iOS: `expo-blur` / `BlurView`; Web: `backdrop-filter: blur()`)
+- **Aktive Tab mit eigenem Pill-Highlight** — heller Pill-Hintergrund um das aktive Icon+Label
+- **Labels bleiben immer sichtbar** für alle Tabs
+- **Active-Tint bleibt `COLORS.primary`** (`#92e846` — passt schon)
+
+Implementierung: Custom Tab-Bar-Component via `tabBar={(props) => <FitnessTabBar {...props} />}` in `app/(tabs)/_layout.tsx`. Eigenes SP-Cycle (klein, vielleicht 2–3 Tasks) oder parallel zum Library-Picker-Flow.
+
 ---
 
 ## Motion & Interactions (geplant als C2)
