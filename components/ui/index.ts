@@ -44,3 +44,6 @@ export type { MediaThumbnailProps } from './MediaThumbnail';
 
 export { MediaViewer } from './MediaViewer';
 export type { MediaViewerProps } from './MediaViewer';
+
+export { FilterChip } from './FilterChip';
+export type { FilterChipProps } from './FilterChip';
