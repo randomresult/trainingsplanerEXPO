@@ -18,12 +18,17 @@ interface ExerciseRaw {
   }[];
 }
 
+// Explicit populate — Strapi v5's `populate=*` is inconsistent for
+// nested relations on some schemas, which was causing focus[] to come
+// back empty on the list endpoint even though the detail endpoint had it.
+const POPULATE = { focus: true, Steps: true };
+
 export const useExercises = (searchQuery?: string) => {
   return useQuery({
     queryKey: ['exercises', searchQuery],
     queryFn: async () => {
       const params: any = {
-        populate: '*',
+        populate: POPULATE,
       };
 
       if (searchQuery) {
@@ -49,7 +54,7 @@ export const useExerciseDetail = (id: string) => {
     queryFn: async () => {
       const { data } = await apiClient.get<StrapiResponse<ExerciseRaw>>(`/exercises/${id}`, {
         params: {
-          populate: '*',
+          populate: POPULATE,
         },
       });
 
