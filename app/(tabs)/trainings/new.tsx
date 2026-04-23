@@ -19,6 +19,7 @@ import {
 } from '@/components/sheets/PlayerPickerSheet';
 import { useCreateTraining } from '@/lib/queries/useTrainings';
 import { useExercises } from '@/lib/queries/useExercises';
+import { usePlayers } from '@/lib/queries/usePlayers';
 
 export default function NewTrainingScreen() {
   const { preselect, returnTo } = useLocalSearchParams<{
@@ -47,6 +48,18 @@ export default function NewTrainingScreen() {
 
   const removeExercise = (id: string) =>
     setExerciseIds((prev) => prev.filter((x) => x !== id));
+
+  const { data: allPlayers } = usePlayers();
+
+  const selectedPlayers = useMemo(() => {
+    const byId = new Map((allPlayers ?? []).map((p: any) => [p.documentId, p]));
+    return playerIds
+      .map((id) => byId.get(id))
+      .filter(Boolean) as any[];
+  }, [allPlayers, playerIds]);
+
+  const removePlayer = (id: string) =>
+    setPlayerIds((prev) => prev.filter((x) => x !== id));
 
   const canCreate = name.trim() && exerciseIds.length > 0 && playerIds.length > 0;
 
@@ -163,11 +176,31 @@ export default function NewTrainingScreen() {
                 Auswählen
               </Button>
             </View>
-            <Text variant="footnote" color="muted">
-              {playerIds.length === 0
-                ? 'Noch keine Spieler gewählt'
-                : `${playerIds.length} ausgewählt`}
-            </Text>
+
+            {playerIds.length === 0 && (
+              <Text variant="footnote" color="muted">Noch keine Spieler gewählt</Text>
+            )}
+
+            {selectedPlayers.map((p) => {
+              const label = [p.firstname, p.Name].filter(Boolean).join(' ') || 'Spieler';
+              return (
+                <View
+                  key={p.documentId}
+                  className="flex-row items-center py-2 border-b border-border"
+                >
+                  <Text variant="footnote" className="flex-1" numberOfLines={1}>
+                    {label}
+                  </Text>
+                  <Pressable
+                    onPress={() => removePlayer(p.documentId)}
+                    hitSlop={6}
+                    className="w-6 h-6 items-center justify-center"
+                  >
+                    <Icon name="close" size={14} color="muted" />
+                  </Pressable>
+                </View>
+              );
+            })}
           </View>
         </ScrollView>
 
