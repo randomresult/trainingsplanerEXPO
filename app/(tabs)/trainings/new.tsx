@@ -1,13 +1,14 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useMemo } from 'react';
 import {
   View,
   ScrollView,
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Screen, Text, Button, toast } from '@/components/ui';
+import { Screen, Text, Button, toast, ExerciseCard, Icon } from '@/components/ui';
 import {
   ExercisePickerSheet,
   ExercisePickerSheetRef,
@@ -17,6 +18,7 @@ import {
   PlayerPickerSheetRef,
 } from '@/components/sheets/PlayerPickerSheet';
 import { useCreateTraining } from '@/lib/queries/useTrainings';
+import { useExercises } from '@/lib/queries/useExercises';
 
 export default function NewTrainingScreen() {
   const { preselect, returnTo } = useLocalSearchParams<{
@@ -34,7 +36,23 @@ export default function NewTrainingScreen() {
   const exerciseSheetRef = useRef<ExercisePickerSheetRef>(null);
   const playerSheetRef = useRef<PlayerPickerSheetRef>(null);
 
+  const { data: allExercises } = useExercises('');
+
+  const selectedExercises = useMemo(() => {
+    const byId = new Map((allExercises ?? []).map((ex: any) => [ex.documentId, ex]));
+    return exerciseIds
+      .map((id) => byId.get(id))
+      .filter(Boolean) as any[];
+  }, [allExercises, exerciseIds]);
+
+  const removeExercise = (id: string) =>
+    setExerciseIds((prev) => prev.filter((x) => x !== id));
+
   const canCreate = name.trim() && exerciseIds.length > 0 && playerIds.length > 0;
+
+  // Temporary: keep old sheet trigger until Task 7.1 wires the Library picker
+  const handleOpenExercisePicker = () =>
+    exerciseSheetRef.current?.present();
 
   const handleCreate = () => {
     createTraining.mutate(
@@ -102,16 +120,33 @@ export default function NewTrainingScreen() {
                 variant="ghost"
                 size="sm"
                 leftIcon="search-outline"
-                onPress={() => exerciseSheetRef.current?.present()}
+                onPress={handleOpenExercisePicker}
               >
                 Auswählen
               </Button>
             </View>
-            <Text variant="footnote" color="muted">
-              {exerciseIds.length === 0
-                ? 'Noch keine Übungen gewählt'
-                : `${exerciseIds.length} ausgewählt`}
-            </Text>
+
+            {exerciseIds.length === 0 && (
+              <Text variant="footnote" color="muted">Noch keine Übungen gewählt</Text>
+            )}
+
+            {selectedExercises.map((ex) => (
+              <ExerciseCard
+                key={ex.documentId}
+                exercise={ex}
+                compact
+                className="mb-1.5"
+                trailing={
+                  <Pressable
+                    onPress={() => removeExercise(ex.documentId)}
+                    hitSlop={6}
+                    className="w-7 h-7 rounded-full bg-destructive/10 items-center justify-center"
+                  >
+                    <Icon name="close" size={14} color="destructive" />
+                  </Pressable>
+                }
+              />
+            ))}
           </View>
 
           <View className="mb-2">
