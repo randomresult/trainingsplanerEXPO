@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../api';
-import type { Exercise, Focus } from '../types/models';
+import type { Exercise } from '../types/models';
 import type { StrapiResponse } from '../types/api';
 
 interface ExerciseRaw {
@@ -11,17 +11,20 @@ interface ExerciseRaw {
   Steps?: string[];
   Hint?: string;
   Videos?: string[];
-  Difficulty?: 'Anfänger' | 'Fortgeschritten' | 'Experte';
-  focus?: {
-    documentId: string;
-    Name: string;
-  }[];
+  focusareas?: { documentId: string; Name: string }[];
+  playerlevels?: { documentId: string; Name: string }[];
+  categories?: { documentId: string; Name: string }[];
 }
 
-// Explicit populate — Strapi v5's `populate=*` is inconsistent for
-// nested relations on some schemas, which was causing focus[] to come
-// back empty on the list endpoint even though the detail endpoint had it.
-const POPULATE = { focus: true, Steps: true };
+// Explicit populate — Strapi v5 populate=* is inconsistent for relations on
+// some schemas. Naming the relations we actually need is deterministic.
+const POPULATE = {
+  focusareas: true,
+  playerlevels: true,
+  categories: true,
+  Steps: true,
+  Videos: true,
+};
 
 export const useExercises = (searchQuery?: string) => {
   return useQuery({
@@ -43,7 +46,7 @@ export const useExercises = (searchQuery?: string) => {
         params,
       });
 
-      return data.data;
+      return data.data as Exercise[];
     },
   });
 };
@@ -58,7 +61,7 @@ export const useExerciseDetail = (id: string) => {
         },
       });
 
-      return data.data;
+      return data.data as Exercise;
     },
     enabled: !!id,
   });

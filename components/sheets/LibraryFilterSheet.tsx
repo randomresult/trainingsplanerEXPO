@@ -11,14 +11,16 @@ import {
 export type DurationBucket = 'short' | 'medium' | 'long';
 
 export interface LibraryFilterState {
-  focus: string[];          // multi-select focus names
-  difficulty: string | null; // single-select difficulty string, or null = alle
-  duration: DurationBucket | null; // single-select bucket, or null = alle
+  focusareas: string[];
+  playerlevels: string[];
+  categories: string[];
+  duration: DurationBucket | null;
 }
 
 export const EMPTY_FILTERS: LibraryFilterState = {
-  focus: [],
-  difficulty: null,
+  focusareas: [],
+  playerlevels: [],
+  categories: [],
   duration: null,
 };
 
@@ -35,13 +37,20 @@ export interface LibraryFilterSheetRef {
 interface Props {
   filters: LibraryFilterState;
   onChange: (next: LibraryFilterState) => void;
-  availableFocus: string[];
-  availableDifficulty: string[];
+  availableFocusareas: string[];
+  availablePlayerlevels: string[];
+  availableCategories: string[];
 }
 
 export const LibraryFilterSheet = forwardRef<LibraryFilterSheetRef, Props>(
   function LibraryFilterSheet(
-    { filters, onChange, availableFocus, availableDifficulty },
+    {
+      filters,
+      onChange,
+      availableFocusareas,
+      availablePlayerlevels,
+      availableCategories,
+    },
     ref
   ) {
     const sheetRef = useRef<BottomSheetRef>(null);
@@ -50,18 +59,15 @@ export const LibraryFilterSheet = forwardRef<LibraryFilterSheetRef, Props>(
       present: () => sheetRef.current?.present(),
     }));
 
-    const toggleFocus = (name: string) => {
-      const next = filters.focus.includes(name)
-        ? filters.focus.filter((f) => f !== name)
-        : [...filters.focus, name];
-      onChange({ ...filters, focus: next });
-    };
-
-    const setDifficulty = (value: string) => {
-      onChange({
-        ...filters,
-        difficulty: filters.difficulty === value ? null : value,
-      });
+    const toggleMulti = (
+      key: 'focusareas' | 'playerlevels' | 'categories',
+      name: string
+    ) => {
+      const current = filters[key];
+      const next = current.includes(name)
+        ? current.filter((v) => v !== name)
+        : [...current, name];
+      onChange({ ...filters, [key]: next });
     };
 
     const setDuration = (value: DurationBucket) => {
@@ -74,7 +80,7 @@ export const LibraryFilterSheet = forwardRef<LibraryFilterSheetRef, Props>(
     const reset = () => onChange(EMPTY_FILTERS);
 
     return (
-      <BottomSheet ref={sheetRef} snapPoints={['70%']} title="Filter">
+      <BottomSheet ref={sheetRef} snapPoints={['80%']} title="Filter">
         <View className="flex-1">
           <View className="flex-row justify-end mb-2">
             <Pressable onPress={reset}>
@@ -85,57 +91,55 @@ export const LibraryFilterSheet = forwardRef<LibraryFilterSheetRef, Props>(
           </View>
 
           <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
-            {availableFocus.length > 0 && (
-              <View className="mb-5">
-                <Text variant="caption1" color="muted" className="uppercase tracking-wide mb-2">
-                  Fokus
-                </Text>
-                <View className="flex-row flex-wrap gap-2">
-                  {availableFocus.map((name) => (
-                    <FilterChip
-                      key={name}
-                      label={name}
-                      active={filters.focus.includes(name)}
-                      onPress={() => toggleFocus(name)}
-                    />
-                  ))}
-                </View>
-              </View>
-            )}
-
-            {availableDifficulty.length > 0 && (
-              <View className="mb-5">
-                <Text variant="caption1" color="muted" className="uppercase tracking-wide mb-2">
-                  Schwierigkeit
-                </Text>
-                <View className="flex-row flex-wrap gap-2">
-                  {availableDifficulty.map((d) => (
-                    <FilterChip
-                      key={d}
-                      label={d}
-                      active={filters.difficulty === d}
-                      onPress={() => setDifficulty(d)}
-                    />
-                  ))}
-                </View>
-              </View>
-            )}
-
-            <View className="mb-5">
-              <Text variant="caption1" color="muted" className="uppercase tracking-wide mb-2">
-                Dauer
-              </Text>
-              <View className="flex-row flex-wrap gap-2">
-                {(Object.keys(DURATION_LABEL) as DurationBucket[]).map((b) => (
+            {availableCategories.length > 0 && (
+              <FilterSection label="Kategorie">
+                {availableCategories.map((name) => (
                   <FilterChip
-                    key={b}
-                    label={DURATION_LABEL[b]}
-                    active={filters.duration === b}
-                    onPress={() => setDuration(b)}
+                    key={name}
+                    label={name}
+                    active={filters.categories.includes(name)}
+                    onPress={() => toggleMulti('categories', name)}
                   />
                 ))}
-              </View>
-            </View>
+              </FilterSection>
+            )}
+
+            {availablePlayerlevels.length > 0 && (
+              <FilterSection label="Schwierigkeit">
+                {availablePlayerlevels.map((name) => (
+                  <FilterChip
+                    key={name}
+                    label={name}
+                    active={filters.playerlevels.includes(name)}
+                    onPress={() => toggleMulti('playerlevels', name)}
+                  />
+                ))}
+              </FilterSection>
+            )}
+
+            {availableFocusareas.length > 0 && (
+              <FilterSection label="Fokus">
+                {availableFocusareas.map((name) => (
+                  <FilterChip
+                    key={name}
+                    label={name}
+                    active={filters.focusareas.includes(name)}
+                    onPress={() => toggleMulti('focusareas', name)}
+                  />
+                ))}
+              </FilterSection>
+            )}
+
+            <FilterSection label="Dauer">
+              {(Object.keys(DURATION_LABEL) as DurationBucket[]).map((b) => (
+                <FilterChip
+                  key={b}
+                  label={DURATION_LABEL[b]}
+                  active={filters.duration === b}
+                  onPress={() => setDuration(b)}
+                />
+              ))}
+            </FilterSection>
           </ScrollView>
 
           <View className="pt-3 pb-4 border-t border-border">
@@ -152,3 +156,20 @@ export const LibraryFilterSheet = forwardRef<LibraryFilterSheetRef, Props>(
     );
   }
 );
+
+function FilterSection({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <View className="mb-5">
+      <Text variant="caption1" color="muted" className="uppercase tracking-wide mb-2">
+        {label}
+      </Text>
+      <View className="flex-row flex-wrap gap-2">{children}</View>
+    </View>
+  );
+}

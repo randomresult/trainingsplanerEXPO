@@ -38,33 +38,32 @@ export default function ExercisePickerScreen() {
   const [filters, setFilters] = useState<LibraryFilterState>(EMPTY_FILTERS);
   const filterSheetRef = useRef<LibraryFilterSheetRef>(null);
 
-  const availableFocus = useMemo(() => {
+  const tagNames = (rel: any[] | undefined) =>
+    (rel ?? []).map((t) => t?.Name).filter(Boolean) as string[];
+
+  const collectTagNames = (key: 'focusareas' | 'playerlevels' | 'categories') => {
     const set = new Set<string>();
     (exercises ?? []).forEach((ex: any) => {
-      (ex.focus ?? []).forEach((f: any) => {
-        if (f?.Name) set.add(f.Name);
-      });
+      tagNames(ex[key]).forEach((n) => set.add(n));
     });
     return Array.from(set).sort();
-  }, [exercises]);
+  };
 
-  const availableDifficulty = useMemo(() => {
-    const set = new Set<string>();
-    (exercises ?? []).forEach((ex: any) => {
-      if (ex.Difficulty) set.add(ex.Difficulty);
-    });
-    return Array.from(set);
-  }, [exercises]);
+  const availableFocusareas = useMemo(() => collectTagNames('focusareas'), [exercises]);
+  const availablePlayerlevels = useMemo(() => collectTagNames('playerlevels'), [exercises]);
+  const availableCategories = useMemo(() => collectTagNames('categories'), [exercises]);
 
   const filtered = useMemo(() => {
+    const matchesMulti = (selected: string[], rel: any[] | undefined) => {
+      if (selected.length === 0) return true;
+      const names = tagNames(rel);
+      return names.some((n) => selected.includes(n));
+    };
     return (exercises ?? []).filter((ex: any) => {
       if (excluded.has(ex.documentId)) return false;
-      if (filters.focus.length > 0) {
-        const names = (ex.focus ?? []).map((f: any) => f?.Name).filter(Boolean);
-        const overlap = names.some((n: string) => filters.focus.includes(n));
-        if (!overlap) return false;
-      }
-      if (filters.difficulty && ex.Difficulty !== filters.difficulty) return false;
+      if (!matchesMulti(filters.focusareas, ex.focusareas)) return false;
+      if (!matchesMulti(filters.playerlevels, ex.playerlevels)) return false;
+      if (!matchesMulti(filters.categories, ex.categories)) return false;
       if (filters.duration) {
         const m = ex.Minutes ?? 0;
         if (filters.duration === 'short' && m > 10) return false;
@@ -76,13 +75,13 @@ export default function ExercisePickerScreen() {
   }, [exercises, filters, excluded]);
 
   const activeFilterCount =
-    filters.focus.length +
-    (filters.difficulty ? 1 : 0) +
+    filters.focusareas.length +
+    filters.playerlevels.length +
+    filters.categories.length +
     (filters.duration ? 1 : 0);
 
-  const removeFocus = (name: string) =>
-    setFilters((s) => ({ ...s, focus: s.focus.filter((f) => f !== name) }));
-  const clearDifficulty = () => setFilters((s) => ({ ...s, difficulty: null }));
+  const removeTag = (key: 'focusareas' | 'playerlevels' | 'categories', name: string) =>
+    setFilters((s) => ({ ...s, [key]: s[key].filter((v) => v !== name) }));
   const clearDuration = () => setFilters((s) => ({ ...s, duration: null }));
 
   useFocusEffect(
@@ -134,21 +133,30 @@ export default function ExercisePickerScreen() {
           badge={activeFilterCount}
           onPress={() => filterSheetRef.current?.present()}
         />
-        {filters.focus.map((name) => (
+        {filters.categories.map((name) => (
+          <FilterChip
+            key={`cat-${name}`}
+            label={name}
+            active
+            onRemove={() => removeTag('categories', name)}
+          />
+        ))}
+        {filters.playerlevels.map((name) => (
+          <FilterChip
+            key={`lvl-${name}`}
+            label={name}
+            active
+            onRemove={() => removeTag('playerlevels', name)}
+          />
+        ))}
+        {filters.focusareas.map((name) => (
           <FilterChip
             key={`focus-${name}`}
             label={name}
             active
-            onRemove={() => removeFocus(name)}
+            onRemove={() => removeTag('focusareas', name)}
           />
         ))}
-        {filters.difficulty && (
-          <FilterChip
-            label={filters.difficulty}
-            active
-            onRemove={clearDifficulty}
-          />
-        )}
         {filters.duration && (
           <FilterChip
             label={DURATION_LABEL[filters.duration]}
@@ -201,8 +209,9 @@ export default function ExercisePickerScreen() {
         ref={filterSheetRef}
         filters={filters}
         onChange={setFilters}
-        availableFocus={availableFocus}
-        availableDifficulty={availableDifficulty}
+        availableFocusareas={availableFocusareas}
+        availablePlayerlevels={availablePlayerlevels}
+        availableCategories={availableCategories}
       />
     </Screen>
   );

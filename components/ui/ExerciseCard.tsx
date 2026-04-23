@@ -16,14 +16,6 @@ export interface ExerciseCardProps {
   className?: string;
 }
 
-// Anfänger → success (grün), Fortgeschritten → warning (gelb), Experte → destructive (rot).
-// Keeps the severity metaphor obvious at a glance.
-const DIFFICULTY_COLOR: Record<NonNullable<Exercise['Difficulty']>, FocusColor> = {
-  'Anfänger': 'success',
-  'Fortgeschritten': 'warning',
-  'Experte': 'destructive',
-};
-
 function badgeVariant(color: FocusColor) {
   return (color === 'muted' ? 'muted' : `${color}-soft`) as
     | 'muted'
@@ -41,8 +33,9 @@ export function ExerciseCard({
   compact,
   className,
 }: ExerciseCardProps) {
-  const focuses = exercise.focus ?? [];
-  const difficulty = exercise.Difficulty;
+  const focusareas = exercise.focusareas ?? [];
+  const playerlevels = exercise.playerlevels ?? [];
+  const categories = exercise.categories ?? [];
 
   return (
     <Card onPress={onPress} className={cn('flex-row items-start gap-3', className)}>
@@ -64,15 +57,19 @@ export function ExerciseCard({
             </Text>
           </View>
 
-          {difficulty && (
-            <Badge variant={badgeVariant(DIFFICULTY_COLOR[difficulty])}>
-              {difficulty}
+          {playerlevels.map((lvl) => (
+            <Badge key={lvl.documentId} variant={badgeVariant(focusColorFromName(lvl.Name))}>
+              {lvl.Name}
             </Badge>
-          )}
-
-          {focuses.map((f) => (
+          ))}
+          {focusareas.map((f) => (
             <Badge key={f.documentId} variant={badgeVariant(focusColorFromName(f.Name))}>
               {f.Name}
+            </Badge>
+          ))}
+          {categories.map((c) => (
+            <Badge key={c.documentId} variant={badgeVariant(focusColorFromName(c.Name))}>
+              {c.Name}
             </Badge>
           ))}
         </View>

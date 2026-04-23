@@ -41,11 +41,17 @@ export default function ExerciseDetailScreen() {
           {exercise.Name}
         </Text>
 
-        <View className="flex-row gap-2 mb-5">
+        <View className="flex-row flex-wrap gap-2 mb-5">
           <Badge variant="muted">{`${exercise.Minutes} Min`}</Badge>
-          {exercise.Difficulty && (
-            <Badge variant="info-soft">{exercise.Difficulty}</Badge>
-          )}
+          {(exercise.playerlevels ?? []).map((lvl: any) => (
+            <Badge key={lvl.documentId} variant="info-soft">{lvl.Name}</Badge>
+          ))}
+          {(exercise.focusareas ?? []).map((f: any) => (
+            <Badge key={f.documentId} variant="primary-soft">{f.Name}</Badge>
+          ))}
+          {(exercise.categories ?? []).map((c: any) => (
+            <Badge key={c.documentId} variant="success-soft">{c.Name}</Badge>
+          ))}
         </View>
 
         {exercise.Description && (
