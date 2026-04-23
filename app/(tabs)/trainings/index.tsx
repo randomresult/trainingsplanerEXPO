@@ -1,6 +1,6 @@
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { View, FlatList, ActivityIndicator, Pressable } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import {
   Screen,
   Text,
@@ -13,6 +13,7 @@ import type { Training } from '@/lib/types/models';
 export default function TrainingsScreen() {
   const { data: trainings, isLoading } = useTrainings();
   const listRef = useRef<FlatList>(null);
+  const { scrollToId } = useLocalSearchParams<{ scrollToId?: string }>();
 
   const upcoming = useMemo(() => {
     if (!trainings) return [];
@@ -20,6 +21,16 @@ export default function TrainingsScreen() {
       .filter((t) => t.training_status === 'draft' || t.training_status === 'in_progress')
       .sort((a: any, b: any) => new Date(a.Date).getTime() - new Date(b.Date).getTime());
   }, [trainings]);
+
+  useEffect(() => {
+    if (!scrollToId || upcoming.length === 0) return;
+    const idx = upcoming.findIndex((t) => t.documentId === scrollToId);
+    if (idx < 0) return;
+    const timer = setTimeout(() => {
+      listRef.current?.scrollToIndex({ index: idx, animated: true });
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [scrollToId, upcoming]);
 
   const renderHeader = () => (
     <View className="px-5 pt-4 pb-4 flex-row justify-between items-center">

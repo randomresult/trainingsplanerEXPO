@@ -27,7 +27,10 @@ export default function NewTrainingScreen() {
       {
         onSuccess: (newTraining) => {
           toast.success('Training erstellt');
-          router.replace(`/trainings/${newTraining.documentId}`);
+          router.replace({
+            pathname: '/trainings',
+            params: { scrollToId: newTraining.documentId },
+          });
         },
         onError: () => toast.error('Training konnte nicht erstellt werden'),
       }
