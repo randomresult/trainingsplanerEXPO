@@ -26,6 +26,7 @@ export const AddPlayersSheet = forwardRef<AddPlayersSheetRef, Props>(
   function AddPlayersSheet({ trainingId }, ref) {
     const sheetRef = useRef<BottomSheetRef>(null);
     const [search, setSearch] = useState('');
+    const [addingId, setAddingId] = useState<string | null>(null);
     const { data: training } = useTrainingDetail(trainingId);
     const { data: allPlayers } = usePlayers();
     const addPlayer = useAddPlayerToTraining();
@@ -51,11 +52,14 @@ export const AddPlayersSheet = forwardRef<AddPlayersSheetRef, Props>(
     }, [allPlayers, alreadyAddedIds, search]);
 
     const handleAdd = async (playerId: string) => {
+      setAddingId(playerId);
       try {
         await addPlayer.mutateAsync({ trainingId, playerId });
         toast.success('Spieler hinzugefügt');
       } catch {
         toast.error('Spieler konnte nicht hinzugefügt werden');
+      } finally {
+        setAddingId(null);
       }
     };
 
@@ -87,8 +91,10 @@ export const AddPlayersSheet = forwardRef<AddPlayersSheetRef, Props>(
                   <Button
                     variant="primary"
                     size="sm"
-                    loading={addPlayer.isPending}
+                    loading={addingId === item.documentId}
+                    disabled={addingId !== null && addingId !== item.documentId}
                     onPress={() => handleAdd(item.documentId)}
+                    className="min-w-[110px]"
                   >
                     Hinzufügen
                   </Button>

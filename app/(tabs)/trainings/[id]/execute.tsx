@@ -9,7 +9,7 @@ import {
   Pressable,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Text,
   Button,
@@ -20,7 +20,11 @@ import {
   MediaViewer,
   toast,
 } from '@/components/ui';
-import { useTrainingDetail, useCompleteTraining } from '@/lib/queries/useTrainings';
+import {
+  useTrainingDetail,
+  useCompleteTraining,
+  useRemoveExerciseFromTraining,
+} from '@/lib/queries/useTrainings';
 import { useTrainingExecution } from '@/lib/hooks/useTrainingExecution';
 import { formatTime } from '@/lib/utils/formatTime';
 import { triggerHaptic } from '@/lib/haptics';
@@ -37,10 +41,30 @@ export default function ExecuteTrainingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: training, isLoading } = useTrainingDetail(id);
   const completeTraining = useCompleteTraining();
+  const removeExercise = useRemoveExerciseFromTraining();
+  const insets = useSafeAreaInsets();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [viewerUri, setViewerUri] = useState<string | null>(null);
   const addExerciseSheetRef = useRef<AddExercisesSheetRef>(null);
   const addPlayerSheetRef = useRef<AddPlayersSheetRef>(null);
+
+  const confirmRemoveExercise = (exerciseId: string, exerciseName: string) => {
+    const msg = `Übung "${exerciseName}" aus dem Training entfernen?`;
+    if (Platform.OS === 'web') {
+      if (typeof window !== 'undefined' && window.confirm(msg)) {
+        removeExercise.mutate({ trainingId: id, exerciseId });
+      }
+      return;
+    }
+    Alert.alert('Übung entfernen', msg, [
+      { text: 'Abbrechen', style: 'cancel' },
+      {
+        text: 'Entfernen',
+        style: 'destructive',
+        onPress: () => removeExercise.mutate({ trainingId: id, exerciseId }),
+      },
+    ]);
+  };
 
   const {
     sessionElapsed,
@@ -82,7 +106,7 @@ export default function ExecuteTrainingScreen() {
 
   if (isLoading || !training) {
     return (
-      <SafeAreaView edges={['top', 'bottom']} className="flex-1 bg-background">
+      <SafeAreaView edges={['top']} className="flex-1 bg-background">
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#8b5cf6" />
         </View>
@@ -91,7 +115,7 @@ export default function ExecuteTrainingScreen() {
   }
 
   return (
-    <SafeAreaView edges={['top', 'bottom']} className="flex-1 bg-background">
+    <SafeAreaView edges={['top']} className="flex-1 bg-background">
       {/* Header */}
       <View className="px-5 py-3 border-b border-border flex-row justify-between items-center">
         <Pressable onPress={() => router.back()} className="p-2 -ml-2">
@@ -210,6 +234,15 @@ export default function ExecuteTrainingScreen() {
                     min
                   </Text>
                 </View>
+
+                <Pressable
+                  onPress={() => confirmRemoveExercise(ex.documentId, ex.Name)}
+                  disabled={removeExercise.isPending}
+                  hitSlop={6}
+                  className="w-8 h-8 rounded-full bg-destructive/10 items-center justify-center active:opacity-70 disabled:opacity-40"
+                >
+                  <Icon name="close" size={14} color="destructive" />
+                </Pressable>
               </View>
 
               {expanded && (
@@ -291,7 +324,13 @@ export default function ExecuteTrainingScreen() {
         </View>
       </ScrollView>
 
-      <View className="px-5 py-3 border-t border-border">
+      <View
+        style={{
+          paddingTop: Math.max(12, insets.bottom),
+          paddingBottom: Math.max(12, insets.bottom),
+        }}
+        className="px-5 border-t border-border"
+      >
         <Button
           size="lg"
           variant="destructive"

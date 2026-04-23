@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { View, SectionList, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
 import { Screen, Text, TrainingCard } from '@/components/ui';
@@ -15,6 +15,8 @@ function monthLabel(iso: string): string {
   return d.toLocaleDateString('de-DE', { year: 'numeric', month: 'long' });
 }
 
+const MAX_AUTO_FETCH_PAGES = 5;
+
 export default function HistoryScreen() {
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useTrainingsHistory();
 
@@ -29,6 +31,17 @@ export default function HistoryScreen() {
     }
     return Array.from(grouped.entries()).map(([title, data]) => ({ title, data }));
   }, [data]);
+
+  // If the current fetched pages all get filtered out client-side (e.g. draft/active
+  // trainings filling the first page), keep paging until we find completed ones or
+  // exhaust a safety cap.
+  useEffect(() => {
+    if (!data) return;
+    if (sections.length > 0) return;
+    if (!hasNextPage || isFetchingNextPage) return;
+    if (data.pages.length >= MAX_AUTO_FETCH_PAGES) return;
+    fetchNextPage();
+  }, [data, sections, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (isLoading) {
     return (

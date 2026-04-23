@@ -26,6 +26,7 @@ export const AddExercisesSheet = forwardRef<AddExercisesSheetRef, Props>(
   function AddExercisesSheet({ trainingId }, ref) {
     const sheetRef = useRef<BottomSheetRef>(null);
     const [search, setSearch] = useState('');
+    const [addingId, setAddingId] = useState<string | null>(null);
     const { data: training } = useTrainingDetail(trainingId);
     const { data: allExercises } = useExercises(search);
     const addExercise = useAddExerciseToTraining();
@@ -45,11 +46,14 @@ export const AddExercisesSheet = forwardRef<AddExercisesSheetRef, Props>(
     );
 
     const handleAdd = async (exerciseId: string) => {
+      setAddingId(exerciseId);
       try {
         await addExercise.mutateAsync({ trainingId, exerciseId });
         toast.success('Übung hinzugefügt');
       } catch {
         toast.error('Übung konnte nicht hinzugefügt werden');
+      } finally {
+        setAddingId(null);
       }
     };
 
@@ -81,8 +85,10 @@ export const AddExercisesSheet = forwardRef<AddExercisesSheetRef, Props>(
                   <Button
                     variant="primary"
                     size="sm"
-                    loading={addExercise.isPending}
+                    loading={addingId === item.documentId}
+                    disabled={addingId !== null && addingId !== item.documentId}
                     onPress={() => handleAdd(item.documentId)}
+                    className="min-w-[110px]"
                   >
                     Hinzufügen
                   </Button>
