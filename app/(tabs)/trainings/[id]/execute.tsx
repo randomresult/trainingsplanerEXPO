@@ -218,36 +218,39 @@ export default function ExecuteTrainingScreen() {
         {exerciseStates.map((ex, idx) => {
           const expanded = expandedId === ex.documentId;
           return (
-            <Card key={ex.documentId} className="mb-3">
-              <View className="flex-row items-start gap-3">
+            <Card key={ex.documentId} className="mb-3 gap-3">
+              {/* Row 1 — title, full width, wraps to 2 lines. Mirrors the
+                  ExerciseCard layout in the library so the same exercise
+                  reads the same everywhere. */}
+              <Pressable
+                onPress={() => setExpandedId(expanded ? null : ex.documentId)}
+              >
+                <Text
+                  variant="headline"
+                  numberOfLines={2}
+                  className={ex.completed ? 'line-through opacity-60' : ''}
+                >
+                  {ex.Name}
+                </Text>
+              </Pressable>
+
+              {/* Row 2 — interactive controls. Checkbox left, minutes next
+                  to it, remove on the far right. */}
+              <View className="flex-row items-center gap-3">
                 <Pressable
                   onPress={() => {
                     triggerHaptic('light');
                     toggleComplete(idx);
                   }}
                   hitSlop={8}
-                  className="w-12 h-12 -ml-2 -mt-2 items-center justify-center"
                 >
                   <View
-                    className={`w-10 h-10 rounded-full border-2 items-center justify-center ${
+                    className={`w-9 h-9 rounded-full border-2 items-center justify-center ${
                       ex.completed ? 'bg-success border-success' : 'border-muted'
                     }`}
                   >
-                    {ex.completed && <Icon name="checkmark" size={22} color="inverse" />}
+                    {ex.completed && <Icon name="checkmark" size={20} color="inverse" />}
                   </View>
-                </Pressable>
-
-                <Pressable
-                  onPress={() => setExpandedId(expanded ? null : ex.documentId)}
-                  className="flex-1"
-                >
-                  <Text
-                    variant="headline"
-                    numberOfLines={2}
-                    className={ex.completed ? 'line-through opacity-60' : ''}
-                  >
-                    {ex.Name}
-                  </Text>
                 </Pressable>
 
                 <View className="flex-row items-center bg-surface-1 rounded-md px-2 py-1">
@@ -259,14 +262,14 @@ export default function ExecuteTrainingScreen() {
                     }}
                     keyboardType="number-pad"
                     className="text-foreground text-right"
-                    // Fixed width — on RN Web a TextInput otherwise expands to fill
-                    // the remaining row space and swallows the name column.
                     style={{ padding: 0, width: 28 }}
                   />
                   <Text variant="caption1" color="muted" className="ml-1">
                     min
                   </Text>
                 </View>
+
+                <View className="flex-1" />
 
                 <Pressable
                   onPress={() => confirmRemoveExercise(ex.documentId, ex.Name)}
@@ -279,7 +282,7 @@ export default function ExecuteTrainingScreen() {
               </View>
 
               {expanded && (
-                <View className="mt-3 pt-3 border-t border-border">
+                <View className="pt-3 border-t border-border">
                   <View className="mb-3">
                     <ExercisePills exercise={ex} />
                   </View>
