@@ -132,21 +132,7 @@ export default function ExercisePickerScreen() {
               />
             </Pressable>
           ),
-          // Dezente Bestätigung im Header: sobald der User mindestens eine
-          // Übung hinzugefügt hat, sieht er den Counter statt nur der Toasts
-          // zu zählen. So weiß er beim Schließen, wie viele schon sitzen.
-          // Compact badge — long text like "N hinzugefügt" can clip on iOS
-          // modal headers where the right slot is narrow. "+N" is the same
-          // information in a third of the space.
-          headerRight: () =>
-            sessionAddedIds.size > 0 ? (
-              <View className="px-2.5 py-1 rounded-full bg-success/20 flex-row items-center gap-1 mr-2">
-                <Icon name="checkmark" size={12} color="success" />
-                <Text variant="caption1" weight="bold" color="success">
-                  {sessionAddedIds.size}
-                </Text>
-              </View>
-            ) : undefined,
+          headerRight: undefined,
         }}
       />
 
