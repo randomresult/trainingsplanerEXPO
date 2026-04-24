@@ -252,6 +252,10 @@ export const useStartTraining = () => {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['trainings', data.documentId] });
+      // Also invalidate the list — the TrainingPickerSheet and any other
+      // screen that filters by training_status needs to see the new
+      // in_progress state, not stale draft.
+      queryClient.invalidateQueries({ queryKey: ['trainings'] });
     },
   });
 };

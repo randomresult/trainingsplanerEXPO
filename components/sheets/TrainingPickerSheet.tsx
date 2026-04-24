@@ -1,6 +1,7 @@
 import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { View, FlatList, Pressable } from 'react-native';
+import { View, Pressable } from 'react-native';
 import { router } from 'expo-router';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   BottomSheet,
   BottomSheetRef,
@@ -27,11 +28,15 @@ export const TrainingPickerSheet = forwardRef<TrainingPickerSheetRef, Props>(
     const [exerciseName, setExerciseName] = useState<string>('');
     const { data: trainings } = useTrainings();
     const addExercise = useAddExerciseToTraining();
+    const queryClient = useQueryClient();
 
     useImperativeHandle(ref, () => ({
       present: (id: string, name: string) => {
         setExerciseId(id);
         setExerciseName(name);
+        // Trainings can be started / deleted / completed between sheet opens.
+        // Force a fresh fetch so the list of "open" trainings is accurate.
+        queryClient.invalidateQueries({ queryKey: ['trainings'] });
         sheetRef.current?.present();
       },
     }));
@@ -74,19 +79,17 @@ export const TrainingPickerSheet = forwardRef<TrainingPickerSheetRef, Props>(
         title={exerciseName ? `"${exerciseName}" hinzufügen` : 'Zum Training hinzufügen'}
       >
         <View className="flex-1">
-          {openTrainings.length > 0 && (
-            <>
+          {openTrainings.length > 0 ? (
+            <View>
               <Text variant="caption1" color="muted" className="mb-2 uppercase tracking-wide">
                 Heute &amp; kommend
               </Text>
-              <FlatList
-                data={openTrainings}
-                keyExtractor={(item: Training) => item.documentId}
-                contentContainerStyle={{ paddingBottom: 8, gap: 6 }}
-                renderItem={({ item }) => {
+              <View className="gap-1.5">
+                {openTrainings.map((item: Training) => {
                   const isActive = item.training_status === 'in_progress';
                   return (
                     <Pressable
+                      key={item.documentId}
                       onPress={() => handleAddToExisting(item.documentId, item.Name)}
                       disabled={addExercise.isPending}
                       className="bg-card rounded-lg p-3 flex-row items-center gap-3"
@@ -118,12 +121,10 @@ export const TrainingPickerSheet = forwardRef<TrainingPickerSheetRef, Props>(
                       <Icon name="chevron-forward" size={16} color="muted" />
                     </Pressable>
                   );
-                }}
-              />
-            </>
-          )}
-
-          {openTrainings.length === 0 && (
+                })}
+              </View>
+            </View>
+          ) : (
             <Text variant="footnote" color="muted" className="text-center py-4">
               Du hast noch kein anstehendes Training.
             </Text>
