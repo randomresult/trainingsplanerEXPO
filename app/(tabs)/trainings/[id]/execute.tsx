@@ -20,6 +20,7 @@ import {
   MediaViewer,
   ExercisePills,
   toast,
+  Swipeable,
 } from '@/components/ui';
 import {
   useTrainingDetail,
@@ -214,137 +215,130 @@ export default function ExecuteTrainingScreen() {
         )}
       </View>
 
-      <ScrollView className="flex-1" contentContainerStyle={{ padding: 20, paddingBottom: 80 }}>
+      <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 80 }}>
         {exerciseStates.map((ex, idx) => {
           const expanded = expandedId === ex.documentId;
           return (
-            <Card key={ex.documentId} className="mb-3 gap-3">
-              {/* Row 1 — title + pills, full width, wraps to 2 lines. Mirrors
-                  the ExerciseCard layout in the library so the same exercise
-                  reads the same everywhere. */}
-              <Pressable
-                onPress={() => setExpandedId(expanded ? null : ex.documentId)}
-                className="gap-2"
-              >
-                <Text
-                  variant="headline"
-                  numberOfLines={2}
-                  className={ex.completed ? 'line-through opacity-60' : ''}
-                >
-                  {ex.Name}
-                </Text>
-                <ExercisePills exercise={ex} />
-              </Pressable>
-
-              {/* Row 2 — interactive controls. Checkbox left, minutes next
-                  to it, remove on the far right. */}
-              <View className="flex-row items-center gap-3">
+            <Swipeable
+              key={ex.documentId}
+              onRemove={() => removeExercise.mutate({ trainingId: id, exerciseId: ex.documentId })}
+            >
+              <View className="bg-card border-b border-border px-5 py-4 gap-3">
+                {/* Row 1 — title + pills, full width, wraps to 2 lines. Mirrors
+                    the ExerciseCard layout in the library so the same exercise
+                    reads the same everywhere. */}
                 <Pressable
-                  onPress={() => {
-                    triggerHaptic('light');
-                    toggleComplete(idx);
-                  }}
-                  hitSlop={8}
+                  onPress={() => setExpandedId(expanded ? null : ex.documentId)}
+                  className="gap-2"
                 >
-                  <View
-                    className={`w-9 h-9 rounded-full border-2 items-center justify-center ${
-                      ex.completed ? 'bg-success border-success' : 'border-muted'
-                    }`}
+                  <Text
+                    variant="headline"
+                    numberOfLines={2}
+                    className={ex.completed ? 'line-through opacity-60' : ''}
                   >
-                    {ex.completed && <Icon name="checkmark" size={20} color="inverse" />}
-                  </View>
-                </Pressable>
-
-                <View className="flex-row items-center bg-surface-1 rounded-md px-2 py-1">
-                  <TextInput
-                    value={String(ex.editedMinutes)}
-                    onChangeText={(t) => {
-                      const n = parseInt(t, 10);
-                      setMinutes(idx, Number.isFinite(n) ? n : 0);
-                    }}
-                    keyboardType="number-pad"
-                    className="text-foreground text-right"
-                    style={{ padding: 0, width: 28 }}
-                  />
-                  <Text variant="caption1" color="muted" className="ml-1">
-                    min
+                    {ex.Name}
                   </Text>
-                </View>
-
-                <View className="flex-1" />
-
-                <Pressable
-                  onPress={() => confirmRemoveExercise(ex.documentId, ex.Name)}
-                  disabled={removeExercise.isPending}
-                  hitSlop={8}
-                  className="w-9 h-9 rounded-full bg-destructive/10 items-center justify-center active:opacity-70 disabled:opacity-40"
-                >
-                  <Icon name="close" size={16} color="destructive" />
+                  <ExercisePills exercise={ex} />
                 </Pressable>
-              </View>
 
-              {expanded && (
-                <View className="pt-3 border-t border-border">
-                  {ex.Description && (
-                    <Text variant="footnote" color="muted" className="mb-3">
-                      {ex.Description}
+                {/* Row 2 — interactive controls. Checkbox left, minutes next to it. */}
+                <View className="flex-row items-center gap-3">
+                  <Pressable
+                    onPress={() => {
+                      triggerHaptic('light');
+                      toggleComplete(idx);
+                    }}
+                    hitSlop={8}
+                  >
+                    <View
+                      className={`w-9 h-9 rounded-full border-2 items-center justify-center ${
+                        ex.completed ? 'bg-success border-success' : 'border-muted'
+                      }`}
+                    >
+                      {ex.completed && <Icon name="checkmark" size={20} color="inverse" />}
+                    </View>
+                  </Pressable>
+
+                  <View className="flex-row items-center bg-surface-1 rounded-md px-2 py-1">
+                    <TextInput
+                      value={String(ex.editedMinutes)}
+                      onChangeText={(t) => {
+                        const n = parseInt(t, 10);
+                        setMinutes(idx, Number.isFinite(n) ? n : 0);
+                      }}
+                      keyboardType="number-pad"
+                      className="text-foreground text-right"
+                      style={{ padding: 0, width: 28 }}
+                    />
+                    <Text variant="caption1" color="muted" className="ml-1">
+                      min
                     </Text>
-                  )}
-                  {(ex.Steps as any)?.length > 0 && (
-                    <View className="mb-3">
-                      <Text variant="subhead" weight="semibold" className="mb-2">
-                        Anleitung
-                      </Text>
-                      {(ex.Steps as any).map((step: any, sidx: number) => {
-                        const title = typeof step === 'string' ? step : step?.Name;
-                        const body = typeof step === 'string' ? null : step?.Description;
-                        return (
-                          <View key={step?.id ?? sidx} className="flex-row gap-2 mb-2">
-                            <Text variant="caption1" color="muted" weight="bold">
-                              {sidx + 1}.
-                            </Text>
-                            <View className="flex-1">
-                              <Text variant="footnote">{title}</Text>
-                              {body && (
-                                <Text variant="caption1" color="muted">
-                                  {body}
-                                </Text>
-                              )}
-                            </View>
-                          </View>
-                        );
-                      })}
-                    </View>
-                  )}
-                  {ex.Hint && (
-                    <View className="bg-warning/10 rounded-md p-3 flex-row gap-2">
-                      <Icon name="bulb-outline" size={14} color="warning" />
-                      <Text variant="caption1" className="flex-1">
-                        {ex.Hint}
-                      </Text>
-                    </View>
-                  )}
-                  {(ex.Videos?.length ?? 0) > 0 && (
-                    <View className="flex-row flex-wrap gap-2 mt-3">
-                      {ex.Videos!.map((v, vidx) => (
-                        <MediaThumbnail
-                          key={vidx}
-                          uri={v}
-                          kind="video"
-                          onPress={() =>
-                            toast.info('Video-Wiedergabe bald verfügbar')
-                          }
-                        />
-                      ))}
-                    </View>
-                  )}
+                  </View>
                 </View>
-              )}
-            </Card>
+
+                {expanded && (
+                  <View className="pt-3 border-t border-border">
+                    {ex.Description && (
+                      <Text variant="footnote" color="muted" className="mb-3">
+                        {ex.Description}
+                      </Text>
+                    )}
+                    {(ex.Steps as any)?.length > 0 && (
+                      <View className="mb-3">
+                        <Text variant="subhead" weight="semibold" className="mb-2">
+                          Anleitung
+                        </Text>
+                        {(ex.Steps as any).map((step: any, sidx: number) => {
+                          const title = typeof step === 'string' ? step : step?.Name;
+                          const body = typeof step === 'string' ? null : step?.Description;
+                          return (
+                            <View key={step?.id ?? sidx} className="flex-row gap-2 mb-2">
+                              <Text variant="caption1" color="muted" weight="bold">
+                                {sidx + 1}.
+                              </Text>
+                              <View className="flex-1">
+                                <Text variant="footnote">{title}</Text>
+                                {body && (
+                                  <Text variant="caption1" color="muted">
+                                    {body}
+                                  </Text>
+                                )}
+                              </View>
+                            </View>
+                          );
+                        })}
+                      </View>
+                    )}
+                    {ex.Hint && (
+                      <View className="bg-warning/10 rounded-md p-3 flex-row gap-2">
+                        <Icon name="bulb-outline" size={14} color="warning" />
+                        <Text variant="caption1" className="flex-1">
+                          {ex.Hint}
+                        </Text>
+                      </View>
+                    )}
+                    {(ex.Videos?.length ?? 0) > 0 && (
+                      <View className="flex-row flex-wrap gap-2 mt-3">
+                        {ex.Videos!.map((v, vidx) => (
+                          <MediaThumbnail
+                            key={vidx}
+                            uri={v}
+                            kind="video"
+                            onPress={() =>
+                              toast.info('Video-Wiedergabe bald verfügbar')
+                            }
+                          />
+                        ))}
+                      </View>
+                    )}
+                  </View>
+                )}
+              </View>
+            </Swipeable>
           );
         })}
 
-        <View className="gap-2 mt-3">
+        <View className="gap-2 mt-3 px-5">
           <Button
             variant="secondary"
             leftIcon="add"

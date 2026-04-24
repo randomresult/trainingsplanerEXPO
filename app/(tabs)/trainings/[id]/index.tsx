@@ -1,6 +1,6 @@
 import { Platform, View, ActivityIndicator, Alert, Pressable } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
-import { Screen, Text, Button, Card, Badge, Icon, PlayerCard, toast, SkeletonDetail, SkeletonList } from '@/components/ui';
+import { Screen, Text, Button, Card, Badge, Icon, PlayerCard, Avatar, toast, SkeletonDetail, SkeletonList, Swipeable } from '@/components/ui';
 import {
   useTrainingDetail,
   useDeleteTraining,
@@ -191,8 +191,11 @@ export default function TrainingDetailScreen() {
           )}
         </View>
         {training.exercises?.map((exercise, idx) => (
-          <Card key={exercise.documentId} className="mb-3 flex-row items-center">
-            <View className="flex-1">
+          <Swipeable
+            key={exercise.documentId}
+            onRemove={canEditExercises ? () => removeExercise.mutate({ trainingId: id, exerciseId: exercise.documentId }) : undefined}
+          >
+            <View className="bg-card border-b border-border px-5 py-4">
               <View className="flex-row justify-between items-start">
                 <Text variant="subhead" weight="semibold" className="flex-1 mr-2">
                   {idx + 1}. {exercise.Name}
@@ -200,17 +203,7 @@ export default function TrainingDetailScreen() {
                 <Text variant="caption1" color="muted">{exercise.Minutes} Min</Text>
               </View>
             </View>
-            {canEditExercises && (
-              <Pressable
-                onPress={() => confirmRemoveExercise(exercise.documentId, exercise.Name)}
-                disabled={removeExercise.isPending}
-                hitSlop={8}
-                className="ml-3 w-9 h-9 rounded-full bg-destructive/10 items-center justify-center active:opacity-70 disabled:opacity-40"
-              >
-                <Icon name="close" size={16} color="destructive" />
-              </Pressable>
-            )}
-          </Card>
+          </Swipeable>
         ))}
       </View>
 
@@ -229,21 +222,23 @@ export default function TrainingDetailScreen() {
             </Button>
           )}
         </View>
-        {training.players?.map((p) => (
-          <PlayerCard
-            key={p.documentId}
-            player={p}
-            compact
-            className="mb-2"
-            showRemove={canEditExercises}
-            onRemove={() =>
-              confirmRemovePlayer(
-                p.documentId,
-                [p.firstname, p.Name].filter(Boolean).join(' ') || 'Spieler'
-              )
-            }
-          />
-        ))}
+        {training.players?.map((p) => {
+          const fullName = [p.firstname, p.Name].filter(Boolean).join(' ') || 'Spieler';
+          const initials = (p.firstname?.[0] ?? '') + (p.Name?.[0] ?? '') || '?';
+          return (
+            <Swipeable
+              key={p.documentId}
+              onRemove={canEditExercises ? () => removePlayer.mutate({ trainingId: id, playerId: p.documentId }) : undefined}
+            >
+              <View className="bg-card border-b border-border px-5 py-3 flex-row items-center gap-3">
+                <Avatar initials={initials} size="sm" />
+                <Text variant="headline" numberOfLines={1} className="flex-1">
+                  {fullName}
+                </Text>
+              </View>
+            </Swipeable>
+          );
+        })}
       </View>
 
       {/* Actions */}

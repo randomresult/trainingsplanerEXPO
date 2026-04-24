@@ -8,7 +8,7 @@ import {
   Pressable,
 } from 'react-native';
 import { router, useLocalSearchParams, Stack } from 'expo-router';
-import { Screen, Text, Button, toast, ExerciseCard, Icon } from '@/components/ui';
+import { Screen, Text, Button, toast, ExerciseCard, Icon, Swipeable } from '@/components/ui';
 import { usePickModeStore } from '@/lib/store/pickModeStore';
 import { useCreateTraining } from '@/lib/queries/useTrainings';
 import { useExercises } from '@/lib/queries/useExercises';
@@ -145,21 +145,19 @@ export default function NewTrainingScreen() {
             )}
 
             {selectedExercises.map((ex) => (
-              <ExerciseCard
+              <Swipeable
                 key={ex.documentId}
-                exercise={ex}
-                compact
-                className="mb-1.5"
-                trailing={
-                  <Pressable
-                    onPress={() => removeExercise(ex.documentId)}
-                    hitSlop={8}
-                    className="w-9 h-9 rounded-full bg-destructive/10 items-center justify-center"
-                  >
-                    <Icon name="close" size={16} color="destructive" />
-                  </Pressable>
-                }
-              />
+                onRemove={() => removeExercise(ex.documentId)}
+              >
+                <View className="bg-card border-b border-border px-4 py-3">
+                  <Text variant="subhead" weight="semibold" numberOfLines={1}>
+                    {ex.Name}
+                  </Text>
+                  <Text variant="caption1" color="muted" numberOfLines={1}>
+                    {ex.Minutes} Min
+                  </Text>
+                </View>
+              </Swipeable>
             ))}
           </View>
 
@@ -185,21 +183,16 @@ export default function NewTrainingScreen() {
             {selectedPlayers.map((p) => {
               const label = [p.firstname, p.Name].filter(Boolean).join(' ') || 'Spieler';
               return (
-                <View
+                <Swipeable
                   key={p.documentId}
-                  className="flex-row items-center py-2 border-b border-border"
+                  onRemove={() => removePlayer(p.documentId)}
                 >
-                  <Text variant="footnote" className="flex-1" numberOfLines={1}>
-                    {label}
-                  </Text>
-                  <Pressable
-                    onPress={() => removePlayer(p.documentId)}
-                    hitSlop={8}
-                    className="w-8 h-8 items-center justify-center"
-                  >
-                    <Icon name="close" size={16} color="muted" />
-                  </Pressable>
-                </View>
+                  <View className="bg-card border-b border-border px-4 py-3">
+                    <Text variant="subhead" numberOfLines={1}>
+                      {label}
+                    </Text>
+                  </View>
+                </Swipeable>
               );
             })}
           </View>
