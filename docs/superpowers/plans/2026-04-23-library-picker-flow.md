@@ -1641,3 +1641,86 @@ gh pr create --title "feat: Library-integrated exercise picker + create-form inl
 - Swipe-to-delete on inline lists — motion cycle
 - Exercise-creation inside Library — future feature
 - Long-press detail preview inside pick-mode — if user feedback demands it
+
+---
+
+## Post-Implementation Deviations (2026-04-24)
+
+What actually shipped differs in several ways from the plan above. Captured here so the doc matches the code for future reference.
+
+### Architecture
+
+**Cross-tab navigation via `?mode=pick` was abandoned.** Pushing `/library?mode=pick` from a different tab (Trainings) silently drops out of the source-tab stack, so `router.back()` had nowhere sensible to go and the `?mode=pick` query stuck in the Library-tab state after navigation. Same problem surfaced for `/trainings/new` when opened from Library.
+
+Every flow that needs to cross tabs is now its own root-stack modal route outside `(tabs)`:
+
+- `app/exercise-picker.tsx` — exercise picker
+- `app/player-picker.tsx` — player picker
+- `app/training-new.tsx` — draft-training create form (moved out of `(tabs)/trainings/new.tsx`)
+- `app/exercise-detail/[id].tsx` — exercise detail (moved out of `(tabs)/library/[id].tsx`)
+
+All four are registered in `app/_layout.tsx` with `presentation: 'modal'` and `headerShown: true`. `router.back()` pops cleanly regardless of which tab the user was on.
+
+### Exercise-picker: single-add, not multi-select
+
+The plan called for `Fertig (N)` confirmation at the end of a multi-select flow. After testing, the UX was reworked to mirror the Library's browse-and-add pattern instead:
+
+- Card tap → `/exercise-detail/[id]`
+- `+` button on card → fires per-tap `onAdd` callback from the store (API call + toast for live-training / detail cases; local state update for training-new)
+- No `Fertig` header, no `selectedIds` state
+- `sessionAddedIds` accumulates this-session adds and renders a compact `✓ N` badge in the header-right
+- Cards with ids passed via `?excludeIds` (already-in-target-training) render pre-checked
+
+**Player-picker still uses multi-select with `Fertig`** — a name list doesn't need detail drill-down, so the single-add model adds no value there.
+
+### `pickModeStore` dual-mode
+
+`lib/store/pickModeStore.ts` grew a second start method:
+
+- `start(initial, onConfirm)` — multi-select (used by player-picker)
+- `startAdd(onAdd, addContextLabel?)` — single-add (used by exercise-picker). `addContextLabel` lets the caller set the detail-screen CTA text (e.g. "Zum Live-Training hinzufügen" from execute, plain "Zum Training hinzufügen" elsewhere)
+
+`confirm()` is async — awaits the callback before closing so the Fertig-button can show a spinner during the bulk-mutation in player-picker.
+
+`cancel()` runs from `navigation.addListener('beforeRemove')`, not `useFocusEffect`. The latter fires when another screen pushes on top (e.g. opening detail from inside the picker) and would wipe the active selection; `beforeRemove` only fires on actual dismissal.
+
+### Strapi schema alignment
+
+The original type assumptions (`Difficulty` enum, `focus[]` relation) didn't match the real schema. Replaced with three relations — `focusareas`, `playerlevels`, `categories` — each typed as `Tag { documentId, Name }`. `useExercises`, `useTrainings`, `useTrainingDetail`, and `useTrainingsHistory` all populate these explicitly; Strapi v5's `populate='*'` only walks one level, which was why pills showed on Library cards (direct `/exercises` query) but not on live-training cards (nested via training.exercises).
+
+### ExerciseCard visual
+
+Three iterations landed here:
+
+1. Initial: round initial-letter avatar + Minutes + Difficulty + single focus badge.
+2. Dropped the avatar, hash-colored pills per tag. Too noisy (5 random colors per card).
+3. **Final**: title on its own line (wraps to 2 lines, never truncated) + `ExercisePills` row below. Minutes gets a dedicated slot with a right-border separator. Playerlevels carry a semantic gradient (Beginner = success / Intermediate = warning / Advanced+Expert = destructive). Categories always `primary-soft`. Focusareas always `muted`. Description lives only on the detail screen.
+
+`components/ui/ExercisePills.tsx` is the shared primitive — used by ExerciseCard, exercise-detail, and the execute-screen cards.
+
+### Execute-screen cards
+
+Match the ExerciseCard layout: title on its own wrappable line, pills row below it, controls (checkbox / minutes input / remove) on the next row. Minutes `TextInput` has a fixed 28px width because RN Web expands inputs to fill unused row space otherwise.
+
+### Completion screen
+
+Reverted from the hero-single-points design back to the 4-stat row (Dauer / Teilnehmer / Abgehakt / Punkte). Live counts (`completedCount` + `sessionDuration`) flow through as route params set by `useCompleteTraining`'s onSuccess, so the "abgehakt" value reflects what the user actually ticked off instead of the training's total exercises.
+
+### Cross-cutting fixes
+
+- `router.dismiss(2)` instead of `dismissAll()` after direct-add from detail — dismissAll wiped the training-new modal when the user came from the draft-creation flow.
+- `useStartTraining.onSuccess` invalidates `['trainings']` (not just the single key) so the TrainingPickerSheet doesn't render stale status.
+- `TrainingPickerSheet.present()` invalidates `['trainings']` on open as defense-in-depth.
+- FlatList inside a `BottomSheetView` can collapse to zero height on web; the sheet uses a plain `.map()` now.
+- `headerShown: true` is explicit on every modal route — the root stack default is `false`, and inherited silently hides the `headerLeft` close button.
+
+### Deleted
+
+- `components/sheets/ExercisePickerSheet.tsx`
+- `components/sheets/AddExercisesSheet.tsx`
+- `components/sheets/AddPlayersSheet.tsx`
+- `components/sheets/PlayerPickerSheet.tsx` (replaced by `/player-picker` modal route)
+
+### Still pending (carried from original "Out of Scope")
+
+Everything in the Out-of-Scope list above still applies. Manual flow validation on Expo Go iOS is not done.

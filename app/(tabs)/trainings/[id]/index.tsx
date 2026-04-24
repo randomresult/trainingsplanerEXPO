@@ -1,16 +1,16 @@
-import { useRef } from 'react';
 import { Platform, View, ActivityIndicator, Alert, Pressable } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
-import { Screen, Text, Button, Card, Badge, Icon, PlayerCard } from '@/components/ui';
-import { AddExercisesSheet, AddExercisesSheetRef } from '@/components/sheets/AddExercisesSheet';
-import { AddPlayersSheet, AddPlayersSheetRef } from '@/components/sheets/AddPlayersSheet';
+import { Screen, Text, Button, Card, Badge, Icon, PlayerCard, toast } from '@/components/ui';
 import {
   useTrainingDetail,
   useDeleteTraining,
   useStartTraining,
   useRemoveExerciseFromTraining,
   useRemovePlayerFromTraining,
+  useAddExerciseToTraining,
+  useAddPlayersToTraining,
 } from '@/lib/queries/useTrainings';
+import { usePickModeStore } from '@/lib/store/pickModeStore';
 import { COLORS } from '@/lib/theme';
 
 const statusBadge = {
@@ -26,9 +26,8 @@ export default function TrainingDetailScreen() {
   const startTraining = useStartTraining();
   const removeExercise = useRemoveExerciseFromTraining();
   const removePlayer = useRemovePlayerFromTraining();
-
-  const addSheetRef = useRef<AddExercisesSheetRef>(null);
-  const addPlayerSheetRef = useRef<AddPlayersSheetRef>(null);
+  const addExercise = useAddExerciseToTraining();
+  const addPlayers = useAddPlayersToTraining();
 
   const canEditExercises =
     training?.training_status === 'draft' || training?.training_status === 'in_progress';
@@ -94,6 +93,42 @@ export default function TrainingDetailScreen() {
     router.push(`/trainings/${id}/execute`);
   };
 
+  const handleAddExercises = () => {
+    if (!training) return;
+    const existingIds = training.exercises?.map((e) => e.documentId) ?? [];
+    usePickModeStore.getState().startAdd(async (exerciseId) => {
+      try {
+        await addExercise.mutateAsync({ trainingId: id, exerciseId });
+        toast.success('Übung hinzugefügt');
+      } catch {
+        toast.error('Übung konnte nicht hinzugefügt werden');
+      }
+    });
+    router.push({
+      pathname: '/exercise-picker',
+      params: { excludeIds: existingIds.join(',') },
+    });
+  };
+
+  const handleAddPlayers = () => {
+    if (!training) return;
+    const existingIds = training.players?.map((p) => p.documentId) ?? [];
+    usePickModeStore.getState().start([], async (newIds) => {
+      if (newIds.length === 0) return;
+      try {
+        await addPlayers.mutateAsync({ trainingId: id, playerIds: newIds });
+        toast.success(
+          newIds.length === 1
+            ? 'Spieler hinzugefügt'
+            : `${newIds.length} Spieler hinzugefügt`
+        );
+      } catch {
+        toast.error('Spieler konnten nicht hinzugefügt werden');
+      }
+    });
+    router.push(`/player-picker?excludeIds=${existingIds.join(',')}`);
+  };
+
   if (isLoading) {
     return (
       <Screen>
@@ -139,38 +174,6 @@ export default function TrainingDetailScreen() {
         </View>
       </View>
 
-      {/* Players */}
-      <View className="px-5 pb-4">
-        <View className="flex-row justify-between items-center mb-3">
-          <Text variant="headline">Spieler ({training.players?.length || 0})</Text>
-          {canEditExercises && (
-            <Button
-              variant="ghost"
-              size="sm"
-              leftIcon="add"
-              onPress={() => addPlayerSheetRef.current?.present()}
-            >
-              Hinzufügen
-            </Button>
-          )}
-        </View>
-        {training.players?.map((p) => (
-          <PlayerCard
-            key={p.documentId}
-            player={p}
-            compact
-            className="mb-2"
-            showRemove={canEditExercises}
-            onRemove={() =>
-              confirmRemovePlayer(
-                p.documentId,
-                [p.firstname, p.Name].filter(Boolean).join(' ') || 'Spieler'
-              )
-            }
-          />
-        ))}
-      </View>
-
       {/* Exercises */}
       <View className="px-5 pb-4">
         <View className="flex-row justify-between items-center mb-3">
@@ -180,7 +183,7 @@ export default function TrainingDetailScreen() {
               variant="ghost"
               size="sm"
               leftIcon="add"
-              onPress={() => addSheetRef.current?.present()}
+              onPress={handleAddExercises}
             >
               Hinzufügen
             </Button>
@@ -206,6 +209,38 @@ export default function TrainingDetailScreen() {
               </Pressable>
             )}
           </Card>
+        ))}
+      </View>
+
+      {/* Players */}
+      <View className="px-5 pb-4">
+        <View className="flex-row justify-between items-center mb-3">
+          <Text variant="headline">Spieler ({training.players?.length || 0})</Text>
+          {canEditExercises && (
+            <Button
+              variant="ghost"
+              size="sm"
+              leftIcon="add"
+              onPress={handleAddPlayers}
+            >
+              Hinzufügen
+            </Button>
+          )}
+        </View>
+        {training.players?.map((p) => (
+          <PlayerCard
+            key={p.documentId}
+            player={p}
+            compact
+            className="mb-2"
+            showRemove={canEditExercises}
+            onRemove={() =>
+              confirmRemovePlayer(
+                p.documentId,
+                [p.firstname, p.Name].filter(Boolean).join(' ') || 'Spieler'
+              )
+            }
+          />
         ))}
       </View>
 
@@ -235,9 +270,6 @@ export default function TrainingDetailScreen() {
           Training löschen
         </Button>
       </View>
-
-      <AddExercisesSheet ref={addSheetRef} trainingId={id} />
-      <AddPlayersSheet ref={addPlayerSheetRef} trainingId={id} />
     </Screen>
   );
 }

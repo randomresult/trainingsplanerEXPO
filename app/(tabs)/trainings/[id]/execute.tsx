@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   Platform,
   View,
@@ -18,36 +18,71 @@ import {
   Avatar,
   MediaThumbnail,
   MediaViewer,
+  ExercisePills,
   toast,
 } from '@/components/ui';
 import {
   useTrainingDetail,
   useCompleteTraining,
   useRemoveExerciseFromTraining,
+  useAddExerciseToTraining,
+  useAddPlayersToTraining,
 } from '@/lib/queries/useTrainings';
 import { useTrainingExecution } from '@/lib/hooks/useTrainingExecution';
 import { formatTime } from '@/lib/utils/formatTime';
 import { triggerHaptic } from '@/lib/haptics';
 import { COLORS } from '@/lib/theme';
-import {
-  AddExercisesSheet,
-  AddExercisesSheetRef,
-} from '@/components/sheets/AddExercisesSheet';
-import {
-  AddPlayersSheet,
-  AddPlayersSheetRef,
-} from '@/components/sheets/AddPlayersSheet';
+import { usePickModeStore } from '@/lib/store/pickModeStore';
 
 export default function ExecuteTrainingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: training, isLoading } = useTrainingDetail(id);
   const completeTraining = useCompleteTraining();
   const removeExercise = useRemoveExerciseFromTraining();
+  const addExercise = useAddExerciseToTraining();
+  const addPlayers = useAddPlayersToTraining();
   const insets = useSafeAreaInsets();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [viewerUri, setViewerUri] = useState<string | null>(null);
-  const addExerciseSheetRef = useRef<AddExercisesSheetRef>(null);
-  const addPlayerSheetRef = useRef<AddPlayersSheetRef>(null);
+
+  const handleAddExercises = () => {
+    if (!training) return;
+    const existingIds = training.exercises?.map((e) => e.documentId) ?? [];
+    usePickModeStore.getState().startAdd(
+      async (exerciseId) => {
+        try {
+          await addExercise.mutateAsync({ trainingId: id, exerciseId });
+          toast.success('Übung hinzugefügt');
+        } catch {
+          toast.error('Übung konnte nicht hinzugefügt werden');
+        }
+      },
+      'Zum Live-Training hinzufügen'
+    );
+    router.push({
+      pathname: '/exercise-picker',
+      params: { excludeIds: existingIds.join(',') },
+    });
+  };
+
+  const handleAddPlayers = () => {
+    if (!training) return;
+    const existingIds = training.players?.map((p) => p.documentId) ?? [];
+    usePickModeStore.getState().start([], async (newIds) => {
+      if (newIds.length === 0) return;
+      try {
+        await addPlayers.mutateAsync({ trainingId: id, playerIds: newIds });
+        toast.success(
+          newIds.length === 1
+            ? 'Spieler hinzugefügt'
+            : `${newIds.length} Spieler hinzugefügt`
+        );
+      } catch {
+        toast.error('Spieler konnten nicht hinzugefügt werden');
+      }
+    });
+    router.push(`/player-picker?excludeIds=${existingIds.join(',')}`);
+  };
 
   const confirmRemoveExercise = (exerciseId: string, exerciseName: string) => {
     const msg = `Übung "${exerciseName}" aus dem Training entfernen?`;
@@ -183,41 +218,41 @@ export default function ExecuteTrainingScreen() {
         {exerciseStates.map((ex, idx) => {
           const expanded = expandedId === ex.documentId;
           return (
-            <Card key={ex.documentId} className="mb-3">
-              <View className="flex-row items-start gap-3">
+            <Card key={ex.documentId} className="mb-3 gap-3">
+              {/* Row 1 — title + pills, full width, wraps to 2 lines. Mirrors
+                  the ExerciseCard layout in the library so the same exercise
+                  reads the same everywhere. */}
+              <Pressable
+                onPress={() => setExpandedId(expanded ? null : ex.documentId)}
+                className="gap-2"
+              >
+                <Text
+                  variant="headline"
+                  numberOfLines={2}
+                  className={ex.completed ? 'line-through opacity-60' : ''}
+                >
+                  {ex.Name}
+                </Text>
+                <ExercisePills exercise={ex} />
+              </Pressable>
+
+              {/* Row 2 — interactive controls. Checkbox left, minutes next
+                  to it, remove on the far right. */}
+              <View className="flex-row items-center gap-3">
                 <Pressable
                   onPress={() => {
                     triggerHaptic('light');
                     toggleComplete(idx);
                   }}
                   hitSlop={8}
-                  className="w-12 h-12 -ml-2 -mt-2 items-center justify-center"
                 >
                   <View
-                    className={`w-10 h-10 rounded-full border-2 items-center justify-center ${
+                    className={`w-9 h-9 rounded-full border-2 items-center justify-center ${
                       ex.completed ? 'bg-success border-success' : 'border-muted'
                     }`}
                   >
-                    {ex.completed && <Icon name="checkmark" size={22} color="inverse" />}
+                    {ex.completed && <Icon name="checkmark" size={20} color="inverse" />}
                   </View>
-                </Pressable>
-
-                <Pressable
-                  onPress={() => setExpandedId(expanded ? null : ex.documentId)}
-                  className="flex-1"
-                >
-                  <Text
-                    variant="headline"
-                    numberOfLines={expanded ? undefined : 1}
-                    className={ex.completed ? 'line-through opacity-60' : ''}
-                  >
-                    {ex.Name}
-                  </Text>
-                  {!expanded && ex.Description && (
-                    <Text variant="footnote" color="muted" numberOfLines={2} className="mt-0.5">
-                      {ex.Description}
-                    </Text>
-                  )}
                 </Pressable>
 
                 <View className="flex-row items-center bg-surface-1 rounded-md px-2 py-1">
@@ -228,13 +263,15 @@ export default function ExecuteTrainingScreen() {
                       setMinutes(idx, Number.isFinite(n) ? n : 0);
                     }}
                     keyboardType="number-pad"
-                    className="text-foreground min-w-[30px] text-right"
-                    style={{ padding: 0 }}
+                    className="text-foreground text-right"
+                    style={{ padding: 0, width: 28 }}
                   />
                   <Text variant="caption1" color="muted" className="ml-1">
                     min
                   </Text>
                 </View>
+
+                <View className="flex-1" />
 
                 <Pressable
                   onPress={() => confirmRemoveExercise(ex.documentId, ex.Name)}
@@ -247,7 +284,7 @@ export default function ExecuteTrainingScreen() {
               </View>
 
               {expanded && (
-                <View className="mt-3 pt-3 border-t border-border">
+                <View className="pt-3 border-t border-border">
                   {ex.Description && (
                     <Text variant="footnote" color="muted" className="mb-3">
                       {ex.Description}
@@ -311,14 +348,14 @@ export default function ExecuteTrainingScreen() {
           <Button
             variant="secondary"
             leftIcon="add"
-            onPress={() => addExerciseSheetRef.current?.present()}
+            onPress={handleAddExercises}
           >
             Übung hinzufügen
           </Button>
           <Button
             variant="secondary"
             leftIcon="person-add-outline"
-            onPress={() => addPlayerSheetRef.current?.present()}
+            onPress={handleAddPlayers}
           >
             Spieler hinzufügen
           </Button>
@@ -348,8 +385,6 @@ export default function ExecuteTrainingScreen() {
       </View>
 
       <MediaViewer uri={viewerUri} onClose={() => setViewerUri(null)} />
-      <AddExercisesSheet ref={addExerciseSheetRef} trainingId={id} />
-      <AddPlayersSheet ref={addPlayerSheetRef} trainingId={id} />
     </SafeAreaView>
   );
 }

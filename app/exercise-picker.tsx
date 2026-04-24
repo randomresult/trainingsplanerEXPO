@@ -1,16 +1,6 @@
-import { useState, useRef, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  TrainingPickerSheet,
-  TrainingPickerSheetRef,
-} from '@/components/sheets/TrainingPickerSheet';
-import {
-  LibraryFilterSheet,
-  LibraryFilterSheetRef,
-  LibraryFilterState,
-  EMPTY_FILTERS,
-  DURATION_LABEL,
-} from '@/components/sheets/LibraryFilterSheet';
-import {
+  Platform,
   View,
   TextInput,
   FlatList,
@@ -18,16 +8,36 @@ import {
   Keyboard,
   Pressable,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, Stack, useLocalSearchParams, useNavigation } from 'expo-router';
 import { Screen, Text, ExerciseCard, Icon, FilterChip } from '@/components/ui';
+import {
+  LibraryFilterSheet,
+  LibraryFilterSheetRef,
+  LibraryFilterState,
+  EMPTY_FILTERS,
+  DURATION_LABEL,
+} from '@/components/sheets/LibraryFilterSheet';
 import { useExercises } from '@/lib/queries/useExercises';
+import { usePickModeStore } from '@/lib/store/pickModeStore';
 import { COLORS } from '@/lib/theme';
 
-export default function LibraryListScreen() {
+export default function ExercisePickerScreen() {
+  const { excludeIds } = useLocalSearchParams<{ excludeIds?: string }>();
+  const initiallyAdded = useMemo(
+    () => new Set((excludeIds ?? '').split(',').filter(Boolean)),
+    [excludeIds]
+  );
+
   const [search, setSearch] = useState('');
   const { data: exercises, isLoading } = useExercises(search);
 
-  const trainingPickerRef = useRef<TrainingPickerSheetRef>(null);
+  const onAdd = usePickModeStore((s) => s.onAdd);
+
+  // Per-card ephemeral state: which is mid-mutation, which has just been added
+  // during this picker session. initiallyAdded comes from the caller as a
+  // query param and covers the "already in training" case.
+  const [addingId, setAddingId] = useState<string | null>(null);
+  const [sessionAddedIds, setSessionAddedIds] = useState<Set<string>>(new Set());
 
   const [filters, setFilters] = useState<LibraryFilterState>(EMPTY_FILTERS);
   const filterSheetRef = useRef<LibraryFilterSheetRef>(null);
@@ -77,13 +87,70 @@ export default function LibraryListScreen() {
     setFilters((s) => ({ ...s, [key]: s[key].filter((v) => v !== name) }));
   const clearDuration = () => setFilters((s) => ({ ...s, duration: null }));
 
+  // Cancel on actual removal (back/swipe-dismiss) — NOT on focus loss, so
+  // pushing /exercise-detail on top and returning preserves the session.
+  const navigation = useNavigation();
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', () => {
+      const store = usePickModeStore.getState();
+      if (store.active) store.cancel();
+    });
+    return unsubscribe;
+  }, [navigation]);
+
+  const handleAdd = async (exerciseId: string) => {
+    if (!onAdd || addingId === exerciseId) return;
+    setAddingId(exerciseId);
+    try {
+      await onAdd(exerciseId);
+      setSessionAddedIds((prev) => {
+        const next = new Set(prev);
+        next.add(exerciseId);
+        return next;
+      });
+    } finally {
+      setAddingId(null);
+    }
+  };
+
   return (
     <Screen>
-      <View className="px-5 pt-4 pb-4 flex-row justify-between items-center">
-        <Text variant="largeTitle" weight="bold">Bibliothek</Text>
-      </View>
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          title: 'Übungen',
+          headerLeft: () => (
+            <Pressable
+              onPress={() => router.back()}
+              className="px-2 py-1"
+              hitSlop={8}
+            >
+              <Icon
+                name={Platform.OS === 'web' ? 'close' : 'chevron-back'}
+                size={22}
+                color="foreground"
+              />
+            </Pressable>
+          ),
+          // Dezente Bestätigung im Header: sobald der User mindestens eine
+          // Übung hinzugefügt hat, sieht er den Counter statt nur der Toasts
+          // zu zählen. So weiß er beim Schließen, wie viele schon sitzen.
+          // Compact badge — long text like "N hinzugefügt" can clip on iOS
+          // modal headers where the right slot is narrow. "+N" is the same
+          // information in a third of the space.
+          headerRight: () =>
+            sessionAddedIds.size > 0 ? (
+              <View className="px-2.5 py-1 rounded-full bg-success/20 flex-row items-center gap-1 mr-2">
+                <Icon name="checkmark" size={12} color="success" />
+                <Text variant="caption1" weight="bold" color="success">
+                  {sessionAddedIds.size}
+                </Text>
+              </View>
+            ) : undefined,
+        }}
+      />
 
-      <View className="px-5 pb-2">
+      <View className="px-5 pt-4 pb-2">
         <TextInput
           value={search}
           onChangeText={setSearch}
@@ -153,28 +220,53 @@ export default function LibraryListScreen() {
                 </Text>
               </View>
             }
-            renderItem={({ item }: { item: any }) => (
-              <ExerciseCard
-                exercise={item}
-                onPress={() => router.push({ pathname: '/exercise-detail/[id]', params: { id: item.documentId } })}
-                trailing={
-                  <Pressable
-                    onPress={(e) => {
-                      e.stopPropagation?.();
-                      trainingPickerRef.current?.present(item.documentId, item.Name);
-                    }}
-                    hitSlop={8}
-                    className="w-8 h-8 rounded-full bg-primary/15 items-center justify-center"
-                  >
-                    <Icon name="add" size={18} color="primary" />
-                  </Pressable>
-                }
-              />
-            )}
+            renderItem={({ item }: { item: any }) => {
+              const alreadyThere = initiallyAdded.has(item.documentId);
+              const sessionAdded = sessionAddedIds.has(item.documentId);
+              const isAdded = alreadyThere || sessionAdded;
+              const isAdding = addingId === item.documentId;
+
+              return (
+                <ExerciseCard
+                  exercise={item}
+                  onPress={() =>
+                    router.push({
+                      pathname: '/exercise-detail/[id]',
+                      params: { id: item.documentId },
+                    })
+                  }
+                  trailing={
+                    <Pressable
+                      onPress={(e) => {
+                        e.stopPropagation?.();
+                        if (!isAdded && !isAdding) handleAdd(item.documentId);
+                      }}
+                      hitSlop={8}
+                      disabled={isAdded || isAdding}
+                      className={
+                        isAdded
+                          ? 'w-8 h-8 rounded-full bg-success/15 items-center justify-center'
+                          : 'w-8 h-8 rounded-full bg-primary/15 items-center justify-center'
+                      }
+                    >
+                      {isAdding ? (
+                        <ActivityIndicator size="small" color={COLORS.primary} />
+                      ) : (
+                        <Icon
+                          name={isAdded ? 'checkmark' : 'add'}
+                          size={18}
+                          color={isAdded ? 'success' : 'primary'}
+                        />
+                      )}
+                    </Pressable>
+                  }
+                />
+              );
+            }}
           />
         </Pressable>
       )}
-      <TrainingPickerSheet ref={trainingPickerRef} />
+
       <LibraryFilterSheet
         ref={filterSheetRef}
         filters={filters}

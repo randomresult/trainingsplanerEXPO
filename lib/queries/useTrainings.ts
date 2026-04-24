@@ -5,6 +5,28 @@ import { useAuthStore } from '../store';
 import type { Training } from '../types/models';
 import type { StrapiResponse } from '../types/api';
 
+// Strapi v5 populate='*' only walks one level — training.exercises comes back
+// but exercises.focusareas (and the other tag relations) stay empty. Every
+// screen that renders exercise pills (execute, detail) needs them populated
+// nested, so we spell it out here once.
+const TRAINING_POPULATE = {
+  exercises: {
+    populate: {
+      focusareas: true,
+      playerlevels: true,
+      categories: true,
+      Steps: true,
+      Videos: true,
+    },
+  },
+  players: {
+    populate: {
+      Club: true,
+    },
+  },
+  clubs: true,
+};
+
 export const useTrainings = () => {
   const user = useAuthStore((s) => s.user);
   const clubId = user?.clubs?.[0]?.documentId;
@@ -15,7 +37,7 @@ export const useTrainings = () => {
       // Strapi v5 users-permissions rejects filters on relations. Fetch and
       // filter client-side.
       const { data } = await apiClient.get<StrapiResponse<Training[]>>('/trainings', {
-        params: { populate: '*' },
+        params: { populate: TRAINING_POPULATE },
       });
 
       return data.data
@@ -37,7 +59,7 @@ export const useTrainingDetail = (id: string) => {
     queryKey: ['trainings', id],
     queryFn: async () => {
       const { data } = await apiClient.get<StrapiResponse<Training>>(`/trainings/${id}`, {
-        params: { populate: '*' },
+        params: { populate: TRAINING_POPULATE },
       });
 
       return data.data;
@@ -122,6 +144,30 @@ export const useAddExerciseToTraining = () => {
   });
 };
 
+export const useAddExercisesToTraining = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: { trainingId: string; exerciseIds: string[] }) => {
+      const { data } = await apiClient.put<StrapiResponse<Training>>(
+        `/trainings/${input.trainingId}`,
+        {
+          data: {
+            exercises: {
+              connect: input.exerciseIds.map((id) => ({ documentId: id })),
+            },
+          },
+        }
+      );
+      return data.data;
+    },
+    onSuccess: (_data, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['trainings', vars.trainingId] });
+      queryClient.invalidateQueries({ queryKey: ['trainings'] });
+    },
+  });
+};
+
 export const useAddPlayerToTraining = () => {
   const queryClient = useQueryClient();
 
@@ -132,6 +178,30 @@ export const useAddPlayerToTraining = () => {
         {
           data: {
             players: { connect: [{ documentId: input.playerId }] },
+          },
+        }
+      );
+      return data.data;
+    },
+    onSuccess: (_data, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['trainings', vars.trainingId] });
+      queryClient.invalidateQueries({ queryKey: ['trainings'] });
+    },
+  });
+};
+
+export const useAddPlayersToTraining = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: { trainingId: string; playerIds: string[] }) => {
+      const { data } = await apiClient.put<StrapiResponse<Training>>(
+        `/trainings/${input.trainingId}`,
+        {
+          data: {
+            players: {
+              connect: input.playerIds.map((id) => ({ documentId: id })),
+            },
           },
         }
       );
@@ -204,6 +274,10 @@ export const useStartTraining = () => {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['trainings', data.documentId] });
+      // Also invalidate the list — the TrainingPickerSheet and any other
+      // screen that filters by training_status needs to see the new
+      // in_progress state, not stale draft.
+      queryClient.invalidateQueries({ queryKey: ['trainings'] });
     },
   });
 };
@@ -231,9 +305,20 @@ export const useCompleteTraining = () => {
       });
       return input.trainingId;
     },
-    onSuccess: (trainingId) => {
+    onSuccess: (trainingId, input) => {
       queryClient.invalidateQueries({ queryKey: ['trainings'] });
-      router.replace(`/trainings/completed/${trainingId}`);
+      // Pass the live-training counts through — the completion screen can't
+      // derive them from the persisted Training (which only has total
+      // exercises, not how many were checked off during execution).
+      const completed = input.playerProgressData[0]?.completedExerciseIds.length ?? 0;
+      router.replace({
+        pathname: '/trainings/completed/[id]',
+        params: {
+          id: trainingId,
+          completedCount: String(completed),
+          sessionDuration: String(input.sessionDuration),
+        },
+      });
     },
   });
 };

@@ -23,11 +23,15 @@ export interface Exercise {
   Steps?: string[];
   Hint?: string;
   Videos?: string[];
-  Difficulty?: 'Anfänger' | 'Fortgeschritten' | 'Experte';
-  focus?: Focus[];
+  focusareas?: Tag[];
+  playerlevels?: Tag[];
+  categories?: Tag[];
 }
 
-export interface Focus {
+// Strapi relations (focusareas, playerlevels, categories) all share the
+// same shape — documentId + human-readable Name. One common type keeps
+// the ExerciseCard pill rendering uniform.
+export interface Tag {
   documentId: string;
   Name: string;
 }

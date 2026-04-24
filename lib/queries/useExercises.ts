@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../api';
-import type { Exercise, Focus } from '../types/models';
+import type { Exercise } from '../types/models';
 import type { StrapiResponse } from '../types/api';
 
 interface ExerciseRaw {
@@ -11,19 +11,27 @@ interface ExerciseRaw {
   Steps?: string[];
   Hint?: string;
   Videos?: string[];
-  Difficulty?: 'Anfänger' | 'Fortgeschritten' | 'Experte';
-  focus?: {
-    documentId: string;
-    Name: string;
-  }[];
+  focusareas?: { documentId: string; Name: string }[];
+  playerlevels?: { documentId: string; Name: string }[];
+  categories?: { documentId: string; Name: string }[];
 }
+
+// Explicit populate — Strapi v5 populate=* is inconsistent for relations on
+// some schemas. Naming the relations we actually need is deterministic.
+const POPULATE = {
+  focusareas: true,
+  playerlevels: true,
+  categories: true,
+  Steps: true,
+  Videos: true,
+};
 
 export const useExercises = (searchQuery?: string) => {
   return useQuery({
     queryKey: ['exercises', searchQuery],
     queryFn: async () => {
       const params: any = {
-        populate: '*',
+        populate: POPULATE,
       };
 
       if (searchQuery) {
@@ -38,7 +46,7 @@ export const useExercises = (searchQuery?: string) => {
         params,
       });
 
-      return data.data;
+      return data.data as Exercise[];
     },
   });
 };
@@ -49,11 +57,11 @@ export const useExerciseDetail = (id: string) => {
     queryFn: async () => {
       const { data } = await apiClient.get<StrapiResponse<ExerciseRaw>>(`/exercises/${id}`, {
         params: {
-          populate: '*',
+          populate: POPULATE,
         },
       });
 
-      return data.data;
+      return data.data as Exercise;
     },
     enabled: !!id,
   });

@@ -4,6 +4,8 @@ import { Screen, Text, Button, Icon, Avatar } from '@/components/ui';
 import { useTrainingDetail } from '@/lib/queries/useTrainings';
 import { COLORS } from '@/lib/theme';
 
+const POINTS_PER_EXERCISE = 10;
+
 function formatDuration(seconds: number | undefined | null): string {
   if (!seconds) return '–';
   const mins = Math.round(seconds / 60);
@@ -11,7 +13,11 @@ function formatDuration(seconds: number | undefined | null): string {
 }
 
 export default function CompletedTrainingScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, completedCount, sessionDuration } = useLocalSearchParams<{
+    id: string;
+    completedCount?: string;
+    sessionDuration?: string;
+  }>();
   const { data: training, isLoading } = useTrainingDetail(id);
 
   if (isLoading || !training) {
@@ -23,6 +29,14 @@ export default function CompletedTrainingScreen() {
       </Screen>
     );
   }
+
+  // Prefer the live counts from the execute session (passed as route params).
+  // Fall back to server-side values so the screen still makes sense when
+  // re-opened later from archive.
+  const completed = completedCount != null ? Number(completedCount) : training.exercises?.length ?? 0;
+  const durationSec =
+    sessionDuration != null ? Number(sessionDuration) : training.actualDuration;
+  const points = completed * POINTS_PER_EXERCISE;
 
   const playersToShow = training.players?.slice(0, 6) ?? [];
   const extra = (training.players?.length ?? 0) - playersToShow.length;
@@ -45,7 +59,7 @@ export default function CompletedTrainingScreen() {
           <View className="items-center flex-1">
             <Icon name="time-outline" size={18} color="muted" />
             <Text variant="body" weight="bold" className="mt-1">
-              {formatDuration(training.actualDuration)}
+              {formatDuration(durationSec)}
             </Text>
             <Text variant="caption1" color="muted">
               Dauer
@@ -63,16 +77,16 @@ export default function CompletedTrainingScreen() {
           <View className="items-center flex-1">
             <Icon name="fitness-outline" size={18} color="muted" />
             <Text variant="body" weight="bold" className="mt-1">
-              {training.exercises?.length ?? 0}
+              {completed}
             </Text>
             <Text variant="caption1" color="muted">
-              Übungen
+              Abgehakt
             </Text>
           </View>
           <View className="items-center flex-1">
             <Icon name="star-outline" size={18} color="muted" />
-            <Text variant="body" weight="bold" className="mt-1">
-              {(training.exercises?.length ?? 0) * 10}
+            <Text variant="body" weight="bold" className="mt-1" color="primary">
+              {points}
             </Text>
             <Text variant="caption1" color="muted">
               Punkte
