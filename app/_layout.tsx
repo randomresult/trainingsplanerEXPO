@@ -54,7 +54,6 @@ function RootLayoutNav() {
       <Stack.Screen
         name="exercise-picker"
         options={{
-          presentation: 'fullScreenModal',
           headerShown: true,
           headerStyle: { backgroundColor: '#0a0a0f' },
           headerTintColor: '#fff',
