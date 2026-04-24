@@ -53,3 +53,6 @@ export type { FilterChipProps } from './FilterChip';
 
 export { Skeleton, SkeletonLine, SkeletonPill } from './Skeleton';
 export { SkeletonCard, SkeletonList, SkeletonDetail } from './SkeletonCard';
+
+export { EmptyState } from './EmptyState';
+export { ErrorState } from './ErrorState';
