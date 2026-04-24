@@ -132,6 +132,19 @@ export default function ExercisePickerScreen() {
               />
             </Pressable>
           ),
+          // Dezente Bestätigung im Header: sobald der User mindestens eine
+          // Übung hinzugefügt hat, sieht er den Counter statt nur der Toasts
+          // zu zählen. So weiß er beim Schließen, wie viele schon sitzen.
+          headerRight: () =>
+            sessionAddedIds.size > 0 ? (
+              <View className="px-3 py-1 rounded-full bg-success/15 flex-row items-center gap-1">
+                <Icon name="checkmark" size={14} color="success" />
+                <Text variant="caption1" weight="semibold" color="success">
+                  {sessionAddedIds.size}{' '}
+                  {sessionAddedIds.size === 1 ? 'hinzugefügt' : 'hinzugefügt'}
+                </Text>
+              </View>
+            ) : undefined,
         }}
       />
 

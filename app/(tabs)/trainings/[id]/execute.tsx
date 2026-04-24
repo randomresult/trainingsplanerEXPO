@@ -219,11 +219,12 @@ export default function ExecuteTrainingScreen() {
           const expanded = expandedId === ex.documentId;
           return (
             <Card key={ex.documentId} className="mb-3 gap-3">
-              {/* Row 1 — title, full width, wraps to 2 lines. Mirrors the
-                  ExerciseCard layout in the library so the same exercise
+              {/* Row 1 — title + pills, full width, wraps to 2 lines. Mirrors
+                  the ExerciseCard layout in the library so the same exercise
                   reads the same everywhere. */}
               <Pressable
                 onPress={() => setExpandedId(expanded ? null : ex.documentId)}
+                className="gap-2"
               >
                 <Text
                   variant="headline"
@@ -232,6 +233,7 @@ export default function ExecuteTrainingScreen() {
                 >
                   {ex.Name}
                 </Text>
+                <ExercisePills exercise={ex} />
               </Pressable>
 
               {/* Row 2 — interactive controls. Checkbox left, minutes next
@@ -283,9 +285,6 @@ export default function ExecuteTrainingScreen() {
 
               {expanded && (
                 <View className="pt-3 border-t border-border">
-                  <View className="mb-3">
-                    <ExercisePills exercise={ex} />
-                  </View>
                   {ex.Description && (
                     <Text variant="footnote" color="muted" className="mb-3">
                       {ex.Description}
