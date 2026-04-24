@@ -50,7 +50,7 @@ export function Swipeable({
     return (
       <Animated.View
         style={{ transform: [{ translateX: trans }], opacity }}
-        className="flex-row"
+        className="flex-row h-full"
       >
         <Pressable
           onPress={() => {
@@ -59,7 +59,7 @@ export function Swipeable({
             action();
           }}
           className={cn(
-            'justify-center items-center px-6',
+            'justify-center items-center px-6 rounded-r-2xl',
             isDestructive ? 'bg-destructive' : 'bg-muted'
           )}
         >
