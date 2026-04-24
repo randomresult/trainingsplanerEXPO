@@ -227,12 +227,12 @@ export default function ExercisePickerScreen() {
                         e.stopPropagation?.();
                         if (!isAdded && !isAdding) handleAdd(item.documentId);
                       }}
-                      hitSlop={8}
+                      hitSlop={10}
                       disabled={isAdded || isAdding}
                       className={
                         isAdded
-                          ? 'w-8 h-8 rounded-full bg-success/15 items-center justify-center'
-                          : 'w-8 h-8 rounded-full bg-primary/15 items-center justify-center'
+                          ? 'w-10 h-10 rounded-full bg-success/15 items-center justify-center'
+                          : 'w-10 h-10 rounded-full bg-primary/15 items-center justify-center'
                       }
                     >
                       {isAdding ? (
@@ -240,7 +240,7 @@ export default function ExercisePickerScreen() {
                       ) : (
                         <Icon
                           name={isAdded ? 'checkmark' : 'add'}
-                          size={18}
+                          size={20}
                           color={isAdded ? 'success' : 'primary'}
                         />
                       )}

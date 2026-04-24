@@ -176,10 +176,10 @@ export default function LibraryListScreen() {
                       e.stopPropagation?.();
                       trainingPickerRef.current?.present(item.documentId, item.Name);
                     }}
-                    hitSlop={8}
-                    className="w-8 h-8 rounded-full bg-primary/15 items-center justify-center"
+                    hitSlop={10}
+                    className="w-10 h-10 rounded-full bg-primary/15 items-center justify-center"
                   >
-                    <Icon name="add" size={18} color="primary" />
+                    <Icon name="add" size={20} color="primary" />
                   </Pressable>
                 }
               />

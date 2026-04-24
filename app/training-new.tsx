@@ -153,10 +153,10 @@ export default function NewTrainingScreen() {
                 trailing={
                   <Pressable
                     onPress={() => removeExercise(ex.documentId)}
-                    hitSlop={6}
-                    className="w-7 h-7 rounded-full bg-destructive/10 items-center justify-center"
+                    hitSlop={8}
+                    className="w-9 h-9 rounded-full bg-destructive/10 items-center justify-center"
                   >
-                    <Icon name="close" size={14} color="destructive" />
+                    <Icon name="close" size={16} color="destructive" />
                   </Pressable>
                 }
               />
@@ -194,10 +194,10 @@ export default function NewTrainingScreen() {
                   </Text>
                   <Pressable
                     onPress={() => removePlayer(p.documentId)}
-                    hitSlop={6}
-                    className="w-6 h-6 items-center justify-center"
+                    hitSlop={8}
+                    className="w-8 h-8 items-center justify-center"
                   >
-                    <Icon name="close" size={14} color="muted" />
+                    <Icon name="close" size={16} color="muted" />
                   </Pressable>
                 </View>
               );
