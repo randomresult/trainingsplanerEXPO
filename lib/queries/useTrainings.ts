@@ -5,6 +5,28 @@ import { useAuthStore } from '../store';
 import type { Training } from '../types/models';
 import type { StrapiResponse } from '../types/api';
 
+// Strapi v5 populate='*' only walks one level — training.exercises comes back
+// but exercises.focusareas (and the other tag relations) stay empty. Every
+// screen that renders exercise pills (execute, detail) needs them populated
+// nested, so we spell it out here once.
+const TRAINING_POPULATE = {
+  exercises: {
+    populate: {
+      focusareas: true,
+      playerlevels: true,
+      categories: true,
+      Steps: true,
+      Videos: true,
+    },
+  },
+  players: {
+    populate: {
+      Club: true,
+    },
+  },
+  clubs: true,
+};
+
 export const useTrainings = () => {
   const user = useAuthStore((s) => s.user);
   const clubId = user?.clubs?.[0]?.documentId;
@@ -15,7 +37,7 @@ export const useTrainings = () => {
       // Strapi v5 users-permissions rejects filters on relations. Fetch and
       // filter client-side.
       const { data } = await apiClient.get<StrapiResponse<Training[]>>('/trainings', {
-        params: { populate: '*' },
+        params: { populate: TRAINING_POPULATE },
       });
 
       return data.data
@@ -37,7 +59,7 @@ export const useTrainingDetail = (id: string) => {
     queryKey: ['trainings', id],
     queryFn: async () => {
       const { data } = await apiClient.get<StrapiResponse<Training>>(`/trainings/${id}`, {
-        params: { populate: '*' },
+        params: { populate: TRAINING_POPULATE },
       });
 
       return data.data;
