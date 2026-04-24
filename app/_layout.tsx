@@ -103,14 +103,16 @@ export default function RootLayout() {
         <BottomSheetModalProvider>
           <RootLayoutNav />
           <Toaster
-            position="top-center"
-            offset={60}
+            position="bottom-center"
+            offset={80}
             duration={3000}
             toastOptions={{
               style: {
                 backgroundColor: 'hsl(0, 0%, 13%)',
                 borderWidth: 1,
                 borderColor: 'hsl(0, 0%, 15%)',
+                maxWidth: 360,
+                width: '90%',
               },
             }}
           />
