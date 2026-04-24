@@ -72,9 +72,10 @@ export default function ExerciseDetailScreen() {
     setDirectAdding(true);
     try {
       await onAdd(exercise.documentId);
-      // Pop both the detail modal and the picker modal so the user lands
-      // back on the live-training / draft-form they came from.
-      router.dismissAll();
+      // Pop exactly two modals (detail + picker) so we land on the caller.
+      // dismissAll would also drop /training-new when the caller was the
+      // draft-creation flow, wiping the user's half-filled form.
+      router.dismiss(2);
     } finally {
       setDirectAdding(false);
     }
