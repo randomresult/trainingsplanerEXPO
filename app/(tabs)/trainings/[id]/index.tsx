@@ -1,6 +1,6 @@
 import { Platform, View, ActivityIndicator, Alert, Pressable } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
-import { Screen, Text, Button, Card, Badge, Icon, PlayerCard, toast } from '@/components/ui';
+import { Screen, Text, Button, Card, Badge, Icon, PlayerCard, toast, SkeletonDetail, SkeletonList } from '@/components/ui';
 import {
   useTrainingDetail,
   useDeleteTraining,
@@ -131,9 +131,10 @@ export default function TrainingDetailScreen() {
 
   if (isLoading) {
     return (
-      <Screen>
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color={COLORS.primary} />
+      <Screen scroll padding="base">
+        <SkeletonDetail />
+        <View className="mt-6">
+          <SkeletonList count={3} />
         </View>
       </Screen>
     );
