@@ -19,7 +19,7 @@ import {
   Pressable,
 } from 'react-native';
 import { router } from 'expo-router';
-import { Screen, Text, ExerciseCard, Icon, FilterChip } from '@/components/ui';
+import { Screen, Text, ExerciseCard, Icon, FilterChip, SkeletonList } from '@/components/ui';
 import { useExercises } from '@/lib/queries/useExercises';
 import { COLORS } from '@/lib/theme';
 
@@ -135,8 +135,8 @@ export default function LibraryListScreen() {
       </View>
 
       {isLoading ? (
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color={COLORS.primary} />
+        <View className="px-5">
+          <SkeletonList count={6} />
         </View>
       ) : (
         <Pressable onPress={Keyboard.dismiss} className="flex-1">

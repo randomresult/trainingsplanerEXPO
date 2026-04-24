@@ -8,6 +8,8 @@ import {
   Icon,
   Button,
   ExercisePills,
+  SkeletonDetail,
+  SkeletonLine,
 } from '@/components/ui';
 import { useExerciseDetail } from '@/lib/queries/useExercises';
 import {
@@ -49,9 +51,14 @@ export default function ExerciseDetailScreen() {
     return (
       <Screen>
         <Stack.Screen options={headerOptions} />
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color={COLORS.primary} />
-        </View>
+        <Screen scroll padding="base">
+          <SkeletonDetail />
+          <View className="mt-6">
+            <SkeletonLine width="30%" height={20} className="mb-3" />
+            <SkeletonLine width="100%" height={80} className="mb-4" />
+            <SkeletonLine width="100%" height={80} />
+          </View>
+        </Screen>
       </Screen>
     );
   }
