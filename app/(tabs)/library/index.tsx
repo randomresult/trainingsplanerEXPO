@@ -17,20 +17,30 @@ import {
   ActivityIndicator,
   Keyboard,
   Pressable,
+  RefreshControl,
 } from 'react-native';
 import { router } from 'expo-router';
 import { Screen, Text, ExerciseCard, Icon, FilterChip, SkeletonList } from '@/components/ui';
 import { useExercises } from '@/lib/queries/useExercises';
+import { useQueryClient } from '@tanstack/react-query';
 import { COLORS } from '@/lib/theme';
 
 export default function LibraryListScreen() {
   const [search, setSearch] = useState('');
   const { data: exercises, isLoading } = useExercises(search);
+  const queryClient = useQueryClient();
+  const [refreshing, setRefreshing] = useState(false);
 
   const trainingPickerRef = useRef<TrainingPickerSheetRef>(null);
 
   const [filters, setFilters] = useState<LibraryFilterState>(EMPTY_FILTERS);
   const filterSheetRef = useRef<LibraryFilterSheetRef>(null);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await queryClient.invalidateQueries({ queryKey: ['exercises'] });
+    setRefreshing(false);
+  };
 
   const tagNames = (rel: any[] | undefined) =>
     (rel ?? []).map((t) => t?.Name).filter(Boolean) as string[];
@@ -145,6 +155,9 @@ export default function LibraryListScreen() {
             keyExtractor={(item: any) => item.documentId}
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={{ padding: 20, paddingBottom: 40, gap: 12 }}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />
+            }
             ListEmptyComponent={
               <View className="items-center justify-center py-12">
                 <Icon name="search-outline" size={40} color="muted" />
