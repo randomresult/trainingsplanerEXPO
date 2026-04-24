@@ -26,10 +26,11 @@ export default function ExerciseDetailScreen() {
   // a single-add flow (live-training or training-new) — the CTA should feed
   // that flow directly rather than asking "which training?" again.
   const onAdd = usePickModeStore((s) => s.onAdd);
+  const addContextLabel = usePickModeStore((s) => s.addContextLabel);
   const [directAdding, setDirectAdding] = useState(false);
-  const [directAdded, setDirectAdded] = useState(false);
 
   const headerOptions = {
+    headerShown: true as const,
     title: 'Übung',
     // Modal has no native back chevron on either platform — provide one
     // explicitly so the user always sees a way out.
@@ -67,11 +68,13 @@ export default function ExerciseDetailScreen() {
   }
 
   const handleDirectAdd = async () => {
-    if (!onAdd || directAdding || directAdded) return;
+    if (!onAdd || directAdding) return;
     setDirectAdding(true);
     try {
       await onAdd(exercise.documentId);
-      setDirectAdded(true);
+      // Pop both the detail modal and the picker modal so the user lands
+      // back on the live-training / draft-form they came from.
+      router.dismissAll();
     } finally {
       setDirectAdding(false);
     }
@@ -142,12 +145,11 @@ export default function ExerciseDetailScreen() {
           <Button
             size="lg"
             className="w-full"
-            leftIcon={directAdded ? 'checkmark' : 'add'}
+            leftIcon="add"
             loading={directAdding}
-            disabled={directAdded}
             onPress={handleDirectAdd}
           >
-            {directAdded ? 'Hinzugefügt' : 'Zum Training hinzufügen'}
+            {addContextLabel ?? 'Zum Training hinzufügen'}
           </Button>
         ) : (
           <Button

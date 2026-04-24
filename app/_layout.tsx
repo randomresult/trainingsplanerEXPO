@@ -55,6 +55,7 @@ function RootLayoutNav() {
         name="exercise-picker"
         options={{
           presentation: 'modal',
+          headerShown: true,
           headerStyle: { backgroundColor: '#0a0a0f' },
           headerTintColor: '#fff',
           headerShadowVisible: false,
@@ -64,6 +65,7 @@ function RootLayoutNav() {
         name="training-new"
         options={{
           presentation: 'modal',
+          headerShown: true,
           headerStyle: { backgroundColor: '#0a0a0f' },
           headerTintColor: '#fff',
           headerShadowVisible: false,
@@ -73,6 +75,7 @@ function RootLayoutNav() {
         name="player-picker"
         options={{
           presentation: 'modal',
+          headerShown: true,
           headerStyle: { backgroundColor: '#0a0a0f' },
           headerTintColor: '#fff',
           headerShadowVisible: false,
@@ -82,6 +85,7 @@ function RootLayoutNav() {
         name="exercise-detail/[id]"
         options={{
           presentation: 'modal',
+          headerShown: true,
           headerStyle: { backgroundColor: '#0a0a0f' },
           headerTintColor: '#fff',
           headerShadowVisible: false,

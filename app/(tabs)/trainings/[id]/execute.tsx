@@ -48,14 +48,17 @@ export default function ExecuteTrainingScreen() {
   const handleAddExercises = () => {
     if (!training) return;
     const existingIds = training.exercises?.map((e) => e.documentId) ?? [];
-    usePickModeStore.getState().startAdd(async (exerciseId) => {
-      try {
-        await addExercise.mutateAsync({ trainingId: id, exerciseId });
-        toast.success('Übung hinzugefügt');
-      } catch {
-        toast.error('Übung konnte nicht hinzugefügt werden');
-      }
-    });
+    usePickModeStore.getState().startAdd(
+      async (exerciseId) => {
+        try {
+          await addExercise.mutateAsync({ trainingId: id, exerciseId });
+          toast.success('Übung hinzugefügt');
+        } catch {
+          toast.error('Übung konnte nicht hinzugefügt werden');
+        }
+      },
+      'Zum Live-Training hinzufügen'
+    );
     router.push({
       pathname: '/exercise-picker',
       params: { excludeIds: existingIds.join(',') },

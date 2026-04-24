@@ -19,9 +19,11 @@ interface PickModeStore {
 
   // Single-add state
   onAdd?: OnAddCallback;
+  /** Label for the detail-screen CTA in single-add mode. Default: "Zum Training hinzufügen". */
+  addContextLabel?: string;
 
   start: (initial: string[], onConfirm: OnConfirmCallback) => void;
-  startAdd: (onAdd: OnAddCallback) => void;
+  startAdd: (onAdd: OnAddCallback, addContextLabel?: string) => void;
   toggle: (id: string) => void;
   confirm: () => Promise<void>;
   cancel: () => void;
@@ -39,12 +41,14 @@ export const usePickModeStore = create<PickModeStore>((set, get) => ({
       selectedIds: initial,
       onConfirm,
       onAdd: undefined,
+      addContextLabel: undefined,
     }),
 
-  startAdd: (onAdd) =>
+  startAdd: (onAdd, addContextLabel) =>
     set({
       active: true,
       onAdd,
+      addContextLabel,
       onConfirm: undefined,
       selectedIds: [],
     }),
@@ -76,5 +80,6 @@ export const usePickModeStore = create<PickModeStore>((set, get) => ({
       selectedIds: [],
       onConfirm: undefined,
       onAdd: undefined,
+      addContextLabel: undefined,
     }),
 }));
