@@ -119,22 +119,33 @@ Library screen gets a toggle above the list: **Übungen | Methodische Reihen**
 - Methodische Reihen: new list of MÜR cards
 
 ### MÜR List
-Larger, visually engaging cards (bigger than exercise cards). Each card shows:
-- Background image or category-based visual
-- MÜR name (prominent)
-- Goal ("Ziel: …")
-- Exercise count ("6 Übungen")
-- Badge/reward indicator if player has completed this MÜR
+Larger, visually engaging cards (bigger than exercise cards). **Chosen design: C-1** (see `mockups/series-card-variants.html`).
 
-Tapping a card → MÜR detail screen (no in-list accordion — detail screen is the right home for exercise list).
+Card layout:
+- **Top row**: category chip (left) · progress pill (right, hidden when 0 exercises done)
+  - Partial: lime pill `"3 / 6"` 
+  - Complete: green pill `"✓ Fertig"`
+- **Body**: series name (prominent, large) · goal text (muted, 2 lines max)
+- **Divider**
+- **Bottom row**: exercise count `"6 Übungen"` (left) · circular `+` button (right)
+- Subtle ghost-number watermark (exercise count, very low opacity behind the card)
+
+Interactions:
+- Tap card body → series detail screen
+- Tap `+` button → `TrainingPickerSheet` (add whole series to a training, same sheet as exercises)
+
+Progress pill derives from `PlayerProgress`: count of series exercises the current user has ever completed across all trainings.
 
 ### MÜR Detail Screen
 Route: `app/(tabs)/library/muers/[id].tsx`
 
 - Hero area: MÜR name + goal + description
-- Badge/reward shown if player has completed this MÜR
-- Ordered list of exercises (numbered 1–6), each tappable → exercise detail
-- "Ganze Reihe zum Training hinzufügen" CTA (only in pick mode)
+- Overall progress indicator (`3 / 6 abgeschlossen`)
+- Ordered list of exercises (numbered 1–N), each row shows:
+  - Exercise name
+  - Completion indicator (✓ done / ○ not yet) — derived from PlayerProgress across all trainings
+  - Tappable → exercise detail screen
+- `+` button / "Ganze Reihe hinzufügen" CTA always visible (opens TrainingPickerSheet)
 
 ### MÜR exercises in Übungen tab
 MÜR exercises appear normally in the Übungen list. A small generic indicator (icon or label "MÜR") marks them as part of a learning path — no MÜR name shown inline to keep the list clean.

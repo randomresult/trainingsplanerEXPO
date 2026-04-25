@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lernpfade — Card Variants</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Serif+Display:ital@0;1&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #141418;
+    --surface2: #1c1c22;
+    --border: rgba(255,255,255,0.07);
+    --text: #f0f2f5;
+    --text-muted: #999999;
+    --text-dim: #3d3d4a;
+    --primary: #92e846;
+    --primary-soft: rgba(146,232,70,0.12);
+    --success: #30d158;
+    --success-soft: rgba(48,209,88,0.12);
+    --amber: #f59e0b;
+    --amber-soft: rgba(245,158,11,0.12);
+  }
+
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    padding: 40px 24px 80px;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 48px;
+    line-height: 1.5;
+  }
+
+  .section-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    padding-left: 2px;
+  }
+
+  .variants-row {
+    display: flex;
+    gap: 32px;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    margin-bottom: 64px;
+  }
+
+  .col {
+    width: 300px;
+    flex-shrink: 0;
+  }
+
+  .variant-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+    padding-left: 2px;
+  }
+
+  .section-note {
+    font-size: 11.5px;
+    color: #555562;
+    margin-top: 10px;
+    padding-left: 2px;
+    line-height: 1.5;
+  }
+
+  /* ─── SHARED CARD BASE ───────────────────────────────────────── */
+  .card {
+    background: var(--surface);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(146,232,70,0.08);
+  }
+
+  /* Ghost number watermark */
+  .ghost-num {
+    position: absolute;
+    top: -14px; right: -6px;
+    font-family: 'DM Serif Display', serif;
+    font-size: 130px;
+    font-style: italic;
+    color: rgba(146,232,70,0.045);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+  }
+
+  .card-inner {
+    padding: 20px 18px 18px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Top row: category chip + progress indicator */
+  .top-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    gap: 8px;
+  }
+
+  .cat-chip {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--amber);
+    background: var(--amber-soft);
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 6px;
+    padding: 3px 8px;
+    flex-shrink: 0;
+  }
+
+  /* Progress states */
+  .progress-none { display: none; }
+
+  .progress-partial {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--primary);
+    background: var(--primary-soft);
+    border: 1px solid rgba(146,232,70,0.18);
+    border-radius: 20px;
+    padding: 3px 10px;
+    flex-shrink: 0;
+  }
+
+  .progress-done {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--success);
+    background: var(--success-soft);
+    border: 1px solid rgba(48,209,88,0.2);
+    border-radius: 20px;
+    padding: 3px 10px;
+    flex-shrink: 0;
+  }
+
+  .series-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    line-height: 1.15;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .series-goal {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 18px;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin-bottom: 14px;
+  }
+
+  .bottom-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .count-stat {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+  .count-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+  }
+  .count-unit {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  /* C base: text CTA */
+  .cta-text {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* C-1: circular + button */
+  .add-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--primary-soft);
+    border: 1px solid rgba(146,232,70,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    color: var(--primary);
+    font-weight: 300;
+    line-height: 1;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .add-btn:hover { background: rgba(146,232,70,0.2); }
+
+  /* C-2: progress bar at bottom */
+  .progress-bar-wrap {
+    padding: 0 18px 16px;
+    position: relative;
+    z-index: 1;
+  }
+  .progress-bar-track {
+    height: 3px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--primary), #c8f570);
+  }
+  .progress-bar-fill.done {
+    background: linear-gradient(90deg, var(--success), #5ee87a);
+  }
+  .progress-bar-label {
+    font-size: 10.5px;
+    color: var(--text-dim);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+  }
+  .progress-bar-label .val {
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .progress-bar-label.done .val {
+    color: var(--success);
+  }
+</style>
+</head>
+<body>
+
+<h1>Lernpfade — Series Card</h1>
+<p class="subtitle">Variant C selected. Two layout options to decide between.<br>Each shown in three progress states: 0 done · 3/6 partial · 6/6 complete.</p>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- C-1: tap card = detail · + button = add to training          -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+
+<div class="section-label">C-1 — Pill + Add button</div>
+<div class="variants-row">
+
+  <!-- 0/6 -->
+  <div class="col">
+    <div class="variant-label">Nicht gestartet</div>
+    <div class="card">
+      <div class="ghost-num">6</div>
+      <div class="card-inner">
+        <div class="top-row">
+          <span class="cat-chip">Technik</span>
+          <!-- no progress pill -->
+        </div>
+        <div class="series-name">Vorhand Topspin auf Unterschnitt</div>
+        <div class="series-goal">Systematischer Aufbau vom Schattenschlag bis zur wettkampfnahen Anwendung.</div>
+        <div class="divider"></div>
+        <div class="bottom-row">
+          <div class="count-stat">
+            <span class="count-num">6</span>
+            <span class="count-unit">Übungen</span>
+          </div>
+          <div class="add-btn">+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3/6 -->
+  <div class="col">
+    <div class="variant-label">3 / 6 abgeschlossen</div>
+    <div class="card">
+      <div class="ghost-num">6</div>
+      <div class="card-inner">
+        <div class="top-row">
+          <span class="cat-chip">Technik</span>
+          <span class="progress-partial">3 / 6</span>
+        </div>
+        <div class="series-name">Vorhand Topspin auf Unterschnitt</div>
+        <div class="series-goal">Systematischer Aufbau vom Schattenschlag bis zur wettkampfnahen Anwendung.</div>
+        <div class="divider"></div>
+        <div class="bottom-row">
+          <div class="count-stat">
+            <span class="count-num">6</span>
+            <span class="count-unit">Übungen</span>
+          </div>
+          <div class="add-btn">+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6/6 -->
+  <div class="col">
+    <div class="variant-label">Abgeschlossen</div>
+    <div class="card">
+      <div class="ghost-num">6</div>
+      <div class="card-inner">
+        <div class="top-row">
+          <span class="cat-chip">Technik</span>
+          <span class="progress-done">✓ Fertig</span>
+        </div>
+        <div class="series-name">Vorhand Topspin auf Unterschnitt</div>
+        <div class="series-goal">Systematischer Aufbau vom Schattenschlag bis zur wettkampfnahen Anwendung.</div>
+        <div class="divider"></div>
+        <div class="bottom-row">
+          <div class="count-stat">
+            <span class="count-num">6</span>
+            <span class="count-unit">Übungen</span>
+          </div>
+          <div class="add-btn">+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<p class="section-note">Tapping the card body → opens series detail. The + button → adds whole series to a training (TrainingPickerSheet).<br>Progress pill appears only when started. Clean when untouched.</p>
+
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- C-2: tap card = detail · progress bar at bottom              -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+
+<div class="section-label" style="margin-top: 56px;">C-2 — Progress bar + text CTA</div>
+<div class="variants-row">
+
+  <!-- 0/6 -->
+  <div class="col">
+    <div class="variant-label">Nicht gestartet</div>
+    <div class="card">
+      <div class="ghost-num">6</div>
+      <div class="card-inner">
+        <div class="top-row">
+          <span class="cat-chip">Technik</span>
+        </div>
+        <div class="series-name">Vorhand Topspin auf Unterschnitt</div>
+        <div class="series-goal">Systematischer Aufbau vom Schattenschlag bis zur wettkampfnahen Anwendung.</div>
+        <div class="divider"></div>
+        <div class="bottom-row">
+          <div class="count-stat">
+            <span class="count-num">6</span>
+            <span class="count-unit">Übungen</span>
+          </div>
+          <span class="cta-text">Öffnen →</span>
+        </div>
+      </div>
+      <div class="progress-bar-wrap" style="padding-top:0">
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" style="width:0%"></div>
+        </div>
+        <div class="progress-bar-label">
+          <span>Fortschritt</span>
+          <span class="val">0 / 6</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3/6 -->
+  <div class="col">
+    <div class="variant-label">3 / 6 abgeschlossen</div>
+    <div class="card">
+      <div class="ghost-num">6</div>
+      <div class="card-inner">
+        <div class="top-row">
+          <span class="cat-chip">Technik</span>
+        </div>
+        <div class="series-name">Vorhand Topspin auf Unterschnitt</div>
+        <div class="series-goal">Systematischer Aufbau vom Schattenschlag bis zur wettkampfnahen Anwendung.</div>
+        <div class="divider"></div>
+        <div class="bottom-row">
+          <div class="count-stat">
+            <span class="count-num">6</span>
+            <span class="count-unit">Übungen</span>
+          </div>
+          <span class="cta-text">Öffnen →</span>
+        </div>
+      </div>
+      <div class="progress-bar-wrap" style="padding-top:0">
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" style="width:50%"></div>
+        </div>
+        <div class="progress-bar-label">
+          <span>Fortschritt</span>
+          <span class="val">3 / 6</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6/6 -->
+  <div class="col">
+    <div class="variant-label">Abgeschlossen</div>
+    <div class="card">
+      <div class="ghost-num">6</div>
+      <div class="card-inner">
+        <div class="top-row">
+          <span class="cat-chip">Technik</span>
+        </div>
+        <div class="series-name">Vorhand Topspin auf Unterschnitt</div>
+        <div class="series-goal">Systematischer Aufbau vom Schattenschlag bis zur wettkampfnahen Anwendung.</div>
+        <div class="divider"></div>
+        <div class="bottom-row">
+          <div class="count-stat">
+            <span class="count-num">6</span>
+            <span class="count-unit">Übungen</span>
+          </div>
+          <span class="cta-text" style="color: var(--success)">✓ Fertig</span>
+        </div>
+      </div>
+      <div class="progress-bar-wrap" style="padding-top:0">
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill done" style="width:100%"></div>
+        </div>
+        <div class="progress-bar-label done">
+          <span>Abgeschlossen</span>
+          <span class="val">6 / 6</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<p class="section-note">Progress bar always visible at the bottom — scannable across many cards. No separate + button; adding happens via detail screen or Library + button.<br>Cleaner surface but less direct add affordance.</p>
+
+</body>
+</html>
