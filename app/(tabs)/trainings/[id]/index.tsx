@@ -1,6 +1,6 @@
 import { Platform, View, ActivityIndicator, Alert, Pressable } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
-import { Screen, Text, Button, Card, Badge, Icon, PlayerCard, toast } from '@/components/ui';
+import { Screen, Text, Button, Card, Badge, Icon, PlayerCard, toast, SkeletonDetail, SkeletonList } from '@/components/ui';
 import {
   useTrainingDetail,
   useDeleteTraining,
@@ -131,9 +131,10 @@ export default function TrainingDetailScreen() {
 
   if (isLoading) {
     return (
-      <Screen>
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color={COLORS.primary} />
+      <Screen scroll padding="base">
+        <SkeletonDetail />
+        <View className="mt-6">
+          <SkeletonList count={3} />
         </View>
       </Screen>
     );
@@ -203,9 +204,10 @@ export default function TrainingDetailScreen() {
               <Pressable
                 onPress={() => confirmRemoveExercise(exercise.documentId, exercise.Name)}
                 disabled={removeExercise.isPending}
-                className="ml-3 w-8 h-8 rounded-full bg-destructive/10 items-center justify-center active:opacity-70 disabled:opacity-40"
+                hitSlop={8}
+                className="ml-3 w-11 h-11 rounded-full bg-destructive/10 items-center justify-center active:opacity-70 disabled:opacity-40"
               >
-                <Icon name="close" size={16} color="destructive" />
+                <Icon name="close" size={20} color="destructive" />
               </Pressable>
             )}
           </Card>

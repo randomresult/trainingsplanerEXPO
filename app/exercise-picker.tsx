@@ -132,21 +132,7 @@ export default function ExercisePickerScreen() {
               />
             </Pressable>
           ),
-          // Dezente Bestätigung im Header: sobald der User mindestens eine
-          // Übung hinzugefügt hat, sieht er den Counter statt nur der Toasts
-          // zu zählen. So weiß er beim Schließen, wie viele schon sitzen.
-          // Compact badge — long text like "N hinzugefügt" can clip on iOS
-          // modal headers where the right slot is narrow. "+N" is the same
-          // information in a third of the space.
-          headerRight: () =>
-            sessionAddedIds.size > 0 ? (
-              <View className="px-2.5 py-1 rounded-full bg-success/20 flex-row items-center gap-1 mr-2">
-                <Icon name="checkmark" size={12} color="success" />
-                <Text variant="caption1" weight="bold" color="success">
-                  {sessionAddedIds.size}
-                </Text>
-              </View>
-            ) : undefined,
+          headerRight: undefined,
         }}
       />
 
@@ -241,12 +227,12 @@ export default function ExercisePickerScreen() {
                         e.stopPropagation?.();
                         if (!isAdded && !isAdding) handleAdd(item.documentId);
                       }}
-                      hitSlop={8}
+                      hitSlop={10}
                       disabled={isAdded || isAdding}
                       className={
                         isAdded
-                          ? 'w-8 h-8 rounded-full bg-success/15 items-center justify-center'
-                          : 'w-8 h-8 rounded-full bg-primary/15 items-center justify-center'
+                          ? 'w-10 h-10 rounded-full bg-success/15 items-center justify-center'
+                          : 'w-10 h-10 rounded-full bg-primary/15 items-center justify-center'
                       }
                     >
                       {isAdding ? (
@@ -254,7 +240,7 @@ export default function ExercisePickerScreen() {
                       ) : (
                         <Icon
                           name={isAdded ? 'checkmark' : 'add'}
-                          size={18}
+                          size={20}
                           color={isAdded ? 'success' : 'primary'}
                         />
                       )}

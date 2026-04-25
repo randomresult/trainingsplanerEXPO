@@ -54,7 +54,6 @@ function RootLayoutNav() {
       <Stack.Screen
         name="exercise-picker"
         options={{
-          presentation: 'modal',
           headerShown: true,
           headerStyle: { backgroundColor: '#0a0a0f' },
           headerTintColor: '#fff',
@@ -104,13 +103,13 @@ export default function RootLayout() {
           <RootLayoutNav />
           <Toaster
             position="top-center"
-            offset={60}
+            offset={120}
             duration={3000}
             toastOptions={{
               style: {
                 backgroundColor: 'hsl(0, 0%, 13%)',
                 borderWidth: 1,
-                borderColor: 'hsl(0, 0%, 15%)',
+                borderColor: 'hsl(0, 0%, 15%)'
               },
             }}
           />

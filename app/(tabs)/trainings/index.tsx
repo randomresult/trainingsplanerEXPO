@@ -1,20 +1,30 @@
-import { useEffect, useMemo, useRef } from 'react';
-import { View, FlatList, ActivityIndicator, Pressable } from 'react-native';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { View, FlatList, ActivityIndicator, Pressable, RefreshControl } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import {
   Screen,
   Text,
   Icon,
   TrainingCard,
+  SkeletonList,
 } from '@/components/ui';
 import { useTrainings } from '@/lib/queries/useTrainings';
+import { useQueryClient } from '@tanstack/react-query';
 import { COLORS } from '@/lib/theme';
 import type { Training } from '@/lib/types/models';
 
 export default function TrainingsScreen() {
   const { data: trainings, isLoading } = useTrainings();
+  const queryClient = useQueryClient();
+  const [refreshing, setRefreshing] = useState(false);
   const listRef = useRef<FlatList>(null);
   const { scrollToId } = useLocalSearchParams<{ scrollToId?: string }>();
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await queryClient.invalidateQueries({ queryKey: ['trainings'] });
+    setRefreshing(false);
+  };
 
   const upcoming = useMemo(() => {
     if (!trainings) return [];
@@ -67,8 +77,8 @@ export default function TrainingsScreen() {
       {renderHeader()}
 
       {isLoading ? (
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color={COLORS.primary} />
+        <View className="px-5">
+          <SkeletonList count={5} />
         </View>
       ) : upcoming.length === 0 ? (
         <View className="flex-1 items-center justify-center px-5">
@@ -92,6 +102,9 @@ export default function TrainingsScreen() {
           keyExtractor={(item) => item.documentId}
           renderItem={renderItem}
           contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />
+          }
           onScrollToIndexFailed={({ index }) => {
             setTimeout(() => {
               listRef.current?.scrollToIndex({ index, animated: true });

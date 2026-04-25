@@ -17,20 +17,30 @@ import {
   ActivityIndicator,
   Keyboard,
   Pressable,
+  RefreshControl,
 } from 'react-native';
 import { router } from 'expo-router';
-import { Screen, Text, ExerciseCard, Icon, FilterChip } from '@/components/ui';
+import { Screen, Text, ExerciseCard, Icon, FilterChip, SkeletonList } from '@/components/ui';
 import { useExercises } from '@/lib/queries/useExercises';
+import { useQueryClient } from '@tanstack/react-query';
 import { COLORS } from '@/lib/theme';
 
 export default function LibraryListScreen() {
   const [search, setSearch] = useState('');
   const { data: exercises, isLoading } = useExercises(search);
+  const queryClient = useQueryClient();
+  const [refreshing, setRefreshing] = useState(false);
 
   const trainingPickerRef = useRef<TrainingPickerSheetRef>(null);
 
   const [filters, setFilters] = useState<LibraryFilterState>(EMPTY_FILTERS);
   const filterSheetRef = useRef<LibraryFilterSheetRef>(null);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await queryClient.invalidateQueries({ queryKey: ['exercises'] });
+    setRefreshing(false);
+  };
 
   const tagNames = (rel: any[] | undefined) =>
     (rel ?? []).map((t) => t?.Name).filter(Boolean) as string[];
@@ -135,8 +145,8 @@ export default function LibraryListScreen() {
       </View>
 
       {isLoading ? (
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color={COLORS.primary} />
+        <View className="px-5">
+          <SkeletonList count={6} />
         </View>
       ) : (
         <Pressable onPress={Keyboard.dismiss} className="flex-1">
@@ -145,6 +155,9 @@ export default function LibraryListScreen() {
             keyExtractor={(item: any) => item.documentId}
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={{ padding: 20, paddingBottom: 40, gap: 12 }}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />
+            }
             ListEmptyComponent={
               <View className="items-center justify-center py-12">
                 <Icon name="search-outline" size={40} color="muted" />
@@ -163,10 +176,10 @@ export default function LibraryListScreen() {
                       e.stopPropagation?.();
                       trainingPickerRef.current?.present(item.documentId, item.Name);
                     }}
-                    hitSlop={8}
-                    className="w-8 h-8 rounded-full bg-primary/15 items-center justify-center"
+                    hitSlop={10}
+                    className="w-10 h-10 rounded-full bg-primary/15 items-center justify-center"
                   >
-                    <Icon name="add" size={18} color="primary" />
+                    <Icon name="add" size={20} color="primary" />
                   </Pressable>
                 }
               />
