@@ -1,5 +1,49 @@
 # Motion & Polish C2 Implementation Plan
 
+## ✅ SHIPPED — 2026-04-25
+
+**PR #6** merged to main (commit 195f8ac).
+
+### What Shipped
+
+- ✅ **Skeleton loaders** (`Skeleton`, `SkeletonLine`, `SkeletonPill`, `SkeletonCard`, `SkeletonList`, `SkeletonDetail`)
+  - Shimmer animation (1200ms loop)
+  - Integrated in Library, Trainings list, Training detail, Live training, Exercise detail
+- ✅ **Pull-to-refresh** (Library + Trainings) via `RefreshControl` + TanStack Query invalidation
+- ✅ **Empty/Error states** (`EmptyState`, `ErrorState`) with spring animations
+- ✅ **Shared animation configs** (`lib/animations.ts`)
+- ✅ **UX improvements**:
+  - Larger touch targets: +/- buttons increased 25% (36px→44px, 32px→40px, icons 16px→20px)
+  - Filter navigation fix: Push instead of modal to fix iOS nested modal bug
+  - Counter badge removed from exercise-picker (confusing UX)
+
+### What Was Skipped
+
+- ❌ **Swipe-to-delete**: Implemented and tested (commits 718831b, 04f0e90, 2f6af22), but reverted (3c1b052) after UX testing — visual cohesion with cards didn't work well, kept standard button-based removal
+- ❌ **Header blur on scroll**: Not implemented (deferred to future cycle)
+- ❌ **Layout animations**: Not implemented (no list entry animations)
+
+### Commits
+
+- dfa85f9 feat(ui): add shared animation configs
+- b2b66ed feat(ui): add skeleton loader primitives
+- 37ee42f feat(library): add skeleton loaders to list and detail
+- 3992d61 feat(trainings): add skeleton loaders to list and detail
+- 56a9555 feat(lists): add pull-to-refresh to library and trainings
+- 66c393f fix(exercise-picker): remove confusing success counter badge from header
+- 35f0d81 ux(buttons): increase +/- button sizes for easier tapping (40px add, 36px remove)
+- 947928f fix(toast): move to bottom above tab bar, reduce width to 90% (max 360px) — **reverted by user**
+- fcaf528 fix(exercise-picker): use fullScreenModal to fix nested filter bottom-sheet on iOS
+- efce7d4 fix(exercise-picker): use push navigation instead of modal to fix filter bottom-sheet
+- b4b7376 feat(ui): add EmptyState and ErrorState components with spring animation
+- 718831b feat(ui): add Swipeable component for swipe-to-delete UX
+- 04f0e90 feat(ux): integrate swipe-to-delete across all exercise/player lists
+- 2f6af22 fix(swipeable): match card border radius for visual cohesion
+- 3c1b052 **Revert** "feat(ui): add Swipeable component for swipe-to-delete UX"
+- 7b61ccc ux(buttons): increase remove button size for better touch targets
+
+---
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add spring animations, skeleton loaders, header blur, and pull-to-refresh across the app. This is a polish-only cycle — no new features, no data model changes. **Swipe gestures excluded** (keeping card-based UI).

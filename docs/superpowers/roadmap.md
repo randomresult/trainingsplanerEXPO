@@ -5,18 +5,25 @@
 
 ## Reihenfolge
 
-### 1. Motion / Polish Cycle (C2)
-**Warum zuerst:** Klein, keine Datenmodell-Änderungen, sofort sichtbarer iOS-Feel-Gewinn. Niedriges Risiko, gute Momentum-Belohnung nach dem Library-Ship.
+### ✅ 1. Motion / Polish Cycle (C2) — SHIPPED 2026-04-25
+**PR #6** merged to main.
 
-**Scope** (aus `specs/2026-04-21-design-system-foundation-c1-design.md` Out-of-Scope-Sektion, zu migrieren):
-- Swipe-to-Delete auf Cards (Trainings, inline Übungen/Spieler)
-- Skeleton-Loader statt Spinner
-- Header-Blur beim Scroll
-- Pull-to-Refresh auf Listen
+**Was shipped:**
+- ✅ Skeleton-Loader mit Shimmer-Animation (Library, Trainings, Exercise Detail)
+- ✅ Pull-to-Refresh (Library, Trainings)
+- ✅ Empty/Error States mit Spring-Animationen
+- ✅ Shared Animation Configs (`lib/animations.ts`)
+- ✅ Größere Touch-Targets für +/- Buttons
+- ✅ Filter-Navigation-Fix (Push statt Modal für iOS)
+- ✅ Counter-Badge entfernt (Exercise-Picker)
 
-**Wird wahrscheinlich zu:** Eigenem Plan `plans/YYYY-MM-DD-motion-polish-c2.md`.
+**Was skipped:**
+- ❌ Swipe-to-Delete (nach Test reverted — UX nicht überzeugend)
+- ❌ Header-Blur beim Scroll (nicht implementiert)
 
-### 2. Trainings-Listen-Skalierung + Recurring-Trainings
+**Docs:** `specs/2026-04-25-motion-polish-c2-design.md`, `plans/2026-04-25-motion-polish-c2.md`
+
+### 2. Trainings-Listen-Skalierung + Recurring-Trainings — NEXT UP
 **Warum als nächstes:** Sobald Recurring-Trainings kommen, explodiert die Liste. Beides zusammen designen, damit die Wochenansicht und das Schedule-Template-Datenmodell zueinander passen.
 
 **Scope:**
