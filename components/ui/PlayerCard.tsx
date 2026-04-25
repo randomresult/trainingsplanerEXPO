@@ -60,9 +60,9 @@ export function PlayerCard({
             triggerHaptic('medium');
             onRemove();
           }}
-          className="w-8 h-8 rounded-full bg-destructive/10 items-center justify-center"
+          className="w-10 h-10 rounded-full bg-destructive/10 items-center justify-center"
         >
-          <Icon name="close" size={16} color="destructive" />
+          <Icon name="close" size={20} color="destructive" />
         </Pressable>
       ) : (
         trailing

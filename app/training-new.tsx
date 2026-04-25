@@ -154,9 +154,9 @@ export default function NewTrainingScreen() {
                   <Pressable
                     onPress={() => removeExercise(ex.documentId)}
                     hitSlop={8}
-                    className="w-9 h-9 rounded-full bg-destructive/10 items-center justify-center"
+                    className="w-11 h-11 rounded-full bg-destructive/10 items-center justify-center"
                   >
-                    <Icon name="close" size={16} color="destructive" />
+                    <Icon name="close" size={20} color="destructive" />
                   </Pressable>
                 }
               />
@@ -195,9 +195,9 @@ export default function NewTrainingScreen() {
                   <Pressable
                     onPress={() => removePlayer(p.documentId)}
                     hitSlop={8}
-                    className="w-8 h-8 items-center justify-center"
+                    className="w-10 h-10 items-center justify-center"
                   >
-                    <Icon name="close" size={16} color="muted" />
+                    <Icon name="close" size={20} color="muted" />
                   </Pressable>
                 </View>
               );

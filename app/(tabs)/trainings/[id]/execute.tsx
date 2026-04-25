@@ -277,9 +277,9 @@ export default function ExecuteTrainingScreen() {
                   onPress={() => confirmRemoveExercise(ex.documentId, ex.Name)}
                   disabled={removeExercise.isPending}
                   hitSlop={8}
-                  className="w-9 h-9 rounded-full bg-destructive/10 items-center justify-center active:opacity-70 disabled:opacity-40"
+                  className="w-11 h-11 rounded-full bg-destructive/10 items-center justify-center active:opacity-70 disabled:opacity-40"
                 >
-                  <Icon name="close" size={16} color="destructive" />
+                  <Icon name="close" size={20} color="destructive" />
                 </Pressable>
               </View>
 

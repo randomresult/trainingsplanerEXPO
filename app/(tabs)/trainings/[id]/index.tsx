@@ -205,9 +205,9 @@ export default function TrainingDetailScreen() {
                 onPress={() => confirmRemoveExercise(exercise.documentId, exercise.Name)}
                 disabled={removeExercise.isPending}
                 hitSlop={8}
-                className="ml-3 w-9 h-9 rounded-full bg-destructive/10 items-center justify-center active:opacity-70 disabled:opacity-40"
+                className="ml-3 w-11 h-11 rounded-full bg-destructive/10 items-center justify-center active:opacity-70 disabled:opacity-40"
               >
-                <Icon name="close" size={16} color="destructive" />
+                <Icon name="close" size={20} color="destructive" />
               </Pressable>
             )}
           </Card>
