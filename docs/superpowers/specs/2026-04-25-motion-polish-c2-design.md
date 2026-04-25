@@ -7,6 +7,17 @@ date: 2026-04-25
 
 # Motion & Polish (C2) Design
 
+## ✅ SHIPPED — 2026-04-25
+
+**Status:** Merged to main via PR #6 (commit 195f8ac).
+
+**Shipped:** Skeleton loaders, pull-to-refresh, empty/error states, larger touch targets, filter nav fix.
+**Skipped:** Swipe-to-delete (reverted after testing), header blur (deferred), layout animations (deferred).
+
+See implementation plan (`plans/2026-04-25-motion-polish-c2.md`) for full commit list and details.
+
+---
+
 ## Overview
 
 Second polish cycle focused on motion, micro-interactions, and loading states. C1 established the primitive layer — C2 makes it feel premium and responsive. This is explicitly a **quality-of-life and feel pass** — no new features, no data model changes.
