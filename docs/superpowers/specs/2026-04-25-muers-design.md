@@ -37,12 +37,12 @@ Add `methodicalSeries[]` relation to the `trainings` content type (relates to `m
 ### Frontend Training type
 
 ```typescript
-export interface MethodischeReiheRef {
+export interface MethodicalSeriesRef {
   documentId: string;
   name: string;
 }
 
-export interface MethodischeReihe {
+export interface MethodicalSeries {
   documentId: string;
   name: string;
   description?: string;
@@ -53,13 +53,13 @@ export interface MethodischeReihe {
 
 export interface Exercise {
   // ... existing fields ...
-  methodicalSeries?: MethodischeReiheRef[];  // back-relation, already exists in Strapi
+  methodicalSeries?: MethodicalSeriesRef[];  // back-relation, already exists in Strapi
 }
 
 export interface Training {
   // ... existing fields ...
-  exercises: Exercise[];                  // ALL exercises — MÜR and standalone
-  methodicalSeries: MethodischeReiheRef[]; // which MÜR blocks are in this training (grouping only)
+  exercises: Exercise[];                   // ALL exercises — MÜR and standalone
+  methodicalSeries: MethodicalSeriesRef[]; // which series blocks are in this training (grouping only)
 }
 ```
 
