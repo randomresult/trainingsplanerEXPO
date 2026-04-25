@@ -37,6 +37,11 @@ Add `methodicalSeries[]` relation to the `trainings` content type (relates to `m
 ### Frontend Training type
 
 ```typescript
+export interface MethodischeReiheRef {
+  documentId: string;
+  name: string;
+}
+
 export interface MethodischeReihe {
   documentId: string;
   name: string;
@@ -46,48 +51,45 @@ export interface MethodischeReihe {
   exercises: Exercise[];
 }
 
-// Exercise gets optional back-relation
 export interface Exercise {
   // ... existing fields ...
-  methodicalSeries?: Pick<MethodischeReihe, 'documentId' | 'name'>[];
+  methodicalSeries?: MethodischeReiheRef[];  // back-relation, already exists in Strapi
 }
 
 export interface Training {
   // ... existing fields ...
-  exercises: Exercise[];           // standalone exercises only
-  methodicalSeries: MethodischeReihe[];  // MÜR blocks (with exercises populated)
+  exercises: Exercise[];                  // ALL exercises — MÜR and standalone
+  methodicalSeries: MethodischeReiheRef[]; // which MÜR blocks are in this training (grouping only)
 }
 ```
 
 ### Key invariant
 
-- `training.exercises[]` = standalone exercises (individual adds, including individual MÜR exercises added solo)
-- `training.methodicalSeries[]` = MÜR blocks added as a group (exercises NOT duplicated in exercises[])
+- `training.exercises[]` = **all** exercises in the training (single source of truth for execute/progress)
+- `training.methodicalSeries[]` = which MÜRs were added as blocks — used only for UI grouping, does NOT populate exercises
+- Grouping is derived: exercises where `exercise.methodicalSeries[0].documentId` matches a MÜR in `training.methodicalSeries[]` are shown in that block; rest are standalone
 
 ---
 
 ## Adding to a Training
 
 ### Adding a MÜR as a block
-1. Write MÜR to `training.methodicalSeries[]`
-2. Do NOT add individual exercises to `training.exercises[]`
+Two writes in one action:
+1. Connect MÜR to `training.methodicalSeries[]` (for grouping)
+2. Connect all MÜR exercises to `training.exercises[]` (so they participate in execute/progress)
 
 ### Adding a single MÜR exercise
-- Goes to `training.exercises[]` as a standalone exercise
-- If the exercise has `methodicalSeries[]` populated, show prompt: "Als Einzelübung oder ganzen Block 'X' hinzufügen?"
+- Goes to `training.exercises[]` as standalone
+- If `exercise.methodicalSeries[]` is populated, show prompt: "Als Einzelübung oder ganzen Block 'X' hinzufügen?"
 
 ---
 
 ## Execute Flow (unchanged)
 
-`useTrainingExecution` stays untouched. The execute screen merges both sources before passing in:
+`useTrainingExecution` stays completely untouched. `training.exercises[]` already contains everything:
 
 ```typescript
-const allExercises = [
-  ...training.methodicalSeries.flatMap(s => s.exercises),
-  ...training.exercises,
-];
-useTrainingExecution(allExercises);
+useTrainingExecution(training.exercises);  // no merge needed
 ```
 
 Progress tracking (PlayerProgress per exercise) is unaffected.
@@ -97,13 +99,14 @@ Progress tracking (PlayerProgress per exercise) is unaffected.
 ## Removing from a Training
 
 ### Remove single exercise from a MÜR block
-- Exercise is removed from `training.methodicalSeries[i].exercises`
-- MÜR block remains, header shows "(4/6 Übungen)"
-- No confirmation dialog — trainer acts deliberately
+- Disconnect exercise from `training.exercises[]` — same mutation as removing any exercise
+- Block counter updates: `(X/total)` where total = MÜR's exercise count, X = how many remain in `training.exercises[]`
+- MÜR block header remains, block shrinks
 
 ### Remove whole MÜR block
-- "MÜR entfernen" action on block header
-- Removes MÜR from `training.methodicalSeries[]`
+Two writes:
+1. Disconnect MÜR from `training.methodicalSeries[]`
+2. Disconnect all its exercises from `training.exercises[]`
 
 ---
 
