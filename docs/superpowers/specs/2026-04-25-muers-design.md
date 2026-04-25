@@ -116,22 +116,27 @@ Library screen gets a toggle above the list: **Übungen | Methodische Reihen**
 - Methodische Reihen: new list of MÜR cards
 
 ### MÜR List
-Each MÜR card shows:
-- Name
-- Category chip
+Larger, visually engaging cards (bigger than exercise cards). Each card shows:
+- Background image or category-based visual
+- MÜR name (prominent)
+- Goal ("Ziel: …")
 - Exercise count ("6 Übungen")
-- Goal (if set)
+- Badge/reward indicator if player has completed this MÜR
+
+Tapping a card → MÜR detail screen (no in-list accordion — detail screen is the right home for exercise list).
 
 ### MÜR Detail Screen
 Route: `app/(tabs)/library/muers/[id].tsx`
 
-- MÜR name + description + goal
-- Ordered list of exercises (numbered: 1, 2, 3...)
-- Each exercise tappable → opens exercise detail
+- Hero area: MÜR name + goal + description
+- Badge/reward shown if player has completed this MÜR
+- Ordered list of exercises (numbered 1–6), each tappable → exercise detail
 - "Ganze Reihe zum Training hinzufügen" CTA (only in pick mode)
 
 ### MÜR exercises in Übungen tab
-MÜR exercises appear normally in the Übungen list. They show a small badge: "Teil von: Vorhand Topspin Basics". Tapping the badge could navigate to the MÜR detail.
+MÜR exercises appear normally in the Übungen list. A small generic indicator (icon or label "MÜR") marks them as part of a learning path — no MÜR name shown inline to keep the list clean.
+
+From the **exercise detail screen** only: show a tappable section "Teil der Methodischen Reihe: Vorhand Topspin Basics" that navigates to the MÜR detail.
 
 ---
 
@@ -149,9 +154,10 @@ A `MuerBlock` component renders a collapsible grouped block:
 ```
 
 - Collapsible (tapping header toggles expanded/collapsed)
-- `(4/6)` = exercises remaining in block / total in block
+- `(4/6)` = how many of the MÜR's exercises are present in this training / total exercises in the MÜR
 - `[•••]` action menu: "MÜR entfernen"
-- In execute mode: exercises show checkboxes, completed ones update the (X/6) counter
+- Each exercise in the block has an individual remove button (edit/detail mode only)
+- In execute mode: exercises show checkboxes. Completion is tracked in the global counter at the top of the execute screen (not per-block)
 
 Used in:
 - Training detail (view mode)
