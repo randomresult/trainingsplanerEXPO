@@ -56,6 +56,3 @@ export { SkeletonCard, SkeletonList, SkeletonDetail } from './SkeletonCard';
 
 export { EmptyState } from './EmptyState';
 export { ErrorState } from './ErrorState';
-
-export { Swipeable } from './Swipeable';
-export type { SwipeableProps } from './Swipeable';
