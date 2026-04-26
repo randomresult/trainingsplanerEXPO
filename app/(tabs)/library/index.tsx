@@ -14,7 +14,6 @@ import {
   View,
   TextInput,
   FlatList,
-  ActivityIndicator,
   Keyboard,
   Pressable,
   RefreshControl,
