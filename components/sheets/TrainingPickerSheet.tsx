@@ -12,30 +12,40 @@ import {
 import {
   useTrainings,
   useAddExerciseToTraining,
+  useAddMethodicalSeriesToTraining,
 } from '@/lib/queries/useTrainings';
 import type { Training } from '@/lib/types/models';
 
 export interface TrainingPickerSheetRef {
-  present: (exerciseId: string, exerciseName: string) => void;
+  present: (exerciseDocumentId: string, exerciseName: string) => void;
+  presentSeries: (seriesDocumentId: string, seriesName: string, exerciseDocumentIds: string[]) => void;
 }
+
+type PickMode =
+  | { kind: 'exercise'; exerciseId: string; name: string }
+  | { kind: 'series'; seriesId: string; seriesName: string; exerciseIds: string[] };
 
 type Props = object;
 
 export const TrainingPickerSheet = forwardRef<TrainingPickerSheetRef, Props>(
   function TrainingPickerSheet(_, ref) {
     const sheetRef = useRef<BottomSheetRef>(null);
-    const [exerciseId, setExerciseId] = useState<string | null>(null);
-    const [exerciseName, setExerciseName] = useState<string>('');
+    const [pickMode, setPickMode] = useState<PickMode | null>(null);
     const { data: trainings } = useTrainings();
     const addExercise = useAddExerciseToTraining();
+    const addSeries = useAddMethodicalSeriesToTraining();
     const queryClient = useQueryClient();
 
     useImperativeHandle(ref, () => ({
       present: (id: string, name: string) => {
-        setExerciseId(id);
-        setExerciseName(name);
+        setPickMode({ kind: 'exercise', exerciseId: id, name });
         // Trainings can be started / deleted / completed between sheet opens.
         // Force a fresh fetch so the list of "open" trainings is accurate.
+        queryClient.invalidateQueries({ queryKey: ['trainings'] });
+        sheetRef.current?.present();
+      },
+      presentSeries: (seriesDocumentId: string, seriesName: string, exerciseDocumentIds: string[]) => {
+        setPickMode({ kind: 'series', seriesId: seriesDocumentId, seriesName, exerciseIds: exerciseDocumentIds });
         queryClient.invalidateQueries({ queryKey: ['trainings'] });
         sheetRef.current?.present();
       },
@@ -53,10 +63,20 @@ export const TrainingPickerSheet = forwardRef<TrainingPickerSheetRef, Props>(
       [trainings]
     );
 
+    const isPending = addExercise.isPending || addSeries.isPending;
+
     const handleAddToExisting = async (trainingId: string, trainingName: string) => {
-      if (!exerciseId) return;
+      if (!pickMode) return;
       try {
-        await addExercise.mutateAsync({ trainingId, exerciseId });
+        if (pickMode.kind === 'exercise') {
+          await addExercise.mutateAsync({ trainingId, exerciseId: pickMode.exerciseId });
+        } else {
+          await addSeries.mutateAsync({
+            trainingId,
+            seriesDocumentId: pickMode.seriesId,
+            exerciseDocumentIds: pickMode.exerciseIds,
+          });
+        }
         sheetRef.current?.dismiss();
         // Dismiss first, then toast — otherwise the sheet's closing animation
         // can visually swallow the toast on web / slow devices.
@@ -67,16 +87,26 @@ export const TrainingPickerSheet = forwardRef<TrainingPickerSheetRef, Props>(
     };
 
     const handleCreateNew = () => {
-      if (!exerciseId) return;
+      if (!pickMode) return;
       sheetRef.current?.dismiss();
-      router.push(`/training-new?preselect=${encodeURIComponent(exerciseId)}`);
+      if (pickMode.kind === 'exercise') {
+        router.push(`/training-new?preselect=${encodeURIComponent(pickMode.exerciseId)}`);
+      } else {
+        router.push(`/training-new?preselectSeries=${encodeURIComponent(pickMode.seriesId)}`);
+      }
     };
+
+    const sheetTitle = pickMode == null
+      ? 'Zum Training hinzufügen'
+      : pickMode.kind === 'exercise'
+        ? `"${pickMode.name}" hinzufügen`
+        : `"${pickMode.seriesName}" Lernpfad hinzufügen`;
 
     return (
       <BottomSheet
         ref={sheetRef}
         snapPoints={['55%']}
-        title={exerciseName ? `"${exerciseName}" hinzufügen` : 'Zum Training hinzufügen'}
+        title={sheetTitle}
       >
         <View className="flex-1">
           {openTrainings.length > 0 ? (
@@ -91,7 +121,7 @@ export const TrainingPickerSheet = forwardRef<TrainingPickerSheetRef, Props>(
                     <Pressable
                       key={item.documentId}
                       onPress={() => handleAddToExisting(item.documentId, item.Name)}
-                      disabled={addExercise.isPending}
+                      disabled={isPending}
                       className="bg-card rounded-lg p-3 flex-row items-center gap-3"
                     >
                       <View className="w-9 h-9 rounded-md bg-info/10 items-center justify-center">
@@ -145,7 +175,7 @@ export const TrainingPickerSheet = forwardRef<TrainingPickerSheetRef, Props>(
                 Neues Training erstellen
               </Text>
               <Text variant="caption1" color="muted">
-                Mit dieser Übung als Start
+                {pickMode?.kind === 'series' ? 'Mit diesem Lernpfad als Start' : 'Mit dieser Übung als Start'}
               </Text>
             </View>
             <Icon name="chevron-forward" size={16} color="primary" />
