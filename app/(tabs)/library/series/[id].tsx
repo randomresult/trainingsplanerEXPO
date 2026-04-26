@@ -1,0 +1,148 @@
+import { useRef } from 'react';
+import { View, Pressable } from 'react-native';
+import { useLocalSearchParams, router } from 'expo-router';
+import {
+  Screen,
+  Text,
+  Icon,
+  SkeletonDetail,
+  SkeletonList,
+} from '@/components/ui';
+import {
+  TrainingPickerSheet,
+  TrainingPickerSheetRef,
+} from '@/components/sheets/TrainingPickerSheet';
+import { useMethodicalSeriesDetail } from '@/lib/queries/useMethodicalSeries';
+
+export default function MethodicalSeriesDetailScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const { data: series, isLoading } = useMethodicalSeriesDetail(id);
+  const trainingPickerRef = useRef<TrainingPickerSheetRef>(null);
+
+  if (isLoading) {
+    return (
+      <Screen scroll padding="base">
+        <View className="pt-4">
+          <SkeletonDetail />
+          <View className="mt-6">
+            <SkeletonList count={4} />
+          </View>
+        </View>
+      </Screen>
+    );
+  }
+
+  if (!series) {
+    return (
+      <Screen>
+        <View className="flex-1 items-center justify-center">
+          <Icon name="list-outline" size={40} color="muted" />
+          <Text variant="footnote" color="muted" className="mt-3">
+            Lernpfad nicht gefunden
+          </Text>
+        </View>
+      </Screen>
+    );
+  }
+
+  const exerciseIds = (series.exercises ?? []).map((ex) => ex.documentId);
+
+  return (
+    <Screen scroll>
+      {/* Hero */}
+      <View className="bg-primary/10 px-5 pt-5 pb-6">
+        <View className="w-12 h-12 rounded-full bg-primary/20 items-center justify-center mb-4">
+          <Icon name="school-outline" size={26} color="primary" />
+        </View>
+
+        {series.category ? (
+          <View className="self-start bg-amber-500/10 border border-amber-500/20 rounded-md px-2 py-1 mb-2">
+            <Text variant="caption2" className="text-amber-500 font-bold uppercase tracking-wider">
+              {series.category}
+            </Text>
+          </View>
+        ) : null}
+
+        <Text variant="largeTitle" weight="bold" className="mb-1">
+          {series.name}
+        </Text>
+
+        {series.goal ? (
+          <View className="bg-primary/10 rounded-lg px-3 py-2 mt-2">
+            <Text variant="caption1" color="primary" weight="semibold" className="mb-1">
+              Ziel
+            </Text>
+            <Text variant="footnote">{series.goal}</Text>
+          </View>
+        ) : null}
+
+        {series.description ? (
+          <Text variant="footnote" color="muted" className="mt-3">
+            {series.description}
+          </Text>
+        ) : null}
+      </View>
+
+      {/* Exercise list */}
+      <View className="px-5 pt-4 pb-4">
+        <Text variant="headline" weight="semibold" className="mb-3">
+          {series.exercises?.length ?? 0} Übungen
+        </Text>
+
+        {/* Per-exercise completion: stubbed false — cross-training PlayerProgress query deferred */}
+        {(series.exercises ?? []).map((ex, idx) => {
+          const done = false;
+          return (
+            <Pressable
+              key={ex.documentId}
+              onPress={() =>
+                router.push({
+                  pathname: '/exercise-detail/[id]',
+                  params: { id: ex.documentId },
+                })
+              }
+              className="flex-row items-center gap-3 mb-3 bg-card border border-border rounded-xl px-3 py-3 active:opacity-80"
+            >
+              <View className="w-7 h-7 rounded-full bg-primary/15 items-center justify-center shrink-0">
+                <Text variant="caption2" weight="bold" color="primary">
+                  {idx + 1}
+                </Text>
+              </View>
+              <Text variant="subhead" className="flex-1" numberOfLines={2}>
+                {ex.Name}
+              </Text>
+              <View
+                className={`w-6 h-6 rounded-full border-2 items-center justify-center shrink-0 ${
+                  done ? 'bg-success border-success' : 'border-muted'
+                }`}
+              >
+                {done && <Icon name="checkmark" size={14} color="inverse" />}
+              </View>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      {/* Add to training CTA */}
+      <View className="px-5 pb-8">
+        <Pressable
+          onPress={() =>
+            trainingPickerRef.current?.presentSeries(
+              series.documentId,
+              series.name,
+              exerciseIds,
+            )
+          }
+          className="flex-row items-center justify-center gap-2 bg-primary rounded-xl py-4 active:opacity-80"
+        >
+          <Icon name="add" size={20} color="inverse" />
+          <Text variant="subhead" weight="semibold" color="inverse">
+            Ganze Reihe hinzufügen
+          </Text>
+        </Pressable>
+      </View>
+
+      <TrainingPickerSheet ref={trainingPickerRef} />
+    </Screen>
+  );
+}
