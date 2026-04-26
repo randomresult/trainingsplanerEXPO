@@ -257,10 +257,10 @@ export default function LibraryListScreen() {
                   {item.name}
                 </Text>
 
-                {/* Goal */}
-                {item.goal ? (
+                {/* Goal or description as subtitle */}
+                {(item.goal || item.description) ? (
                   <Text variant="footnote" color="muted" numberOfLines={2} className="mb-4">
-                    {item.goal}
+                    {item.goal || item.description}
                   </Text>
                 ) : <View className="mb-4" />}
 
