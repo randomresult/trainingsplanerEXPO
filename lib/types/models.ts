@@ -15,6 +15,11 @@ export interface User {
   role?: { name?: string } | null;
 }
 
+export interface MethodicalSeriesRef {
+  documentId: string;
+  name: string;
+}
+
 export interface Exercise {
   documentId: string;
   Name: string;
@@ -26,6 +31,7 @@ export interface Exercise {
   focusareas?: Tag[];
   playerlevels?: Tag[];
   categories?: Tag[];
+  methodicalSeries?: MethodicalSeriesRef[];
 }
 
 // Strapi relations (focusareas, playerlevels, categories) all share the
@@ -45,6 +51,15 @@ export interface Player {
   Club?: Club | null;
 }
 
+export interface MethodicalSeries {
+  documentId: string;
+  name: string;
+  description?: string;
+  goal?: string;
+  category?: string;
+  exercises: Exercise[];
+}
+
 export interface Training {
   documentId: string;
   Name: string;
@@ -54,7 +69,8 @@ export interface Training {
   startedAt?: string;
   completedAt?: string;
   actualDuration?: number;
-  exercises: Exercise[];
+  exercises: Exercise[];               // ALL exercises — MÜR and standalone
+  methodicalSeries: MethodicalSeriesRef[]; // grouping only, no exercises populated
   players: Player[];
 }
 
