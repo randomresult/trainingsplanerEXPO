@@ -17,8 +17,10 @@ const TRAINING_POPULATE = {
       categories: true,
       Steps: true,
       Videos: true,
+      methodicalSeries: true,  // back-relation: which MÜR does this exercise belong to?
     },
   },
+  methodicalSeries: true,  // just name + documentId for grouping — no nested exercises needed
   players: {
     populate: {
       Club: true,
@@ -356,5 +358,75 @@ export const useTrainingsHistory = () => {
     getNextPageParam: (lastPage) =>
       lastPage.page < lastPage.pageCount ? lastPage.page + 1 : undefined,
     enabled: !!clubId,
+  });
+};
+
+export const useAddMethodicalSeriesToTraining = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: {
+      trainingId: string;
+      seriesDocumentId: string;
+      exerciseDocumentIds: string[];
+    }) => {
+      // Write 1: connect MÜR to training.methodicalSeries[] (grouping)
+      await apiClient.put(`/trainings/${input.trainingId}`, {
+        data: {
+          methodicalSeries: { connect: [{ documentId: input.seriesDocumentId }] },
+        },
+      });
+      // Write 2: connect all MÜR exercises to training.exercises[]
+      const { data } = await apiClient.put<StrapiResponse<Training>>(
+        `/trainings/${input.trainingId}`,
+        {
+          data: {
+            exercises: {
+              connect: input.exerciseDocumentIds.map((id) => ({ documentId: id })),
+            },
+          },
+        }
+      );
+      return data.data;
+    },
+    onSuccess: (_data, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['trainings', vars.trainingId] });
+      queryClient.invalidateQueries({ queryKey: ['trainings'] });
+    },
+  });
+};
+
+export const useRemoveMethodicalSeriesFromTraining = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: {
+      trainingId: string;
+      seriesDocumentId: string;
+      exerciseDocumentIds: string[];
+    }) => {
+      // Write 1: disconnect MÜR from training.methodicalSeries[]
+      await apiClient.put(`/trainings/${input.trainingId}`, {
+        data: {
+          methodicalSeries: { disconnect: [{ documentId: input.seriesDocumentId }] },
+        },
+      });
+      // Write 2: disconnect all MÜR exercises from training.exercises[]
+      const { data } = await apiClient.put<StrapiResponse<Training>>(
+        `/trainings/${input.trainingId}`,
+        {
+          data: {
+            exercises: {
+              disconnect: input.exerciseDocumentIds.map((id) => ({ documentId: id })),
+            },
+          },
+        }
+      );
+      return data.data;
+    },
+    onSuccess: (_data, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['trainings', vars.trainingId] });
+      queryClient.invalidateQueries({ queryKey: ['trainings'] });
+    },
   });
 };
