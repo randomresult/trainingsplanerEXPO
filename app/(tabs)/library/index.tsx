@@ -16,7 +16,8 @@ import {
   FlatList,
   Keyboard,
   Pressable,
-  ImageBackground,
+  Image,
+  StyleSheet,
   RefreshControl,
 } from 'react-native';
 
@@ -241,65 +242,57 @@ export default function LibraryListScreen() {
             renderItem={({ item }: { item: MethodicalSeries }) => (
               <Pressable
                 onPress={() => router.push({ pathname: '/(tabs)/library/series/[id]' as any, params: { id: item.documentId } })}
-                className="rounded-2xl overflow-hidden active:opacity-80"
+                className="rounded-2xl overflow-hidden active:opacity-75"
               >
-                <ImageBackground
-                  source={SERIES_BG}
-                  resizeMode="cover"
-                  className="rounded-2xl overflow-hidden"
-                >
-                  {/* Dark overlay so text stays readable */}
-                  <View className="bg-black/65 p-4">
-                    {/* Top row: category chip + progress pill placeholder */}
-                    <View className="flex-row items-start justify-between mb-3">
-                      {item.category ? (
-                        <View className="bg-amber-500/20 border border-amber-500/40 rounded-md px-2 py-1">
-                          <Text variant="caption2" className="text-amber-400 font-bold uppercase tracking-wider">
-                            {item.category}
-                          </Text>
-                        </View>
-                      ) : <View />}
-                      {/* Progress pill: hidden until cross-training PlayerProgress query is built */}
-                    </View>
+                {/* Background image — absolute fill, parent height driven by content */}
+                <Image source={SERIES_BG} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
 
-                    {/* Series name */}
-                    <Text variant="title3" weight="bold" numberOfLines={2} className="mb-1 text-white">
-                      {item.name}
-                    </Text>
-
-                    {/* Goal or description */}
-                    {(item.goal || item.description) ? (
-                      <Text variant="footnote" numberOfLines={2} className="mb-4 text-white/60">
-                        {item.goal || item.description}
-                      </Text>
-                    ) : <View className="mb-4" />}
-
-                    {/* Divider */}
-                    <View className="h-px bg-white/15 mb-3" />
-
-                    {/* Bottom row: count + add button */}
-                    <View className="flex-row items-center justify-between">
-                      <View className="flex-row items-baseline gap-1">
-                        <Text variant="title2" weight="bold" className="text-white">{item.exercises?.length ?? 0}</Text>
-                        <Text variant="footnote" className="text-white/60">Übungen</Text>
+                {/* Dark overlay + content */}
+                <View className="bg-black/55 p-4">
+                  <View className="flex-row items-start justify-between mb-3">
+                    {item.category ? (
+                      <View className="bg-amber-500/25 border border-amber-400/50 rounded-md px-2 py-1">
+                        <Text variant="caption2" className="text-amber-300 font-bold uppercase tracking-widest">
+                          {item.category}
+                        </Text>
                       </View>
-                      <Pressable
-                        onPress={(e) => {
-                          e.stopPropagation?.();
-                          trainingPickerRef.current?.presentSeries(
-                            item.documentId,
-                            item.name,
-                            (item.exercises ?? []).map((ex) => ex.documentId),
-                          );
-                        }}
-                        hitSlop={10}
-                        className="w-9 h-9 rounded-full bg-white/15 border border-white/20 items-center justify-center"
-                      >
-                        <Icon name="add" size={20} color="foreground" />
-                      </Pressable>
-                    </View>
+                    ) : <View />}
+                    {/* Progress pill: hidden until cross-training PlayerProgress query is built */}
                   </View>
-                </ImageBackground>
+
+                  <Text variant="title3" weight="bold" numberOfLines={2} className="mb-1 text-white">
+                    {item.name}
+                  </Text>
+
+                  {(item.goal || item.description) ? (
+                    <Text variant="footnote" numberOfLines={2} className="mb-4 text-white/65">
+                      {item.goal || item.description}
+                    </Text>
+                  ) : <View className="mb-4" />}
+
+                  <View className="h-px bg-white/20 mb-3" />
+
+                  <View className="flex-row items-center justify-between">
+                    <View className="flex-row items-baseline gap-1">
+                      <Text variant="title2" weight="bold" className="text-white">{item.exercises?.length ?? 0}</Text>
+                      <Text variant="footnote" className="text-white/60">Übungen</Text>
+                    </View>
+                    <Pressable
+                      onPress={(e) => {
+                        e.stopPropagation?.();
+                        trainingPickerRef.current?.presentSeries(
+                          item.documentId,
+                          item.name,
+                          (item.exercises ?? []).map((ex) => ex.documentId),
+                        );
+                      }}
+                      hitSlop={10}
+                      className="w-9 h-9 rounded-full bg-white/15 border border-white/30 items-center justify-center"
+                    >
+                      <Icon name="add" size={20} color="foreground" />
+                    </Pressable>
+                  </View>
+                </View>
               </Pressable>
             )}
           />

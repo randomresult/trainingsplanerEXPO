@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { View, Pressable, ImageBackground } from 'react-native';
+import { View, Pressable, Image, StyleSheet } from 'react-native';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
 
 const SERIES_BG = require('@/assets/images/series_background_default.png');
@@ -55,16 +55,17 @@ export default function MethodicalSeriesDetailScreen() {
     <Screen scroll>
       <Stack.Screen options={{ title: series.name }} />
 
-      {/* Hero */}
-      <ImageBackground source={SERIES_BG} resizeMode="cover">
-        <View className="bg-black/65 px-5 pt-5 pb-6">
+      {/* Hero — image absolutely fills, overlay drives height */}
+      <View className="overflow-hidden">
+        <Image source={SERIES_BG} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
+        <View className="bg-black/55 px-5 pt-5 pb-6">
           <View className="w-12 h-12 rounded-full bg-white/15 items-center justify-center mb-4">
             <Icon name="school-outline" size={26} color="foreground" />
           </View>
 
           {series.category ? (
-            <View className="self-start bg-amber-500/20 border border-amber-500/40 rounded-md px-2 py-1 mb-2">
-              <Text variant="caption2" className="text-amber-400 font-bold uppercase tracking-wider">
+            <View className="self-start bg-amber-500/25 border border-amber-400/50 rounded-md px-2 py-1 mb-2">
+              <Text variant="caption2" className="text-amber-300 font-bold uppercase tracking-widest">
                 {series.category}
               </Text>
             </View>
@@ -89,7 +90,7 @@ export default function MethodicalSeriesDetailScreen() {
             </Text>
           ) : null}
         </View>
-      </ImageBackground>
+      </View>
 
       {/* Exercise list */}
       <View className="px-5 pt-4 pb-4">
