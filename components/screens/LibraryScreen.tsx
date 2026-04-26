@@ -225,8 +225,10 @@ export function LibraryScreen({ trainingId, trainingName }: LibraryScreenProps) 
     <Pressable
       onPress={() =>
         router.push({
-          pathname: '/(tabs)/library/series/[id]' as any,
-          params: { id: item.documentId },
+          pathname: '/series-detail/[id]' as any,
+          params: pickMode
+            ? { id: item.documentId, trainingId, trainingName: trainingName ?? '' }
+            : { id: item.documentId },
         })
       }
       style={{ position: 'relative' }}
@@ -301,7 +303,7 @@ export function LibraryScreen({ trainingId, trainingName }: LibraryScreenProps) 
         </View>
       </View>
     </Pressable>
-  ), [pickMode, handleAddSeries, addingSeriesId, sessionAddedSeriesIds]);
+  ), [pickMode, trainingId, trainingName, handleAddSeries, addingSeriesId, sessionAddedSeriesIds]);
 
   return (
     <Screen edges={pickMode ? ['bottom'] : ['top', 'bottom']}>

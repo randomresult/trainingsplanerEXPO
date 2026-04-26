@@ -106,8 +106,10 @@ export default function ExerciseDetailScreen() {
           <Pressable
             onPress={() =>
               router.push({
-                pathname: '/(tabs)/library/series/[id]' as any,
-                params: { id: exercise.methodicalSeries![0].documentId },
+                pathname: '/series-detail/[id]' as any,
+                params: trainingId
+                  ? { id: exercise.methodicalSeries![0].documentId, trainingId, trainingName: trainingName ?? '' }
+                  : { id: exercise.methodicalSeries![0].documentId },
               })
             }
             className="flex-row items-center gap-2 bg-primary/10 rounded-lg px-3 py-2 mb-5"

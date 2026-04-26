@@ -61,6 +61,15 @@ function RootLayoutNav() {
         }}
       />
       <Stack.Screen
+        name="series-detail/[id]"
+        options={{
+          headerShown: true,
+          headerStyle: { backgroundColor: '#0a0a0f' },
+          headerTintColor: '#fff',
+          headerShadowVisible: false,
+        }}
+      />
+      <Stack.Screen
         name="training-new"
         options={{
           presentation: 'modal',

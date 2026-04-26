@@ -1,0 +1,249 @@
+import { useRef, useState } from 'react';
+import { Platform, View, Pressable, ActivityIndicator } from 'react-native';
+import { useLocalSearchParams, router, Stack } from 'expo-router';
+import {
+  Screen,
+  Text,
+  Icon,
+  SkeletonDetail,
+  SkeletonList,
+  Button,
+} from '@/components/ui';
+import {
+  TrainingPickerSheet,
+  TrainingPickerSheetRef,
+} from '@/components/sheets/TrainingPickerSheet';
+import { useMethodicalSeriesDetail } from '@/lib/queries/useMethodicalSeries';
+import {
+  useAddExerciseToTraining,
+  useAddMethodicalSeriesToTraining,
+} from '@/lib/queries/useTrainings';
+import { COLORS } from '@/lib/theme';
+import { toast } from 'sonner-native';
+
+export default function SeriesDetailScreen() {
+  const { id, trainingId, trainingName } = useLocalSearchParams<{
+    id: string;
+    trainingId?: string;
+    trainingName?: string;
+  }>();
+  const { data: series, isLoading } = useMethodicalSeriesDetail(id);
+  const trainingPickerRef = useRef<TrainingPickerSheetRef>(null);
+  const pickMode = !!trainingId;
+
+  const addExerciseMutation = useAddExerciseToTraining();
+  const addSeriesMutation = useAddMethodicalSeriesToTraining();
+  const [addingExerciseId, setAddingExerciseId] = useState<string | null>(null);
+  const [addingWholeSeries, setAddingWholeSeries] = useState(false);
+  const [sessionAddedIds, setSessionAddedIds] = useState<Set<string>>(new Set());
+
+  const headerOptions = {
+    headerShown: true as const,
+    title: 'Lernpfad',
+    headerLeft: () => (
+      <Pressable onPress={() => router.back()} className="px-2 py-1" hitSlop={8}>
+        <Icon
+          name={Platform.OS === 'web' ? 'close' : 'chevron-back'}
+          size={22}
+          color="foreground"
+        />
+      </Pressable>
+    ),
+  };
+
+  const handleAddExercise = async (exerciseId: string) => {
+    if (!trainingId || addingExerciseId === exerciseId) return;
+    setAddingExerciseId(exerciseId);
+    try {
+      await addExerciseMutation.mutateAsync({ trainingId, exerciseId });
+      setSessionAddedIds((prev) => new Set(prev).add(exerciseId));
+      toast.success('Übung hinzugefügt');
+    } catch {
+      toast.error('Übung konnte nicht hinzugefügt werden');
+    } finally {
+      setAddingExerciseId(null);
+    }
+  };
+
+  const handleAddWholeSeries = async () => {
+    if (!trainingId || !series || addingWholeSeries) return;
+    setAddingWholeSeries(true);
+    try {
+      await addSeriesMutation.mutateAsync({
+        trainingId,
+        seriesDocumentId: series.documentId,
+        exerciseDocumentIds: (series.exercises ?? []).map((ex) => ex.documentId),
+      });
+      toast.success('Lernpfad hinzugefügt');
+    } catch {
+      toast.error('Lernpfad konnte nicht hinzugefügt werden');
+    } finally {
+      setAddingWholeSeries(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <Screen scroll padding="base" edges={['bottom']}>
+        <Stack.Screen options={headerOptions} />
+        <View className="pt-14">
+          <SkeletonDetail />
+          <View className="mt-6">
+            <SkeletonList count={4} />
+          </View>
+        </View>
+      </Screen>
+    );
+  }
+
+  if (!series) {
+    return (
+      <Screen edges={['bottom']}>
+        <Stack.Screen options={headerOptions} />
+        <View className="flex-1 items-center justify-center">
+          <Icon name="list-outline" size={40} color="muted" />
+          <Text variant="footnote" color="muted" className="mt-3">
+            Lernpfad nicht gefunden
+          </Text>
+        </View>
+      </Screen>
+    );
+  }
+
+  const exerciseIds = (series.exercises ?? []).map((ex) => ex.documentId);
+
+  return (
+    <Screen scroll edges={['bottom']}>
+      <Stack.Screen options={headerOptions} />
+
+      {/* Hero */}
+      <View className="bg-card px-5 pt-5 pb-6 border-b border-border">
+        <View className="w-12 h-12 rounded-full bg-primary/15 items-center justify-center mb-4">
+          <Icon name="school-outline" size={26} color="primary" />
+        </View>
+
+        {series.category ? (
+          <View className="self-start bg-amber-500/25 border border-amber-400/50 rounded-md px-2 py-1 mb-2">
+            <Text variant="caption2" className="text-amber-300 font-bold uppercase tracking-widest">
+              {series.category}
+            </Text>
+          </View>
+        ) : null}
+
+        <Text variant="largeTitle" weight="bold" className="mb-1">
+          {series.name}
+        </Text>
+
+        {series.goal ? (
+          <View className="bg-surface-1 rounded-lg px-3 py-2 mt-2">
+            <Text variant="caption1" weight="semibold" color="muted" className="mb-1">
+              Ziel
+            </Text>
+            <Text variant="footnote">{series.goal}</Text>
+          </View>
+        ) : null}
+
+        {series.description ? (
+          <Text variant="footnote" className="mt-3" color="muted">
+            {series.description}
+          </Text>
+        ) : null}
+      </View>
+
+      {/* Exercise list */}
+      <View className="px-5 pt-4 pb-4">
+        <Text variant="headline" weight="semibold" className="mb-3">
+          {series.exercises?.length ?? 0} Übungen
+        </Text>
+
+        {(series.exercises ?? []).map((ex, idx) => {
+          const isAdded = sessionAddedIds.has(ex.documentId);
+          const isAdding = addingExerciseId === ex.documentId;
+          return (
+            <Pressable
+              key={ex.documentId}
+              onPress={() =>
+                router.push({
+                  pathname: '/exercise-detail/[id]',
+                  params: pickMode
+                    ? { id: ex.documentId, trainingId, trainingName: trainingName ?? '' }
+                    : { id: ex.documentId },
+                })
+              }
+              className="flex-row items-center gap-3 mb-3 bg-card border border-border rounded-xl px-3 py-3 active:opacity-80"
+            >
+              <View className="w-7 h-7 rounded-full bg-primary/15 items-center justify-center shrink-0">
+                <Text variant="caption2" weight="bold" color="primary">
+                  {idx + 1}
+                </Text>
+              </View>
+              <Text variant="subhead" className="flex-1" numberOfLines={2}>
+                {ex.Name}
+              </Text>
+              <Pressable
+                onPress={(e) => {
+                  e.stopPropagation?.();
+                  if (pickMode) {
+                    if (!isAdded && !isAdding) handleAddExercise(ex.documentId);
+                  } else {
+                    trainingPickerRef.current?.present(ex.documentId, ex.Name);
+                  }
+                }}
+                disabled={pickMode && (isAdded || isAdding)}
+                hitSlop={10}
+                className={
+                  pickMode && isAdded
+                    ? 'w-9 h-9 rounded-full bg-success/15 items-center justify-center shrink-0'
+                    : 'w-9 h-9 rounded-full bg-primary/15 items-center justify-center shrink-0'
+                }
+              >
+                {pickMode && isAdding ? (
+                  <ActivityIndicator size="small" color={COLORS.primary} />
+                ) : (
+                  <Icon
+                    name={pickMode && isAdded ? 'checkmark' : 'add'}
+                    size={18}
+                    color={pickMode && isAdded ? 'success' : 'primary'}
+                  />
+                )}
+              </Pressable>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      {/* Add whole series CTA */}
+      <View className="px-5 pb-8">
+        {pickMode ? (
+          <Button
+            size="lg"
+            className="w-full"
+            leftIcon="add"
+            loading={addingWholeSeries}
+            onPress={handleAddWholeSeries}
+          >
+            {trainingName ? `Ganze Reihe zu „${trainingName}"` : 'Ganze Reihe hinzufügen'}
+          </Button>
+        ) : (
+          <Pressable
+            onPress={() =>
+              trainingPickerRef.current?.presentSeries(
+                series.documentId,
+                series.name,
+                exerciseIds,
+              )
+            }
+            className="flex-row items-center justify-center gap-2 bg-primary rounded-xl py-4 active:opacity-80"
+          >
+            <Icon name="add" size={20} color="inverse" />
+            <Text variant="subhead" weight="semibold" color="inverse">
+              Ganze Reihe hinzufügen
+            </Text>
+          </Pressable>
+        )}
+      </View>
+
+      {!pickMode && <TrainingPickerSheet ref={trainingPickerRef} />}
+    </Screen>
+  );
+}
