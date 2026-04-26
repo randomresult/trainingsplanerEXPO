@@ -58,3 +58,4 @@ export { EmptyState } from './EmptyState';
 export { ErrorState } from './ErrorState';
 
 export { MethodicalSeriesBlock } from './MethodicalSeriesBlock';
+export { TimePickerModal } from './TimePickerModal';

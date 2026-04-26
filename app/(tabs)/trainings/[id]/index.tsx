@@ -190,6 +190,8 @@ export default function TrainingDetailScreen() {
               blockExercises={blockExercises}
               totalInSeries={blockExercises.length}
               mode={canEditExercises ? 'edit' : 'view'}
+              onNavigateToDetail={() => router.push({ pathname: '/series-detail/[id]' as any, params: { id: seriesDocId } })}
+              onNavigateToExercise={(exId) => router.push({ pathname: '/exercise-detail/[id]', params: { id: exId, readOnly: '1' } })}
               onRemoveSeries={
                 canEditExercises
                   ? () =>
@@ -215,16 +217,17 @@ export default function TrainingDetailScreen() {
           const standalone = (training.exercises ?? []).filter(
             (e) => !e.methodicalSeries?.some((s) => seriesIds.has(s.documentId))
           );
-          return standalone.map((exercise, idx) => (
+          return standalone.map((exercise) => (
             <Card key={exercise.documentId} className="mb-3 flex-row items-center">
-              <View className="flex-1">
-                <View className="flex-row justify-between items-start">
-                  <Text variant="subhead" weight="semibold" className="flex-1 mr-2">
-                    {idx + 1}. {exercise.Name}
-                  </Text>
-                  <Text variant="caption1" color="muted">{exercise.Minutes} Min</Text>
-                </View>
-              </View>
+              <Pressable
+                onPress={() => router.push({ pathname: '/exercise-detail/[id]', params: { id: exercise.documentId, readOnly: '1' } })}
+                className="flex-1 flex-row justify-between items-start"
+              >
+                <Text variant="subhead" weight="semibold" className="flex-1 mr-2">
+                  {exercise.Name}
+                </Text>
+                <Text variant="caption1" color="muted">{exercise.Minutes} Min</Text>
+              </Pressable>
               {canEditExercises && (
                 <Pressable
                   onPress={() => confirmRemoveExercise(exercise.documentId, exercise.Name)}

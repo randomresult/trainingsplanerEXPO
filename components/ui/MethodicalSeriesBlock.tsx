@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Pressable, TextInput, Platform, Alert } from 'react-native';
+import { View, Pressable, Platform, Alert } from 'react-native';
 import { Text } from './Text';
 import { Icon } from './Icon';
+import { TimePickerModal } from './TimePickerModal';
 import { triggerHaptic } from '@/lib/haptics';
 import { ExercisePills } from '@/components/ui/ExercisePills';
 import type { MethodicalSeriesRef, Exercise } from '@/lib/types/models';
@@ -19,6 +20,8 @@ interface MethodicalSeriesBlockProps {
   mode: 'view' | 'edit' | 'execute';
   onRemoveSeries?: () => void;
   onRemoveExercise?: (exerciseDocumentId: string) => void;
+  onNavigateToDetail?: () => void;
+  onNavigateToExercise?: (exerciseDocumentId: string) => void;
   exerciseStates?: Map<string, ExerciseState>;
   indexByDocId?: Map<string, number>;
   onToggleComplete?: (idx: number) => void;
@@ -34,6 +37,8 @@ export function MethodicalSeriesBlock({
   mode,
   onRemoveSeries,
   onRemoveExercise,
+  onNavigateToDetail,
+  onNavigateToExercise,
   exerciseStates,
   indexByDocId,
   onToggleComplete,
@@ -42,6 +47,7 @@ export function MethodicalSeriesBlock({
   onSetExpanded,
 }: MethodicalSeriesBlockProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const [timerPickerDocId, setTimerPickerDocId] = useState<string | null>(null);
 
   const inBlock = blockExercises.length;
 
@@ -78,34 +84,44 @@ export function MethodicalSeriesBlock({
       {/* Block header */}
       <Pressable
         onPress={() => setCollapsed(!collapsed)}
-        className="flex-row items-center px-4 py-3 bg-primary/10"
+        className={`px-4 pt-4 bg-primary/10 ${collapsed ? 'pb-4' : 'pb-3'}`}
       >
-        <Icon
-          name={collapsed ? 'chevron-forward' : 'chevron-down'}
-          size={16}
-          color="primary"
-        />
-        <View className="flex-1 ml-2">
-          <Text variant="subhead" weight="semibold" color="primary" numberOfLines={1}>
+        {/* Row 1: chevron + school icon + name */}
+        <View className={`flex-row items-center gap-2 ${collapsed ? '' : 'mb-3'}`}>
+          <Icon name={collapsed ? 'chevron-forward' : 'chevron-down'} size={18} color="primary" />
+          <Icon name="school-outline" size={16} color="primary" />
+          <Text variant="subhead" weight="semibold" color="primary" numberOfLines={1} className="flex-1">
             {series.name}
           </Text>
-          {series.goal ? (
-            <Text variant="caption2" color="muted" numberOfLines={1}>
-              {series.goal}
-            </Text>
-          ) : null}
         </View>
-        <Text variant="caption1" color="muted" className="mr-2">
-          {inBlock}/{totalInSeries}
-        </Text>
-        {mode === 'edit' && onRemoveSeries && (
-          <Pressable
-            onPress={confirmRemoveSeries}
-            hitSlop={8}
-            className="w-8 h-8 rounded-full bg-destructive/10 items-center justify-center"
-          >
-            <Icon name="close" size={16} color="destructive" />
-          </Pressable>
+
+        {/* Row 2: counter + actions — hidden when collapsed */}
+        {!collapsed && (
+          <View className="flex-row items-center justify-between">
+            <Text variant="caption1" color="muted">
+              {inBlock}/{totalInSeries} Übungen
+            </Text>
+            <View className="flex-row items-center gap-2">
+              {onNavigateToDetail && (
+                <Pressable
+                  onPress={(e) => { e.stopPropagation?.(); onNavigateToDetail(); }}
+                  hitSlop={8}
+                  className="w-11 h-11 rounded-full bg-primary/20 items-center justify-center"
+                >
+                  <Icon name="open-outline" size={20} color="primary" />
+                </Pressable>
+              )}
+              {(mode === 'edit' || mode === 'execute') && onRemoveSeries && (
+                <Pressable
+                  onPress={(e) => { e.stopPropagation?.(); confirmRemoveSeries(); }}
+                  hitSlop={8}
+                  className="w-11 h-11 rounded-full bg-destructive/10 items-center justify-center"
+                >
+                  <Icon name="close" size={20} color="destructive" />
+                </Pressable>
+              )}
+            </View>
+          </View>
         )}
       </Pressable>
 
@@ -118,24 +134,24 @@ export function MethodicalSeriesBlock({
         return (
           <View
             key={ex.documentId}
-            className="border-t border-primary/10 px-4 py-3"
+            className="border-t border-primary/10 px-4 py-4"
           >
             {mode === 'execute' ? (
               <>
                 <Pressable
                   onPress={() => onSetExpanded?.(expanded ? null : ex.documentId)}
-                  className="gap-2"
+                  className="flex-row items-center gap-2"
                 >
+                  <Icon name={expanded ? 'chevron-down' : 'chevron-forward'} size={16} color="muted" />
                   <Text
                     variant="subhead"
                     numberOfLines={2}
-                    className={state?.completed ? 'line-through opacity-60' : ''}
+                    className={`flex-1 ${state?.completed ? 'line-through opacity-60' : ''}`}
                   >
                     {ex.Name}
                   </Text>
-                  <ExercisePills exercise={ex} />
                 </Pressable>
-                <View className="flex-row items-center gap-3 mt-2">
+                <View className="flex-row items-center gap-4 mt-4">
                   <Pressable
                     onPress={() => {
                       triggerHaptic('light');
@@ -144,44 +160,69 @@ export function MethodicalSeriesBlock({
                     hitSlop={8}
                   >
                     <View
-                      className={`w-9 h-9 rounded-full border-2 items-center justify-center ${
+                      className={`w-14 h-14 rounded-full border-2 items-center justify-center ${
                         state?.completed ? 'bg-success border-success' : 'border-muted'
                       }`}
                     >
-                      {state?.completed && <Icon name="checkmark" size={20} color="inverse" />}
+                      {state?.completed && <Icon name="checkmark" size={28} color="inverse" />}
                     </View>
                   </Pressable>
-                  <View className="flex-row items-center bg-surface-1 rounded-md px-2 py-1">
-                    <TextInput
-                      value={String(state?.editedMinutes ?? ex.Minutes ?? 0)}
-                      onChangeText={(t) => {
-                        const n = parseInt(t, 10);
-                        if (idx >= 0) onSetMinutes?.(idx, Number.isFinite(n) ? n : 0);
-                      }}
-                      keyboardType="number-pad"
-                      className="text-foreground text-right"
-                      style={{ padding: 0, width: 28 }}
-                    />
+                  <Pressable
+                    onPress={() => setTimerPickerDocId(ex.documentId)}
+                    className="flex-row items-center bg-surface-1 rounded-lg px-4 py-3 active:opacity-70"
+                    hitSlop={4}
+                  >
+                    <Text variant="body" weight="semibold">
+                      {state?.editedMinutes ?? ex.Minutes ?? 0}
+                    </Text>
                     <Text variant="caption1" color="muted" className="ml-1">min</Text>
-                  </View>
+                  </Pressable>
+                  <View className="flex-1" />
+                  {onRemoveExercise && (
+                    <Pressable
+                      onPress={() => confirmRemoveExercise(ex)}
+                      hitSlop={8}
+                      className="w-12 h-12 rounded-full bg-destructive/10 items-center justify-center active:opacity-70"
+                    >
+                      <Icon name="close" size={22} color="destructive" />
+                    </Pressable>
+                  )}
                 </View>
+                {expanded && (
+                  <View className="mt-4">
+                    <ExercisePills exercise={ex} showMinutes={false} />
+                  </View>
+                )}
                 {expanded && (
                   <ExerciseExpandedDetail exercise={ex} />
                 )}
+                <TimePickerModal
+                  visible={timerPickerDocId === ex.documentId}
+                  value={state?.editedMinutes ?? ex.Minutes ?? 0}
+                  onClose={() => setTimerPickerDocId(null)}
+                  onConfirm={(m) => {
+                    if (idx >= 0) onSetMinutes?.(idx, m);
+                    setTimerPickerDocId(null);
+                  }}
+                />
               </>
             ) : (
               <View className="flex-row items-center">
-                <View className="flex-1">
-                  <Text variant="subhead" numberOfLines={2}>{ex.Name}</Text>
+                <Pressable
+                  onPress={() => onNavigateToExercise?.(ex.documentId)}
+                  disabled={!onNavigateToExercise}
+                  className="flex-1 flex-row justify-between items-start"
+                >
+                  <Text variant="subhead" numberOfLines={2} className="flex-1 mr-2">{ex.Name}</Text>
                   <Text variant="caption1" color="muted">{ex.Minutes} Min</Text>
-                </View>
+                </Pressable>
                 {mode === 'edit' && onRemoveExercise && (
                   <Pressable
                     onPress={() => confirmRemoveExercise(ex)}
                     hitSlop={8}
-                    className="ml-3 w-11 h-11 rounded-full bg-destructive/10 items-center justify-center"
+                    className="ml-3 w-12 h-12 rounded-full bg-destructive/10 items-center justify-center"
                   >
-                    <Icon name="close" size={20} color="destructive" />
+                    <Icon name="close" size={22} color="destructive" />
                   </Pressable>
                 )}
               </View>

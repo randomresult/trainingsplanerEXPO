@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Platform, View, Pressable } from 'react-native';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
 import {
@@ -12,19 +12,41 @@ import {
   SkeletonLine,
 } from '@/components/ui';
 import { useExerciseDetail } from '@/lib/queries/useExercises';
+import { useAddExerciseToTraining } from '@/lib/queries/useTrainings';
+import { toast } from 'sonner-native';
+import { usePickSessionStore } from '@/lib/store/pickSessionStore';
 import {
   TrainingPickerSheet,
   TrainingPickerSheetRef,
 } from '@/components/sheets/TrainingPickerSheet';
 
 export default function ExerciseDetailScreen() {
-  const { id, trainingId, trainingName } = useLocalSearchParams<{
+  const { id, trainingId, trainingName, readOnly } = useLocalSearchParams<{
     id: string;
     trainingId?: string;
     trainingName?: string;
+    readOnly?: string;
   }>();
   const { data: exercise, isLoading } = useExerciseDetail(id);
   const trainingPickerRef = useRef<TrainingPickerSheetRef>(null);
+  const addExerciseMutation = useAddExerciseToTraining();
+  const [adding, setAdding] = useState(false);
+  const { addedExerciseIds, markAdded } = usePickSessionStore();
+
+  const handleDirectAdd = async () => {
+    if (!trainingId || !exercise || adding) return;
+    setAdding(true);
+    try {
+      await addExerciseMutation.mutateAsync({ trainingId, exerciseId: exercise.documentId });
+      markAdded(exercise.documentId);
+      toast.success('Übung hinzugefügt');
+      router.back();
+    } catch {
+      toast.error('Übung konnte nicht hinzugefügt werden');
+    } finally {
+      setAdding(false);
+    }
+  };
 
   const headerOptions = {
     headerShown: true as const,
@@ -157,18 +179,31 @@ export default function ExerciseDetailScreen() {
         )}
       </Screen>
 
-      {!trainingId && (
-        <View className="px-5 py-3 border-t border-border bg-background">
-          <Button
-            size="lg"
-            className="w-full"
-            leftIcon="add"
-            onPress={() => trainingPickerRef.current?.present(exercise.documentId, exercise.Name)}
-          >
-            Zum Training hinzufügen
-          </Button>
-        </View>
-      )}
+      {!readOnly && (() => {
+        const alreadyAdded = trainingId ? addedExerciseIds.has(exercise.documentId) : false;
+        return (
+          <View className="px-5 py-3 border-t border-border bg-background">
+            <Button
+              size="lg"
+              className="w-full"
+              leftIcon={alreadyAdded ? 'checkmark' : 'add'}
+              loading={adding}
+              disabled={alreadyAdded}
+              onPress={
+                trainingId
+                  ? handleDirectAdd
+                  : () => trainingPickerRef.current?.present(exercise.documentId, exercise.Name)
+              }
+            >
+              {alreadyAdded
+                ? 'Bereits hinzugefügt'
+                : trainingId
+                  ? (trainingName ? `Übung zu „${trainingName}" hinzufügen` : 'Übung hinzufügen')
+                  : 'Zum Training hinzufügen'}
+            </Button>
+          </View>
+        );
+      })()}
 
       <TrainingPickerSheet ref={trainingPickerRef} />
     </Screen>

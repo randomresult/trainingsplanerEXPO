@@ -38,6 +38,7 @@ import {
 } from '@/lib/queries/useTrainings';
 import { useQueryClient } from '@tanstack/react-query';
 import { COLORS } from '@/lib/theme';
+import { usePickSessionStore } from '@/lib/store/pickSessionStore';
 import type { MethodicalSeries } from '@/lib/types/models';
 import { toast } from 'sonner-native';
 
@@ -77,13 +78,12 @@ export function LibraryScreen({ trainingId, trainingName }: LibraryScreenProps) 
   const addSeriesMutation = useAddMethodicalSeriesToTraining();
 
   const [addingId, setAddingId] = useState<string | null>(null);
-  const [sessionAddedIds, setSessionAddedIds] = useState<Set<string>>(new Set());
 
   // Fix 4: State for series loading/added tracking
   const [addingSeriesId, setAddingSeriesId] = useState<string | null>(null);
-  const [sessionAddedSeriesIds, setSessionAddedSeriesIds] = useState<Set<string>>(new Set());
 
   const trainingPickerRef = useRef<TrainingPickerSheetRef>(null);
+  const { markAdded, markSeriesAdded, addedExerciseIds, addedSeriesIds } = usePickSessionStore();
   const [filters, setFilters] = useState<LibraryFilterState>(EMPTY_FILTERS);
   const filterSheetRef = useRef<LibraryFilterSheetRef>(null);
 
@@ -136,36 +136,38 @@ export function LibraryScreen({ trainingId, trainingName }: LibraryScreenProps) 
     setAddingId(exerciseId);
     try {
       await addExerciseMutation.mutateAsync({ trainingId, exerciseId });
-      setSessionAddedIds((prev) => new Set(prev).add(exerciseId));
+      markAdded(exerciseId);
       toast.success('Übung hinzugefügt');
     } catch {
       toast.error('Übung konnte nicht hinzugefügt werden');
     } finally {
       setAddingId(null);
     }
-  }, [trainingId, addingId, addExerciseMutation]);
+  }, [trainingId, addingId, addExerciseMutation, markAdded]);
 
   const handleAddSeries = useCallback(async (item: MethodicalSeries) => {
     if (!trainingId || addingSeriesId === item.documentId) return;
     setAddingSeriesId(item.documentId);
     try {
+      const exerciseDocumentIds = (item.exercises ?? []).map((ex) => ex.documentId);
       await addSeriesMutation.mutateAsync({
         trainingId,
         seriesDocumentId: item.documentId,
-        exerciseDocumentIds: (item.exercises ?? []).map((ex) => ex.documentId),
+        exerciseDocumentIds,
       });
-      setSessionAddedSeriesIds((prev) => new Set(prev).add(item.documentId));
+      exerciseDocumentIds.forEach(markAdded);
+      markSeriesAdded(item.documentId);
       toast.success('Lernpfad hinzugefügt');
     } catch {
       toast.error('Lernpfad konnte nicht hinzugefügt werden');
     } finally {
       setAddingSeriesId(null);
     }
-  }, [trainingId, addingSeriesId, addSeriesMutation]);
+  }, [trainingId, addingSeriesId, addSeriesMutation, markAdded]);
 
   // Fix 3: Memoized renderItem for exercises FlatList
   const renderExerciseItem = useCallback(({ item }: { item: any }) => {
-    const isAdded = sessionAddedIds.has(item.documentId);
+    const isAdded = addedExerciseIds.has(item.documentId);
     const isAdding = addingId === item.documentId;
     return (
       <ExerciseCard
@@ -218,7 +220,7 @@ export function LibraryScreen({ trainingId, trainingName }: LibraryScreenProps) 
         }
       />
     );
-  }, [sessionAddedIds, addingId, pickMode, trainingId, trainingName, handleAddExercise]);
+  }, [addedExerciseIds, addingId, pickMode, trainingId, trainingName, handleAddExercise]);
 
   // Fix 3 + Fix 4: Memoized renderItem for series FlatList with loading/added state
   const renderSeriesItem = useCallback(({ item }: { item: MethodicalSeries }) => (
@@ -266,7 +268,7 @@ export function LibraryScreen({ trainingId, trainingName }: LibraryScreenProps) 
             <Text variant="footnote" className="text-white/60">Übungen</Text>
           </View>
           {(() => {
-            const isSeriesAdded = sessionAddedSeriesIds.has(item.documentId);
+            const isSeriesAdded = addedSeriesIds.has(item.documentId);
             const isSeriesAdding = addingSeriesId === item.documentId;
             return (
               <Pressable
@@ -303,7 +305,7 @@ export function LibraryScreen({ trainingId, trainingName }: LibraryScreenProps) 
         </View>
       </View>
     </Pressable>
-  ), [pickMode, trainingId, trainingName, handleAddSeries, addingSeriesId, sessionAddedSeriesIds]);
+  ), [pickMode, trainingId, trainingName, handleAddSeries, addingSeriesId, addedSeriesIds]);
 
   return (
     <Screen edges={pickMode ? ['bottom'] : ['top', 'bottom']}>

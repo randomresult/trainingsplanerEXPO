@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Platform, View, Pressable } from 'react-native';
+import { Platform, View, Pressable, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
 import {
   Screen,
@@ -14,8 +14,10 @@ import {
   TrainingPickerSheetRef,
 } from '@/components/sheets/TrainingPickerSheet';
 import { useMethodicalSeriesDetail } from '@/lib/queries/useMethodicalSeries';
-import { useAddMethodicalSeriesToTraining } from '@/lib/queries/useTrainings';
+import { useAddMethodicalSeriesToTraining, useAddExerciseToTraining } from '@/lib/queries/useTrainings';
 import { toast } from 'sonner-native';
+import { COLORS } from '@/lib/theme';
+import { usePickSessionStore } from '@/lib/store/pickSessionStore';
 
 export default function SeriesDetailScreen() {
   const { id, trainingId, trainingName } = useLocalSearchParams<{
@@ -28,7 +30,24 @@ export default function SeriesDetailScreen() {
   const pickMode = !!trainingId;
 
   const addSeriesMutation = useAddMethodicalSeriesToTraining();
+  const addExerciseMutation = useAddExerciseToTraining();
   const [addingWholeSeries, setAddingWholeSeries] = useState(false);
+  const [addingExerciseId, setAddingExerciseId] = useState<string | null>(null);
+  const { addedExerciseIds, addedSeriesIds, markAdded, markSeriesAdded } = usePickSessionStore();
+
+  const handleAddExercise = async (exerciseId: string, exerciseName: string) => {
+    if (!trainingId || addingExerciseId === exerciseId) return;
+    setAddingExerciseId(exerciseId);
+    try {
+      await addExerciseMutation.mutateAsync({ trainingId, exerciseId });
+      markAdded(exerciseId);
+      toast.success(`${exerciseName} hinzugefügt`);
+    } catch {
+      toast.error('Übung konnte nicht hinzugefügt werden');
+    } finally {
+      setAddingExerciseId(null);
+    }
+  };
 
   const headerOptions = {
     headerShown: true as const,
@@ -55,11 +74,14 @@ export default function SeriesDetailScreen() {
     if (!trainingId || !series || addingWholeSeries) return;
     setAddingWholeSeries(true);
     try {
+      const exerciseDocumentIds = (series.exercises ?? []).map((ex) => ex.documentId);
       await addSeriesMutation.mutateAsync({
         trainingId,
         seriesDocumentId: series.documentId,
-        exerciseDocumentIds: (series.exercises ?? []).map((ex) => ex.documentId),
+        exerciseDocumentIds,
       });
+      exerciseDocumentIds.forEach(markAdded);
+      markSeriesAdded(series.documentId);
       toast.success('Lernpfad hinzugefügt');
       router.dismissAll();
     } catch {
@@ -100,8 +122,10 @@ export default function SeriesDetailScreen() {
   const exerciseIds = (series.exercises ?? []).map((ex) => ex.documentId);
 
   return (
-    <Screen scroll edges={['bottom']}>
+    <Screen edges={['bottom']}>
       <Stack.Screen options={headerOptions} />
+
+      <Screen scroll edges={[]}>
 
       {/* Hero */}
       <View className="bg-card px-5 pt-5 pb-6 border-b border-border">
@@ -164,52 +188,67 @@ export default function SeriesDetailScreen() {
               <Text variant="subhead" className="flex-1" numberOfLines={2}>
                 {ex.Name}
               </Text>
-              {!pickMode && (
-                <Pressable
-                  onPress={(e) => {
-                    e.stopPropagation?.();
-                    trainingPickerRef.current?.present(ex.documentId, ex.Name);
-                  }}
-                  hitSlop={10}
-                  className="w-9 h-9 rounded-full bg-primary/15 items-center justify-center shrink-0"
-                >
-                  <Icon name="add" size={18} color="primary" />
-                </Pressable>
-              )}
+              {(() => {
+                const isAdded = addedExerciseIds.has(ex.documentId);
+                const isAdding = addingExerciseId === ex.documentId;
+                return (
+                  <Pressable
+                    onPress={(e) => {
+                      e.stopPropagation?.();
+                      if (isAdded || isAdding) return;
+                      if (pickMode) {
+                        handleAddExercise(ex.documentId, ex.Name);
+                      } else {
+                        trainingPickerRef.current?.present(ex.documentId, ex.Name);
+                      }
+                    }}
+                    hitSlop={10}
+                    disabled={isAdded || isAdding}
+                    className={
+                      isAdded
+                        ? 'w-9 h-9 rounded-full bg-success/15 items-center justify-center shrink-0'
+                        : 'w-9 h-9 rounded-full bg-primary/15 items-center justify-center shrink-0'
+                    }
+                  >
+                    {isAdding ? (
+                      <ActivityIndicator size="small" color={COLORS.primary} />
+                    ) : (
+                      <Icon name={isAdded ? 'checkmark' : 'add'} size={18} color={isAdded ? 'success' : 'primary'} />
+                    )}
+                  </Pressable>
+                );
+              })()}
             </Pressable>
         ))}
       </View>
 
-      {/* Add whole series CTA */}
-      <View className="px-5 pb-8">
-        {pickMode ? (
-          <Button
-            size="lg"
-            className="w-full"
-            leftIcon="add"
-            loading={addingWholeSeries}
-            onPress={handleAddWholeSeries}
-          >
-            {trainingName ? `Lernpfad zu „${trainingName}" hinzufügen` : 'Lernpfad hinzufügen'}
-          </Button>
-        ) : (
-          <Pressable
-            onPress={() =>
-              trainingPickerRef.current?.presentSeries(
-                series.documentId,
-                series.name,
-                exerciseIds,
-              )
-            }
-            className="flex-row items-center justify-center gap-2 bg-primary rounded-xl py-4 active:opacity-80"
-          >
-            <Icon name="add" size={20} color="inverse" />
-            <Text variant="subhead" weight="semibold" color="inverse">
-              Ganze Reihe hinzufügen
-            </Text>
-          </Pressable>
-        )}
-      </View>
+      </Screen>
+
+      {(() => {
+        const seriesAlreadyAdded = pickMode && addedSeriesIds.has(series.documentId);
+        return (
+          <View className="px-5 py-3 border-t border-border bg-background">
+            <Button
+              size="lg"
+              className="w-full"
+              leftIcon={seriesAlreadyAdded ? 'checkmark' : 'add'}
+              loading={addingWholeSeries}
+              disabled={seriesAlreadyAdded}
+              onPress={
+                pickMode
+                  ? handleAddWholeSeries
+                  : () => trainingPickerRef.current?.presentSeries(series.documentId, series.name, exerciseIds)
+              }
+            >
+              {seriesAlreadyAdded
+                ? 'Bereits hinzugefügt'
+                : pickMode
+                  ? (trainingName ? `Lernpfad zu „${trainingName}" hinzufügen` : 'Lernpfad hinzufügen')
+                  : 'Ganze Reihe hinzufügen'}
+            </Button>
+          </View>
+        );
+      })()}
 
       {!pickMode && <TrainingPickerSheet ref={trainingPickerRef} />}
     </Screen>

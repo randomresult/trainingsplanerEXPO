@@ -3,7 +3,6 @@ import {
   Platform,
   View,
   ScrollView,
-  TextInput,
   Alert,
   ActivityIndicator,
   Pressable,
@@ -20,6 +19,7 @@ import {
   MediaViewer,
   ExercisePills,
   MethodicalSeriesBlock,
+  TimePickerModal,
   toast,
 } from '@/components/ui';
 import {
@@ -44,6 +44,7 @@ export default function ExecuteTrainingScreen() {
   const removeSeries = useRemoveMethodicalSeriesFromTraining();
   const insets = useSafeAreaInsets();
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [timerPickerDocId, setTimerPickerDocId] = useState<string | null>(null);
   const [viewerUri, setViewerUri] = useState<string | null>(null);
 
   const handleAddExercises = () => {
@@ -220,6 +221,7 @@ export default function ExecuteTrainingScreen() {
               blockExercises={blockExercises}
               totalInSeries={blockExercises.length}
               mode="execute"
+              onNavigateToDetail={() => router.push({ pathname: '/series-detail/[id]' as any, params: { id: series.documentId } })}
               onRemoveSeries={() =>
                 removeSeries.mutate({
                   trainingId: id,
@@ -247,22 +249,22 @@ export default function ExecuteTrainingScreen() {
             const idx = indexByDocId.get(ex.documentId) ?? -1;
             const expanded = expandedId === ex.documentId;
             return (
-              <Card key={ex.documentId} className="mb-3 gap-3">
+              <Card key={ex.documentId} className="mb-3 gap-4">
                 <Pressable
                   onPress={() => setExpandedId(expanded ? null : ex.documentId)}
-                  className="gap-2"
+                  className="flex-row items-center gap-2"
                 >
+                  <Icon name={expanded ? 'chevron-down' : 'chevron-forward'} size={16} color="muted" />
                   <Text
                     variant="headline"
                     numberOfLines={2}
-                    className={ex.completed ? 'line-through opacity-60' : ''}
+                    className={`flex-1 ${ex.completed ? 'line-through opacity-60' : ''}`}
                   >
                     {ex.Name}
                   </Text>
-                  <ExercisePills exercise={ex} />
                 </Pressable>
 
-                <View className="flex-row items-center gap-3">
+                <View className="flex-row items-center gap-4">
                   <Pressable
                     onPress={() => {
                       triggerHaptic('light');
@@ -271,29 +273,22 @@ export default function ExecuteTrainingScreen() {
                     hitSlop={8}
                   >
                     <View
-                      className={`w-9 h-9 rounded-full border-2 items-center justify-center ${
+                      className={`w-14 h-14 rounded-full border-2 items-center justify-center ${
                         ex.completed ? 'bg-success border-success' : 'border-muted'
                       }`}
                     >
-                      {ex.completed && <Icon name="checkmark" size={20} color="inverse" />}
+                      {ex.completed && <Icon name="checkmark" size={28} color="inverse" />}
                     </View>
                   </Pressable>
 
-                  <View className="flex-row items-center bg-surface-1 rounded-md px-2 py-1">
-                    <TextInput
-                      value={String(ex.editedMinutes)}
-                      onChangeText={(t) => {
-                        const n = parseInt(t, 10);
-                        if (idx >= 0) setMinutes(idx, Number.isFinite(n) ? n : 0);
-                      }}
-                      keyboardType="number-pad"
-                      className="text-foreground text-right"
-                      style={{ padding: 0, width: 28 }}
-                    />
-                    <Text variant="caption1" color="muted" className="ml-1">
-                      min
-                    </Text>
-                  </View>
+                  <Pressable
+                    onPress={() => setTimerPickerDocId(ex.documentId)}
+                    className="flex-row items-center bg-surface-1 rounded-lg px-4 py-3 active:opacity-70"
+                    hitSlop={4}
+                  >
+                    <Text variant="body" weight="semibold">{ex.editedMinutes}</Text>
+                    <Text variant="caption1" color="muted" className="ml-1">min</Text>
+                  </Pressable>
 
                   <View className="flex-1" />
 
@@ -301,11 +296,23 @@ export default function ExecuteTrainingScreen() {
                     onPress={() => confirmRemoveExercise(ex.documentId, ex.Name)}
                     disabled={removeExercise.isPending}
                     hitSlop={8}
-                    className="w-11 h-11 rounded-full bg-destructive/10 items-center justify-center active:opacity-70 disabled:opacity-40"
+                    className="w-12 h-12 rounded-full bg-destructive/10 items-center justify-center active:opacity-70 disabled:opacity-40"
                   >
-                    <Icon name="close" size={20} color="destructive" />
+                    <Icon name="close" size={22} color="destructive" />
                   </Pressable>
                 </View>
+
+                <TimePickerModal
+                  visible={timerPickerDocId === ex.documentId}
+                  value={ex.editedMinutes}
+                  onClose={() => setTimerPickerDocId(null)}
+                  onConfirm={(m) => {
+                    if (idx >= 0) setMinutes(idx, m);
+                    setTimerPickerDocId(null);
+                  }}
+                />
+
+                {expanded && <ExercisePills exercise={ex} showMinutes={false} />}
 
                 {expanded && (
                   <View className="pt-3 border-t border-border">
