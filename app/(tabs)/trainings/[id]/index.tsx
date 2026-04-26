@@ -7,7 +7,6 @@ import {
   useStartTraining,
   useRemoveExerciseFromTraining,
   useRemovePlayerFromTraining,
-  useAddExerciseToTraining,
   useAddPlayersToTraining,
   useRemoveMethodicalSeriesFromTraining,
 } from '@/lib/queries/useTrainings';
@@ -27,7 +26,6 @@ export default function TrainingDetailScreen() {
   const startTraining = useStartTraining();
   const removeExercise = useRemoveExerciseFromTraining();
   const removePlayer = useRemovePlayerFromTraining();
-  const addExercise = useAddExerciseToTraining();
   const addPlayers = useAddPlayersToTraining();
   const removeSeries = useRemoveMethodicalSeriesFromTraining();
 
@@ -97,18 +95,9 @@ export default function TrainingDetailScreen() {
 
   const handleAddExercises = () => {
     if (!training) return;
-    const existingIds = training.exercises?.map((e) => e.documentId) ?? [];
-    usePickModeStore.getState().startAdd(async (exerciseId) => {
-      try {
-        await addExercise.mutateAsync({ trainingId: id, exerciseId });
-        toast.success('Übung hinzugefügt');
-      } catch {
-        toast.error('Übung konnte nicht hinzugefügt werden');
-      }
-    });
     router.push({
-      pathname: '/exercise-picker',
-      params: { excludeIds: existingIds.join(',') },
+      pathname: '/library-pick',
+      params: { trainingId: id, trainingName: training.Name },
     });
   };
 
