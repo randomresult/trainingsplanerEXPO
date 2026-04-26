@@ -23,7 +23,7 @@
 
 **Docs:** `specs/2026-04-25-motion-polish-c2-design.md`, `plans/2026-04-25-motion-polish-c2.md`
 
-### 2. MÜRs — Methodische Übungsreihen (Lernpfade) — DESIGN COMPLETE, READY TO IMPLEMENT
+### ✅ 2. MÜRs — Methodische Übungsreihen (Lernpfade) — SHIPPED 2026-04-26
 
 **Docs:**
 - Spec: `specs/2026-04-25-muers-design.md`
@@ -67,7 +67,16 @@
 
 **Scope:** Siehe `specs/training-programs.md` Draft. Empfohlenes Modell: Player-Program-Enrollment mit optionaler Goal-Suggest-Integration. Explizit als Post-MVP markiert.
 
-### X. Library / Picker Unification (nach MÜRs, eigenständiger Cycle)
+### X. Series-to-New-Training (kleiner Task, nach Picker-Unification)
+**Kontext:** `TrainingPickerSheet` zeigt existierende Trainings. Wenn der User stattdessen ein neues Training mit einer ganzen Reihe erstellen will, fehlt der Flow. `training-new.tsx` kennt nur `?preselect=<exerciseId>`, kein `?preselectSeries=`.
+
+**Scope:**
+- `TrainingPickerSheet` bekommt "Neues Training erstellen"-Option, die zu `training-new.tsx?preselectSeries=<id>&seriesName=<name>&exerciseIds=<csv>` navigiert
+- `training-new.tsx` liest `preselectSeries`-Param und füllt Exercises + methodicalSeries beim Erstellen vor
+
+**Warum nach Unification:** Nach Unification gibt es nur noch einen Add-Flow — der neue Training-Flow baut dann sauber darauf auf.
+
+### Y. Library / Picker Unification (nach MÜRs, eigenständiger Cycle)
 **Kontext:** Aktuell existieren zwei separate Screens mit ähnlicher UI:
 - `app/(tabs)/library/index.tsx` — Library-Tab, `+` → TrainingPickerSheet (wähle Training)
 - `app/exercise-picker.tsx` — Modal, `+` → fügt direkt zum bekannten Training hinzu (via `usePickModeStore`)
