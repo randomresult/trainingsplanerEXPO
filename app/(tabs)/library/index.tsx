@@ -276,7 +276,7 @@ export default function LibraryListScreen() {
                   <Pressable
                     onPress={(e) => {
                       e.stopPropagation?.();
-                      (trainingPickerRef.current as any)?.presentSeries(
+                      trainingPickerRef.current?.presentSeries(
                         item.documentId,
                         item.name,
                         (item.exercises ?? []).map((ex) => ex.documentId),
