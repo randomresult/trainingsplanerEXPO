@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useCallback } from 'react';
 import {
   View,
   TextInput,
@@ -43,6 +43,19 @@ import { toast } from 'sonner-native';
 
 const SERIES_BG = require('../../assets/images/series_background_default.png');
 
+// Fix 1: Pure utility functions moved to module level (no component state deps)
+const tagNames = (rel: any[] | undefined) =>
+  (rel ?? []).map((t) => t?.Name).filter(Boolean) as string[];
+
+const collectTagNames = (
+  exercises: any[] | undefined,
+  key: 'focusareas' | 'playerlevels' | 'categories',
+) => {
+  const set = new Set<string>();
+  (exercises ?? []).forEach((ex: any) => tagNames(ex[key]).forEach((n) => set.add(n)));
+  return Array.from(set).sort();
+};
+
 type LibraryTab = 'exercises' | 'series';
 
 export interface LibraryScreenProps {
@@ -66,31 +79,28 @@ export function LibraryScreen({ trainingId, trainingName }: LibraryScreenProps) 
   const [addingId, setAddingId] = useState<string | null>(null);
   const [sessionAddedIds, setSessionAddedIds] = useState<Set<string>>(new Set());
 
+  // Fix 4: State for series loading/added tracking
+  const [addingSeriesId, setAddingSeriesId] = useState<string | null>(null);
+  const [sessionAddedSeriesIds, setSessionAddedSeriesIds] = useState<Set<string>>(new Set());
+
   const trainingPickerRef = useRef<TrainingPickerSheetRef>(null);
   const [filters, setFilters] = useState<LibraryFilterState>(EMPTY_FILTERS);
   const filterSheetRef = useRef<LibraryFilterSheetRef>(null);
 
+  // Fix 2: Use refetchQueries so the spinner waits for actual network data
   const onRefresh = async () => {
     setRefreshing(true);
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ['exercises'] }),
-      queryClient.invalidateQueries({ queryKey: ['methodicalSeries'] }),
+      queryClient.refetchQueries({ queryKey: ['exercises'], type: 'active' }),
+      queryClient.refetchQueries({ queryKey: ['methodicalSeries'], type: 'active' }),
     ]);
     setRefreshing(false);
   };
 
-  const tagNames = (rel: any[] | undefined) =>
-    (rel ?? []).map((t) => t?.Name).filter(Boolean) as string[];
-
-  const collectTagNames = (key: 'focusareas' | 'playerlevels' | 'categories') => {
-    const set = new Set<string>();
-    (exercises ?? []).forEach((ex: any) => tagNames(ex[key]).forEach((n) => set.add(n)));
-    return Array.from(set).sort();
-  };
-
-  const availableFocusareas = useMemo(() => collectTagNames('focusareas'), [exercises]);
-  const availablePlayerlevels = useMemo(() => collectTagNames('playerlevels'), [exercises]);
-  const availableCategories = useMemo(() => collectTagNames('categories'), [exercises]);
+  // Fix 1: useMemo calls now pass exercises as first argument
+  const availableFocusareas = useMemo(() => collectTagNames(exercises, 'focusareas'), [exercises]);
+  const availablePlayerlevels = useMemo(() => collectTagNames(exercises, 'playerlevels'), [exercises]);
+  const availableCategories = useMemo(() => collectTagNames(exercises, 'categories'), [exercises]);
 
   const filtered = useMemo(() => {
     const matchesMulti = (selected: string[], rel: any[] | undefined) => {
@@ -135,19 +145,164 @@ export function LibraryScreen({ trainingId, trainingName }: LibraryScreenProps) 
     }
   };
 
+  // Fix 4: Updated handleAddSeries with loading/added state tracking
   const handleAddSeries = async (item: MethodicalSeries) => {
-    if (!trainingId) return;
+    if (!trainingId || addingSeriesId === item.documentId) return;
+    setAddingSeriesId(item.documentId);
     try {
       await addSeriesMutation.mutateAsync({
         trainingId,
         seriesDocumentId: item.documentId,
         exerciseDocumentIds: (item.exercises ?? []).map((ex) => ex.documentId),
       });
+      setSessionAddedSeriesIds((prev) => new Set(prev).add(item.documentId));
       toast.success('Lernpfad hinzugefügt');
     } catch {
       toast.error('Lernpfad konnte nicht hinzugefügt werden');
+    } finally {
+      setAddingSeriesId(null);
     }
   };
+
+  // Fix 3: Memoized renderItem for exercises FlatList
+  const renderExerciseItem = useCallback(({ item }: { item: any }) => {
+    const isAdded = sessionAddedIds.has(item.documentId);
+    const isAdding = addingId === item.documentId;
+    return (
+      <ExerciseCard
+        exercise={item}
+        onPress={() =>
+          router.push({
+            pathname: '/exercise-detail/[id]',
+            params: pickMode
+              ? { id: item.documentId, trainingId, trainingName: trainingName ?? '' }
+              : { id: item.documentId },
+          })
+        }
+        trailing={
+          pickMode ? (
+            <Pressable
+              onPress={(e) => {
+                e.stopPropagation?.();
+                if (!isAdded && !isAdding) handleAddExercise(item.documentId);
+              }}
+              hitSlop={10}
+              disabled={isAdded || isAdding}
+              className={
+                isAdded
+                  ? 'w-10 h-10 rounded-full bg-success/15 items-center justify-center'
+                  : 'w-10 h-10 rounded-full bg-primary/15 items-center justify-center'
+              }
+            >
+              {isAdding ? (
+                <ActivityIndicator size="small" color={COLORS.primary} />
+              ) : (
+                <Icon
+                  name={isAdded ? 'checkmark' : 'add'}
+                  size={20}
+                  color={isAdded ? 'success' : 'primary'}
+                />
+              )}
+            </Pressable>
+          ) : (
+            <Pressable
+              onPress={(e) => {
+                e.stopPropagation?.();
+                trainingPickerRef.current?.present(item.documentId, item.Name);
+              }}
+              hitSlop={10}
+              className="w-10 h-10 rounded-full bg-primary/15 items-center justify-center"
+            >
+              <Icon name="add" size={20} color="primary" />
+            </Pressable>
+          )
+        }
+      />
+    );
+  }, [sessionAddedIds, addingId, pickMode, trainingId, trainingName, handleAddExercise]);
+
+  // Fix 3 + Fix 4: Memoized renderItem for series FlatList with loading/added state
+  const renderSeriesItem = useCallback(({ item }: { item: MethodicalSeries }) => (
+    <Pressable
+      onPress={() =>
+        router.push({
+          pathname: '/(tabs)/library/series/[id]' as any,
+          params: { id: item.documentId },
+        })
+      }
+      style={{ position: 'relative' }}
+      className="rounded-2xl overflow-hidden active:opacity-75"
+    >
+      <Image
+        source={SERIES_BG}
+        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+        resizeMode="cover"
+      />
+      <View style={{ backgroundColor: 'rgba(0,0,0,0.55)' }} className="p-4">
+        <View className="flex-row items-start justify-between mb-3">
+          {item.category ? (
+            <View className="bg-amber-500/25 border border-amber-400/50 rounded-md px-2 py-1">
+              <Text variant="caption2" className="text-amber-300 font-bold uppercase tracking-widest">
+                {item.category}
+              </Text>
+            </View>
+          ) : <View />}
+        </View>
+        <Text variant="title3" weight="bold" numberOfLines={2} className="mb-1 text-white">
+          {item.name}
+        </Text>
+        {(item.goal || item.description) ? (
+          <Text variant="footnote" numberOfLines={2} className="mb-4 text-white/65">
+            {item.goal || item.description}
+          </Text>
+        ) : <View className="mb-4" />}
+        <View className="h-px bg-white/20 mb-3" />
+        <View className="flex-row items-center justify-between">
+          <View className="flex-row items-baseline gap-1">
+            <Text variant="title2" weight="bold" className="text-white">
+              {item.exercises?.length ?? 0}
+            </Text>
+            <Text variant="footnote" className="text-white/60">Übungen</Text>
+          </View>
+          {(() => {
+            const isSeriesAdded = sessionAddedSeriesIds.has(item.documentId);
+            const isSeriesAdding = addingSeriesId === item.documentId;
+            return (
+              <Pressable
+                onPress={(e) => {
+                  e.stopPropagation?.();
+                  if (!isSeriesAdded && !isSeriesAdding) {
+                    if (pickMode) {
+                      handleAddSeries(item);
+                    } else {
+                      trainingPickerRef.current?.presentSeries(
+                        item.documentId,
+                        item.name,
+                        (item.exercises ?? []).map((ex) => ex.documentId),
+                      );
+                    }
+                  }
+                }}
+                disabled={isSeriesAdded || isSeriesAdding}
+                hitSlop={10}
+                className={
+                  isSeriesAdded
+                    ? 'w-9 h-9 rounded-full bg-white/15 border border-white/30 items-center justify-center'
+                    : 'w-9 h-9 rounded-full bg-white/15 border border-white/30 items-center justify-center'
+                }
+              >
+                {isSeriesAdding ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Icon name={isSeriesAdded ? 'checkmark' : 'add'} size={20} color="foreground" />
+                )}
+              </Pressable>
+            );
+          })()}
+        </View>
+      </View>
+    </Pressable>
+  ), [pickMode, handleAddSeries, addingSeriesId, sessionAddedSeriesIds]);
 
   return (
     <Screen edges={pickMode ? ['bottom'] : ['top', 'bottom']}>
@@ -248,61 +403,7 @@ export function LibraryScreen({ trainingId, trainingName }: LibraryScreenProps) 
                     </Text>
                   </View>
                 }
-                renderItem={({ item }: { item: any }) => {
-                  const isAdded = sessionAddedIds.has(item.documentId);
-                  const isAdding = addingId === item.documentId;
-                  return (
-                    <ExerciseCard
-                      exercise={item}
-                      onPress={() =>
-                        router.push({
-                          pathname: '/exercise-detail/[id]',
-                          params: pickMode
-                            ? { id: item.documentId, trainingId, trainingName: trainingName ?? '' }
-                            : { id: item.documentId },
-                        })
-                      }
-                      trailing={
-                        pickMode ? (
-                          <Pressable
-                            onPress={(e) => {
-                              e.stopPropagation?.();
-                              if (!isAdded && !isAdding) handleAddExercise(item.documentId);
-                            }}
-                            hitSlop={10}
-                            disabled={isAdded || isAdding}
-                            className={
-                              isAdded
-                                ? 'w-10 h-10 rounded-full bg-success/15 items-center justify-center'
-                                : 'w-10 h-10 rounded-full bg-primary/15 items-center justify-center'
-                            }
-                          >
-                            {isAdding ? (
-                              <ActivityIndicator size="small" color={COLORS.primary} />
-                            ) : (
-                              <Icon
-                                name={isAdded ? 'checkmark' : 'add'}
-                                size={20}
-                                color={isAdded ? 'success' : 'primary'}
-                              />
-                            )}
-                          </Pressable>
-                        ) : (
-                          <Pressable
-                            onPress={(e) => {
-                              e.stopPropagation?.();
-                              trainingPickerRef.current?.present(item.documentId, item.Name);
-                            }}
-                            hitSlop={10}
-                            className="w-10 h-10 rounded-full bg-primary/15 items-center justify-center"
-                          >
-                            <Icon name="add" size={20} color="primary" />
-                          </Pressable>
-                        )
-                      }
-                    />
-                  );
-                }}
+                renderItem={renderExerciseItem}
               />
             </Pressable>
           )}
@@ -324,70 +425,7 @@ export function LibraryScreen({ trainingId, trainingName }: LibraryScreenProps) 
                 <Text variant="footnote" color="muted" className="mt-3">Keine Lernpfade vorhanden</Text>
               </View>
             }
-            renderItem={({ item }: { item: MethodicalSeries }) => (
-              <Pressable
-                onPress={() =>
-                  router.push({
-                    pathname: '/(tabs)/library/series/[id]' as any,
-                    params: { id: item.documentId },
-                  })
-                }
-                style={{ position: 'relative' }}
-                className="rounded-2xl overflow-hidden active:opacity-75"
-              >
-                <Image
-                  source={SERIES_BG}
-                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                  resizeMode="cover"
-                />
-                <View style={{ backgroundColor: 'rgba(0,0,0,0.55)' }} className="p-4">
-                  <View className="flex-row items-start justify-between mb-3">
-                    {item.category ? (
-                      <View className="bg-amber-500/25 border border-amber-400/50 rounded-md px-2 py-1">
-                        <Text variant="caption2" className="text-amber-300 font-bold uppercase tracking-widest">
-                          {item.category}
-                        </Text>
-                      </View>
-                    ) : <View />}
-                  </View>
-                  <Text variant="title3" weight="bold" numberOfLines={2} className="mb-1 text-white">
-                    {item.name}
-                  </Text>
-                  {(item.goal || item.description) ? (
-                    <Text variant="footnote" numberOfLines={2} className="mb-4 text-white/65">
-                      {item.goal || item.description}
-                    </Text>
-                  ) : <View className="mb-4" />}
-                  <View className="h-px bg-white/20 mb-3" />
-                  <View className="flex-row items-center justify-between">
-                    <View className="flex-row items-baseline gap-1">
-                      <Text variant="title2" weight="bold" className="text-white">
-                        {item.exercises?.length ?? 0}
-                      </Text>
-                      <Text variant="footnote" className="text-white/60">Übungen</Text>
-                    </View>
-                    <Pressable
-                      onPress={(e) => {
-                        e.stopPropagation?.();
-                        if (pickMode) {
-                          handleAddSeries(item);
-                        } else {
-                          trainingPickerRef.current?.presentSeries(
-                            item.documentId,
-                            item.name,
-                            (item.exercises ?? []).map((ex) => ex.documentId),
-                          );
-                        }
-                      }}
-                      hitSlop={10}
-                      className="w-9 h-9 rounded-full bg-white/15 border border-white/30 items-center justify-center"
-                    >
-                      <Icon name="add" size={20} color="foreground" />
-                    </Pressable>
-                  </View>
-                </View>
-              </Pressable>
-            )}
+            renderItem={renderSeriesItem}
           />
         )
       )}
