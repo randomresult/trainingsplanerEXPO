@@ -1,6 +1,8 @@
 import { useRef } from 'react';
-import { View, Pressable } from 'react-native';
+import { View, Pressable, ImageBackground } from 'react-native';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
+
+const SERIES_BG = require('@/assets/images/series_background_default.png');
 import {
   Screen,
   Text,
@@ -54,38 +56,40 @@ export default function MethodicalSeriesDetailScreen() {
       <Stack.Screen options={{ title: series.name }} />
 
       {/* Hero */}
-      <View className="bg-primary/10 px-5 pt-5 pb-6">
-        <View className="w-12 h-12 rounded-full bg-primary/20 items-center justify-center mb-4">
-          <Icon name="school-outline" size={26} color="primary" />
-        </View>
-
-        {series.category ? (
-          <View className="self-start bg-amber-500/10 border border-amber-500/20 rounded-md px-2 py-1 mb-2">
-            <Text variant="caption2" className="text-amber-500 font-bold uppercase tracking-wider">
-              {series.category}
-            </Text>
+      <ImageBackground source={SERIES_BG} resizeMode="cover">
+        <View className="bg-black/65 px-5 pt-5 pb-6">
+          <View className="w-12 h-12 rounded-full bg-white/15 items-center justify-center mb-4">
+            <Icon name="school-outline" size={26} color="foreground" />
           </View>
-        ) : null}
 
-        <Text variant="largeTitle" weight="bold" className="mb-1">
-          {series.name}
-        </Text>
+          {series.category ? (
+            <View className="self-start bg-amber-500/20 border border-amber-500/40 rounded-md px-2 py-1 mb-2">
+              <Text variant="caption2" className="text-amber-400 font-bold uppercase tracking-wider">
+                {series.category}
+              </Text>
+            </View>
+          ) : null}
 
-        {series.goal ? (
-          <View className="bg-primary/10 rounded-lg px-3 py-2 mt-2">
-            <Text variant="caption1" color="primary" weight="semibold" className="mb-1">
-              Ziel
-            </Text>
-            <Text variant="footnote">{series.goal}</Text>
-          </View>
-        ) : null}
-
-        {series.description ? (
-          <Text variant="footnote" color="muted" className="mt-3">
-            {series.description}
+          <Text variant="largeTitle" weight="bold" className="mb-1 text-white">
+            {series.name}
           </Text>
-        ) : null}
-      </View>
+
+          {series.goal ? (
+            <View className="bg-white/10 rounded-lg px-3 py-2 mt-2">
+              <Text variant="caption1" weight="semibold" className="mb-1 text-white/60">
+                Ziel
+              </Text>
+              <Text variant="footnote" className="text-white/90">{series.goal}</Text>
+            </View>
+          ) : null}
+
+          {series.description ? (
+            <Text variant="footnote" className="mt-3 text-white/60">
+              {series.description}
+            </Text>
+          ) : null}
+        </View>
+      </ImageBackground>
 
       {/* Exercise list */}
       <View className="px-5 pt-4 pb-4">
