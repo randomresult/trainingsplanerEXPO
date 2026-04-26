@@ -21,7 +21,7 @@ import {
   RefreshControl,
 } from 'react-native';
 
-const SERIES_BG = require('@/assets/images/series_background_default.png');
+const SERIES_BG = require('../../../assets/images/series_background_default.png');
 import { router } from 'expo-router';
 import { Screen, Text, ExerciseCard, Icon, FilterChip, SkeletonList } from '@/components/ui';
 import { useExercises } from '@/lib/queries/useExercises';
@@ -242,10 +242,11 @@ export default function LibraryListScreen() {
             renderItem={({ item }: { item: MethodicalSeries }) => (
               <Pressable
                 onPress={() => router.push({ pathname: '/(tabs)/library/series/[id]' as any, params: { id: item.documentId } })}
+                style={{ position: 'relative' }}
                 className="rounded-2xl overflow-hidden active:opacity-75"
               >
                 {/* Background image — absolute fill, parent height driven by content */}
-                <Image source={SERIES_BG} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
+                <Image source={SERIES_BG} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} resizeMode="cover" />
 
                 {/* Dark overlay — inline style avoids NativeWind rgba translation issues */}
                 <View style={{ backgroundColor: 'rgba(0,0,0,0.55)' }} className="p-4">

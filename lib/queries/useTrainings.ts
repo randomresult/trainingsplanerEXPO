@@ -9,6 +9,10 @@ import type { StrapiResponse } from '../types/api';
 // but exercises.focusareas (and the other tag relations) stay empty. Every
 // screen that renders exercise pills (execute, detail) needs them populated
 // nested, so we spell it out here once.
+// Strapi v5 populate='*' only walks one level — training.exercises comes back
+// but exercises.focusareas (and the other tag relations) stay empty. Every
+// screen that renders exercise pills (execute, detail) needs them populated
+// nested, so we spell it out here once.
 const TRAINING_POPULATE = {
   exercises: {
     populate: {

@@ -29,7 +29,7 @@ export default function LibraryLayout() {
         ...(webBackButton && { headerLeft: webBackButton }),
       }}
     >
-      <Stack.Screen name="index" options={{ headerShown: false, headerBackTitle: 'Bibliothek' }} />
+      <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="series/[id]" options={{ headerShown: true }} />
     </Stack>
   );

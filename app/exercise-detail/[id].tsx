@@ -49,9 +49,9 @@ export default function ExerciseDetailScreen() {
 
   if (isLoading) {
     return (
-      <Screen>
+      <Screen edges={['bottom']}>
         <Stack.Screen options={headerOptions} />
-        <Screen scroll padding="base">
+        <Screen scroll padding="base" edges={['bottom']}>
           <SkeletonDetail />
           <View className="mt-6">
             <SkeletonLine width="30%" height={20} className="mb-3" />
@@ -65,7 +65,7 @@ export default function ExerciseDetailScreen() {
 
   if (!exercise) {
     return (
-      <Screen padding="base">
+      <Screen padding="base" edges={['bottom']}>
         <Stack.Screen options={headerOptions} />
         <View className="flex-1 items-center justify-center">
           <Text variant="footnote" color="muted">Übung nicht gefunden</Text>
@@ -89,10 +89,10 @@ export default function ExerciseDetailScreen() {
   };
 
   return (
-    <Screen>
+    <Screen edges={['bottom']}>
       <Stack.Screen options={headerOptions} />
 
-      <Screen scroll padding="base">
+      <Screen scroll padding="base" edges={['bottom']}>
         <Text variant="largeTitle" weight="bold" className="mb-3 mt-2">
           {exercise.Name}
         </Text>
