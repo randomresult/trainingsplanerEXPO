@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react';
-import { Platform, View, ActivityIndicator, Pressable } from 'react-native';
+import { useRef } from 'react';
+import { Platform, View, Pressable } from 'react-native';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
 import {
   Screen,
@@ -16,9 +16,6 @@ import {
   TrainingPickerSheet,
   TrainingPickerSheetRef,
 } from '@/components/sheets/TrainingPickerSheet';
-import { useAddExerciseToTraining } from '@/lib/queries/useTrainings';
-import { toast } from 'sonner-native';
-import { COLORS } from '@/lib/theme';
 
 export default function ExerciseDetailScreen() {
   const { id, trainingId, trainingName } = useLocalSearchParams<{
@@ -28,9 +25,6 @@ export default function ExerciseDetailScreen() {
   }>();
   const { data: exercise, isLoading } = useExerciseDetail(id);
   const trainingPickerRef = useRef<TrainingPickerSheetRef>(null);
-
-  const addExerciseMutation = useAddExerciseToTraining();
-  const [directAdding, setDirectAdding] = useState(false);
 
   const headerOptions = {
     headerShown: true as const,
@@ -79,20 +73,6 @@ export default function ExerciseDetailScreen() {
       </Screen>
     );
   }
-
-  const handleDirectAdd = async () => {
-    if (!trainingId || directAdding) return;
-    setDirectAdding(true);
-    try {
-      await addExerciseMutation.mutateAsync({ trainingId, exerciseId: exercise.documentId });
-      toast.success('Übung hinzugefügt');
-      router.back();
-    } catch {
-      toast.error('Übung konnte nicht hinzugefügt werden');
-    } finally {
-      setDirectAdding(false);
-    }
-  };
 
   return (
     <Screen edges={['bottom']}>
@@ -177,18 +157,8 @@ export default function ExerciseDetailScreen() {
         )}
       </Screen>
 
-      <View className="px-5 py-3 border-t border-border bg-background">
-        {trainingId ? (
-          <Button
-            size="lg"
-            className="w-full"
-            leftIcon="add"
-            loading={directAdding}
-            onPress={handleDirectAdd}
-          >
-            {trainingName ? `Zu „${trainingName}"` : 'Zum Training hinzufügen'}
-          </Button>
-        ) : (
+      {!trainingId && (
+        <View className="px-5 py-3 border-t border-border bg-background">
           <Button
             size="lg"
             className="w-full"
@@ -197,8 +167,8 @@ export default function ExerciseDetailScreen() {
           >
             Zum Training hinzufügen
           </Button>
-        )}
-      </View>
+        </View>
+      )}
 
       <TrainingPickerSheet ref={trainingPickerRef} />
     </Screen>

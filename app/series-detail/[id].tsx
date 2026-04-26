@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Platform, View, Pressable, ActivityIndicator } from 'react-native';
+import { Platform, View, Pressable } from 'react-native';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
 import {
   Screen,
@@ -14,11 +14,7 @@ import {
   TrainingPickerSheetRef,
 } from '@/components/sheets/TrainingPickerSheet';
 import { useMethodicalSeriesDetail } from '@/lib/queries/useMethodicalSeries';
-import {
-  useAddExerciseToTraining,
-  useAddMethodicalSeriesToTraining,
-} from '@/lib/queries/useTrainings';
-import { COLORS } from '@/lib/theme';
+import { useAddMethodicalSeriesToTraining } from '@/lib/queries/useTrainings';
 import { toast } from 'sonner-native';
 
 export default function SeriesDetailScreen() {
@@ -31,11 +27,8 @@ export default function SeriesDetailScreen() {
   const trainingPickerRef = useRef<TrainingPickerSheetRef>(null);
   const pickMode = !!trainingId;
 
-  const addExerciseMutation = useAddExerciseToTraining();
   const addSeriesMutation = useAddMethodicalSeriesToTraining();
-  const [addingExerciseId, setAddingExerciseId] = useState<string | null>(null);
   const [addingWholeSeries, setAddingWholeSeries] = useState(false);
-  const [sessionAddedIds, setSessionAddedIds] = useState<Set<string>>(new Set());
 
   const headerOptions = {
     headerShown: true as const,
@@ -56,20 +49,6 @@ export default function SeriesDetailScreen() {
         </Pressable>
       ),
     } : {}),
-  };
-
-  const handleAddExercise = async (exerciseId: string) => {
-    if (!trainingId || addingExerciseId === exerciseId) return;
-    setAddingExerciseId(exerciseId);
-    try {
-      await addExerciseMutation.mutateAsync({ trainingId, exerciseId });
-      setSessionAddedIds((prev) => new Set(prev).add(exerciseId));
-      toast.success('Übung hinzugefügt');
-    } catch {
-      toast.error('Übung konnte nicht hinzugefügt werden');
-    } finally {
-      setAddingExerciseId(null);
-    }
   };
 
   const handleAddWholeSeries = async () => {
@@ -164,10 +143,7 @@ export default function SeriesDetailScreen() {
           {series.exercises?.length ?? 0} Übungen
         </Text>
 
-        {(series.exercises ?? []).map((ex, idx) => {
-          const isAdded = sessionAddedIds.has(ex.documentId);
-          const isAdding = addingExerciseId === ex.documentId;
-          return (
+        {(series.exercises ?? []).map((ex, idx) => (
             <Pressable
               key={ex.documentId}
               onPress={() =>
@@ -188,36 +164,20 @@ export default function SeriesDetailScreen() {
               <Text variant="subhead" className="flex-1" numberOfLines={2}>
                 {ex.Name}
               </Text>
-              <Pressable
-                onPress={(e) => {
-                  e.stopPropagation?.();
-                  if (pickMode) {
-                    if (!isAdded && !isAdding) handleAddExercise(ex.documentId);
-                  } else {
+              {!pickMode && (
+                <Pressable
+                  onPress={(e) => {
+                    e.stopPropagation?.();
                     trainingPickerRef.current?.present(ex.documentId, ex.Name);
-                  }
-                }}
-                disabled={pickMode && (isAdded || isAdding)}
-                hitSlop={10}
-                className={
-                  pickMode && isAdded
-                    ? 'w-9 h-9 rounded-full bg-success/15 items-center justify-center shrink-0'
-                    : 'w-9 h-9 rounded-full bg-primary/15 items-center justify-center shrink-0'
-                }
-              >
-                {pickMode && isAdding ? (
-                  <ActivityIndicator size="small" color={COLORS.primary} />
-                ) : (
-                  <Icon
-                    name={pickMode && isAdded ? 'checkmark' : 'add'}
-                    size={18}
-                    color={pickMode && isAdded ? 'success' : 'primary'}
-                  />
-                )}
-              </Pressable>
+                  }}
+                  hitSlop={10}
+                  className="w-9 h-9 rounded-full bg-primary/15 items-center justify-center shrink-0"
+                >
+                  <Icon name="add" size={18} color="primary" />
+                </Pressable>
+              )}
             </Pressable>
-          );
-        })}
+        ))}
       </View>
 
       {/* Add whole series CTA */}
