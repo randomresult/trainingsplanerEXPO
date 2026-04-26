@@ -16,19 +16,20 @@ import {
   TrainingPickerSheet,
   TrainingPickerSheetRef,
 } from '@/components/sheets/TrainingPickerSheet';
-import { usePickModeStore } from '@/lib/store/pickModeStore';
+import { useAddExerciseToTraining } from '@/lib/queries/useTrainings';
+import { toast } from 'sonner-native';
 import { COLORS } from '@/lib/theme';
 
 export default function ExerciseDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, trainingId, trainingName } = useLocalSearchParams<{
+    id: string;
+    trainingId?: string;
+    trainingName?: string;
+  }>();
   const { data: exercise, isLoading } = useExerciseDetail(id);
   const trainingPickerRef = useRef<TrainingPickerSheetRef>(null);
 
-  // If the picker is open with an onAdd callback, the user is already inside
-  // a single-add flow (live-training or training-new) — the CTA should feed
-  // that flow directly rather than asking "which training?" again.
-  const onAdd = usePickModeStore((s) => s.onAdd);
-  const addContextLabel = usePickModeStore((s) => s.addContextLabel);
+  const addExerciseMutation = useAddExerciseToTraining();
   const [directAdding, setDirectAdding] = useState(false);
 
   const headerOptions = {
@@ -75,14 +76,14 @@ export default function ExerciseDetailScreen() {
   }
 
   const handleDirectAdd = async () => {
-    if (!onAdd || directAdding) return;
+    if (!trainingId || directAdding) return;
     setDirectAdding(true);
     try {
-      await onAdd(exercise.documentId);
-      // Pop exactly two modals (detail + picker) so we land on the caller.
-      // dismissAll would also drop /training-new when the caller was the
-      // draft-creation flow, wiping the user's half-filled form.
-      router.dismiss(2);
+      await addExerciseMutation.mutateAsync({ trainingId, exerciseId: exercise.documentId });
+      toast.success('Übung hinzugefügt');
+      router.back();
+    } catch {
+      toast.error('Übung konnte nicht hinzugefügt werden');
     } finally {
       setDirectAdding(false);
     }
@@ -170,7 +171,7 @@ export default function ExerciseDetailScreen() {
       </Screen>
 
       <View className="px-5 py-3 border-t border-border bg-background">
-        {onAdd ? (
+        {trainingId ? (
           <Button
             size="lg"
             className="w-full"
@@ -178,7 +179,7 @@ export default function ExerciseDetailScreen() {
             loading={directAdding}
             onPress={handleDirectAdd}
           >
-            {addContextLabel ?? 'Zum Training hinzufügen'}
+            {trainingName ? `Zu „${trainingName}"` : 'Zum Training hinzufügen'}
           </Button>
         ) : (
           <Button
