@@ -101,6 +101,27 @@ export default function ExerciseDetailScreen() {
           <ExercisePills exercise={exercise} />
         </View>
 
+        {(exercise.methodicalSeries?.length ?? 0) > 0 && (
+          <Pressable
+            onPress={() =>
+              router.push({
+                pathname: '/(tabs)/library/series/[id]' as any,
+                params: { id: exercise.methodicalSeries![0].documentId },
+              })
+            }
+            className="flex-row items-center gap-2 bg-primary/10 rounded-lg px-3 py-2 mb-5"
+          >
+            <Icon name="school-outline" size={16} color="primary" />
+            <View className="flex-1">
+              <Text variant="caption2" color="muted">Teil der Methodischen Reihe</Text>
+              <Text variant="footnote" weight="semibold" color="primary">
+                {exercise.methodicalSeries![0].name}
+              </Text>
+            </View>
+            <Icon name="chevron-forward" size={14} color="primary" />
+          </Pressable>
+        )}
+
         {exercise.Description && (
           <>
             <Text variant="headline" className="mb-2">Beschreibung</Text>
