@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Pressable, TextInput, Platform, Alert } from 'react-native';
-import { Text, Icon } from '@/components/ui';
+import { Text } from './Text';
+import { Icon } from './Icon';
+import { triggerHaptic } from '@/lib/haptics';
 import { ExercisePills } from '@/components/ui/ExercisePills';
 import type { MethodicalSeriesRef, Exercise } from '@/lib/types/models';
 
@@ -87,6 +89,11 @@ export function MethodicalSeriesBlock({
           <Text variant="subhead" weight="semibold" color="primary" numberOfLines={1}>
             {series.name}
           </Text>
+          {series.goal ? (
+            <Text variant="caption2" color="muted" numberOfLines={1}>
+              {series.goal}
+            </Text>
+          ) : null}
         </View>
         <Text variant="caption1" color="muted" className="mr-2">
           {inBlock}/{totalInSeries}
@@ -131,6 +138,7 @@ export function MethodicalSeriesBlock({
                 <View className="flex-row items-center gap-3 mt-2">
                   <Pressable
                     onPress={() => {
+                      triggerHaptic('light');
                       if (idx >= 0) onToggleComplete?.(idx);
                     }}
                     hitSlop={8}

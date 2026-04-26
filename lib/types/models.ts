@@ -18,6 +18,7 @@ export interface User {
 export interface MethodicalSeriesRef {
   documentId: string;
   name: string;
+  goal?: string;
 }
 
 export interface Exercise {
