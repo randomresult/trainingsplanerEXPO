@@ -30,6 +30,7 @@ export default function LibraryLayout() {
       }}
     >
       <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="series/[id]" options={{ headerShown: true }} />
     </Stack>
   );
 }

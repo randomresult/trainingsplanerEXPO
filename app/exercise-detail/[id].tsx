@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Platform, View, ActivityIndicator, Pressable } from 'react-native';
+import { Platform, View, Pressable } from 'react-native';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
 import {
   Screen,
@@ -12,30 +12,45 @@ import {
   SkeletonLine,
 } from '@/components/ui';
 import { useExerciseDetail } from '@/lib/queries/useExercises';
+import { useAddExerciseToTraining } from '@/lib/queries/useTrainings';
+import { toast } from 'sonner-native';
+import { usePickSessionStore } from '@/lib/store/pickSessionStore';
 import {
   TrainingPickerSheet,
   TrainingPickerSheetRef,
 } from '@/components/sheets/TrainingPickerSheet';
-import { usePickModeStore } from '@/lib/store/pickModeStore';
-import { COLORS } from '@/lib/theme';
 
 export default function ExerciseDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, trainingId, trainingName, readOnly } = useLocalSearchParams<{
+    id: string;
+    trainingId?: string;
+    trainingName?: string;
+    readOnly?: string;
+  }>();
   const { data: exercise, isLoading } = useExerciseDetail(id);
   const trainingPickerRef = useRef<TrainingPickerSheetRef>(null);
+  const addExerciseMutation = useAddExerciseToTraining();
+  const [adding, setAdding] = useState(false);
+  const { addedExerciseIds, markAdded } = usePickSessionStore();
 
-  // If the picker is open with an onAdd callback, the user is already inside
-  // a single-add flow (live-training or training-new) — the CTA should feed
-  // that flow directly rather than asking "which training?" again.
-  const onAdd = usePickModeStore((s) => s.onAdd);
-  const addContextLabel = usePickModeStore((s) => s.addContextLabel);
-  const [directAdding, setDirectAdding] = useState(false);
+  const handleDirectAdd = async () => {
+    if (!trainingId || !exercise || adding) return;
+    setAdding(true);
+    try {
+      await addExerciseMutation.mutateAsync({ trainingId, exerciseId: exercise.documentId });
+      markAdded(exercise.documentId);
+      toast.success('Übung hinzugefügt');
+      router.back();
+    } catch {
+      toast.error('Übung konnte nicht hinzugefügt werden');
+    } finally {
+      setAdding(false);
+    }
+  };
 
   const headerOptions = {
     headerShown: true as const,
     title: 'Übung',
-    // Modal has no native back chevron on either platform — provide one
-    // explicitly so the user always sees a way out.
     headerLeft: () => (
       <Pressable onPress={() => router.back()} className="px-2 py-1" hitSlop={8}>
         <Icon
@@ -45,13 +60,20 @@ export default function ExerciseDetailScreen() {
         />
       </Pressable>
     ),
+    ...(trainingId ? {
+      headerRight: () => (
+        <Pressable onPress={() => router.dismissAll()} className="px-2 py-1" hitSlop={8}>
+          <Text variant="subhead" weight="semibold" color="primary">Fertig</Text>
+        </Pressable>
+      ),
+    } : {}),
   };
 
   if (isLoading) {
     return (
-      <Screen>
+      <Screen edges={['bottom']}>
         <Stack.Screen options={headerOptions} />
-        <Screen scroll padding="base">
+        <Screen scroll padding="base" edges={['bottom']}>
           <SkeletonDetail />
           <View className="mt-6">
             <SkeletonLine width="30%" height={20} className="mb-3" />
@@ -65,7 +87,7 @@ export default function ExerciseDetailScreen() {
 
   if (!exercise) {
     return (
-      <Screen padding="base">
+      <Screen padding="base" edges={['bottom']}>
         <Stack.Screen options={headerOptions} />
         <View className="flex-1 items-center justify-center">
           <Text variant="footnote" color="muted">Übung nicht gefunden</Text>
@@ -74,25 +96,11 @@ export default function ExerciseDetailScreen() {
     );
   }
 
-  const handleDirectAdd = async () => {
-    if (!onAdd || directAdding) return;
-    setDirectAdding(true);
-    try {
-      await onAdd(exercise.documentId);
-      // Pop exactly two modals (detail + picker) so we land on the caller.
-      // dismissAll would also drop /training-new when the caller was the
-      // draft-creation flow, wiping the user's half-filled form.
-      router.dismiss(2);
-    } finally {
-      setDirectAdding(false);
-    }
-  };
-
   return (
-    <Screen>
+    <Screen edges={['bottom']}>
       <Stack.Screen options={headerOptions} />
 
-      <Screen scroll padding="base">
+      <Screen scroll padding="base" edges={['bottom']}>
         <Text variant="largeTitle" weight="bold" className="mb-3 mt-2">
           {exercise.Name}
         </Text>
@@ -100,6 +108,29 @@ export default function ExerciseDetailScreen() {
         <View className="mb-5">
           <ExercisePills exercise={exercise} />
         </View>
+
+        {(exercise.methodicalSeries?.length ?? 0) > 0 && (
+          <Pressable
+            onPress={() =>
+              router.push({
+                pathname: '/series-detail/[id]' as any,
+                params: trainingId
+                  ? { id: exercise.methodicalSeries![0].documentId, trainingId, trainingName: trainingName ?? '' }
+                  : { id: exercise.methodicalSeries![0].documentId },
+              })
+            }
+            className="flex-row items-center gap-2 bg-primary/10 rounded-lg px-3 py-2 mb-5"
+          >
+            <Icon name="school-outline" size={16} color="primary" />
+            <View className="flex-1">
+              <Text variant="caption2" color="muted">Teil der Methodischen Reihe</Text>
+              <Text variant="footnote" weight="semibold" color="primary">
+                {exercise.methodicalSeries![0].name}
+              </Text>
+            </View>
+            <Icon name="chevron-forward" size={14} color="primary" />
+          </Pressable>
+        )}
 
         {exercise.Description && (
           <>
@@ -148,28 +179,31 @@ export default function ExerciseDetailScreen() {
         )}
       </Screen>
 
-      <View className="px-5 py-3 border-t border-border bg-background">
-        {onAdd ? (
-          <Button
-            size="lg"
-            className="w-full"
-            leftIcon="add"
-            loading={directAdding}
-            onPress={handleDirectAdd}
-          >
-            {addContextLabel ?? 'Zum Training hinzufügen'}
-          </Button>
-        ) : (
-          <Button
-            size="lg"
-            className="w-full"
-            leftIcon="add"
-            onPress={() => trainingPickerRef.current?.present(exercise.documentId, exercise.Name)}
-          >
-            Zum Training hinzufügen
-          </Button>
-        )}
-      </View>
+      {!readOnly && (() => {
+        const alreadyAdded = trainingId ? addedExerciseIds.has(exercise.documentId) : false;
+        return (
+          <View className="px-5 py-3 border-t border-border bg-background">
+            <Button
+              size="lg"
+              className="w-full"
+              leftIcon={alreadyAdded ? 'checkmark' : 'add'}
+              loading={adding}
+              disabled={alreadyAdded}
+              onPress={
+                trainingId
+                  ? handleDirectAdd
+                  : () => trainingPickerRef.current?.present(exercise.documentId, exercise.Name)
+              }
+            >
+              {alreadyAdded
+                ? 'Bereits hinzugefügt'
+                : trainingId
+                  ? (trainingName ? `Übung zu „${trainingName}" hinzufügen` : 'Übung hinzufügen')
+                  : 'Zum Training hinzufügen'}
+            </Button>
+          </View>
+        );
+      })()}
 
       <TrainingPickerSheet ref={trainingPickerRef} />
     </Screen>

@@ -56,7 +56,7 @@ export default function NewTrainingScreen() {
       setExerciseIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
     });
     router.push({
-      pathname: '/exercise-picker',
+      pathname: '/exercise-picker' as any,
       params: { excludeIds: exerciseIds.join(',') },
     });
   };

@@ -18,21 +18,24 @@ function levelVariant(name: string) {
 
 export interface ExercisePillsProps {
   exercise: Pick<Exercise, 'Minutes' | 'focusareas' | 'playerlevels' | 'categories'>;
+  showMinutes?: boolean;
 }
 
-export function ExercisePills({ exercise }: ExercisePillsProps) {
+export function ExercisePills({ exercise, showMinutes = true }: ExercisePillsProps) {
   const focusareas = exercise.focusareas ?? [];
   const playerlevels = exercise.playerlevels ?? [];
   const categories = exercise.categories ?? [];
 
   return (
     <View className="flex-row items-center flex-wrap gap-1.5">
-      <View className="flex-row items-center gap-1 pr-2.5 border-r border-border">
-        <Icon name="time-outline" size={12} color="muted" />
-        <Text variant="caption1" weight="semibold" color="muted">
-          {exercise.Minutes} Min
-        </Text>
-      </View>
+      {showMinutes && (
+        <View className="flex-row items-center gap-1 pr-2.5 border-r border-border">
+          <Icon name="time-outline" size={12} color="muted" />
+          <Text variant="caption1" weight="semibold" color="muted">
+            {exercise.Minutes} Min
+          </Text>
+        </View>
+      )}
 
       {playerlevels.map((lvl) => (
         <Badge key={lvl.documentId} variant={levelVariant(lvl.Name)}>

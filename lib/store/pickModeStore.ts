@@ -5,8 +5,7 @@ import { create } from 'zustand';
 type OnConfirmCallback = (ids: string[]) => void | Promise<void>;
 
 // Single-add mode — caller receives one id at a time as the user taps + on
-// each card. Used by the exercise-picker now that it mirrors the Library
-// browse-and-add pattern.
+// each card. Used by training-new.tsx (legacy flow, to be migrated in Series-to-New-Training task).
 type OnAddCallback = (id: string) => void | Promise<void>;
 
 interface PickModeStore {
@@ -19,11 +18,9 @@ interface PickModeStore {
 
   // Single-add state
   onAdd?: OnAddCallback;
-  /** Label for the detail-screen CTA in single-add mode. Default: "Zum Training hinzufügen". */
-  addContextLabel?: string;
 
   start: (initial: string[], onConfirm: OnConfirmCallback) => void;
-  startAdd: (onAdd: OnAddCallback, addContextLabel?: string) => void;
+  startAdd: (onAdd: OnAddCallback) => void;
   toggle: (id: string) => void;
   confirm: () => Promise<void>;
   cancel: () => void;
@@ -41,14 +38,12 @@ export const usePickModeStore = create<PickModeStore>((set, get) => ({
       selectedIds: initial,
       onConfirm,
       onAdd: undefined,
-      addContextLabel: undefined,
     }),
 
-  startAdd: (onAdd, addContextLabel) =>
+  startAdd: (onAdd) =>
     set({
       active: true,
       onAdd,
-      addContextLabel,
       onConfirm: undefined,
       selectedIds: [],
     }),
@@ -65,21 +60,10 @@ export const usePickModeStore = create<PickModeStore>((set, get) => ({
     try {
       await onConfirm?.(selectedIds);
     } finally {
-      set({
-        active: false,
-        selectedIds: [],
-        onConfirm: undefined,
-        onAdd: undefined,
-      });
+      set({ active: false, selectedIds: [], onConfirm: undefined, onAdd: undefined });
     }
   },
 
   cancel: () =>
-    set({
-      active: false,
-      selectedIds: [],
-      onConfirm: undefined,
-      onAdd: undefined,
-      addContextLabel: undefined,
-    }),
+    set({ active: false, selectedIds: [], onConfirm: undefined, onAdd: undefined }),
 }));

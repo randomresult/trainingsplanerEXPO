@@ -1,6 +1,6 @@
 # Roadmap — nächste Cycles
 
-**Stand:** 2026-04-25
+**Stand:** 2026-04-26
 **Kontext:** Library-Picker ist shipped & merged. Dies ist die geplante Reihenfolge der nächsten Arbeits-Cycles. Bitte in dieser Reihenfolge angehen, außer ein neuer Blocker kommt dazwischen.
 
 ## Reihenfolge
@@ -23,23 +23,25 @@
 
 **Docs:** `specs/2026-04-25-motion-polish-c2-design.md`, `plans/2026-04-25-motion-polish-c2.md`
 
-### 2. MÜRs — Methodische Übungsreihen (Lernpfade) — NEXT UP
-**Warum vorgezogen:** Recurring-Trainings wurden als Idee verworfen. MÜRs sind das wertvollere Feature — strukturierte Lernpfade für Spieler, persistent über Trainings hinweg, Grundlage für Badges/Achievements.
+### ✅ 2. MÜRs — Methodische Übungsreihen (Lernpfade) — SHIPPED 2026-04-26
 
-**Konzept (aus Original-Spec 2026-04-19):**
-- Wrapper aus mehreren Übungen in Reihenfolge (z.B. "Vorhand Topspin Basics")
-- Fortschritt läuft parallel zu Trainings — Übung in Training abgehakt → MÜR-Progress aktualisiert
-- Tab 2 (Bibliothek): Toggle zwischen Übungen ↔ Methodische Reihen
-- Erstellen/Editieren: Web-only, nur Trainer
-- Badge-Kandidaten: "Erste MÜR abgeschlossen", "MÜR-Meister" etc.
+**Docs:**
+- Spec: `specs/2026-04-25-muers-design.md`
+- Plan: `plans/2026-04-26-muers.md`
+- Card mockup: `mockups/series-card-variants.html` (C-1 selected)
 
-**Scope (zu klären in Brainstorm):**
-- Strapi Content Type `exercise_series` / `muers`
-- Library-Integration (Toggle, Liste, Detail)
-- Progress-Tracking via `PlayerProgress`
-- Verknüpfung mit Training-Flow ("Ganze Reihe zu Training hinzufügen")
+**Was entschieden:**
+- Datenmodell: both-arrays — `training.exercises[]` = alle Übungen (source of truth), `training.methodicalSeries[]` = Gruppierungsmetadata
+- Karten-Design: C-1 (category chip + progress pill oben, Name + Ziel, Divider, Übungsanzahl + `+`-Button)
+- Fortschritt auf Karte (`3/6`-Pill): cross-training via `PlayerProgress` — für initial MVP deferred, Pill bleibt hidden bis Query gebaut
+- `+`-Button auf Karte → `TrainingPickerSheet` (muss für Series erweitert werden — Task 6b im Plan)
+- Kein Series-Support im `exercise-picker.tsx` — Library-Tab ist der Add-Flow
+- Library/Picker-Unification: bewusst ausgelagert (siehe Item X unten)
 
-**Spec nötig:** `specs/YYYY-MM-DD-muers-design.md` — in Brainstorm aktuell.
+**Was bewusst nicht in Scope:**
+- Erstellen/Editieren von MÜRs (Strapi web-only)
+- Progress-Badges / Achievements
+- Fortschritts-Pill auf Karte (deferred — braucht cross-training PlayerProgress Query)
 
 ### 3. Trainings-Erstellungs-UX (Quick-Create + Blueprint)
 **Warum danach:** Setzt MÜRs voraus ("Reihe zu Training hinzufügen"), macht dann mehr Sinn.
@@ -64,6 +66,28 @@
 **Warum zuletzt:** Setzt auf Club-Admin auf (Programs sind club-scoped), inhaltlich die Königsdisziplin. Könnte auch mit dem Wizard kombiniert werden.
 
 **Scope:** Siehe `specs/training-programs.md` Draft. Empfohlenes Modell: Player-Program-Enrollment mit optionaler Goal-Suggest-Integration. Explizit als Post-MVP markiert.
+
+### X. Series-to-New-Training (kleiner Task, nach Picker-Unification)
+**Kontext:** `TrainingPickerSheet` zeigt existierende Trainings. Wenn der User stattdessen ein neues Training mit einer ganzen Reihe erstellen will, fehlt der Flow. `training-new.tsx` kennt nur `?preselect=<exerciseId>`, kein `?preselectSeries=`.
+
+**Scope:**
+- `TrainingPickerSheet` bekommt "Neues Training erstellen"-Option, die zu `training-new.tsx?preselectSeries=<id>&seriesName=<name>&exerciseIds=<csv>` navigiert
+- `training-new.tsx` liest `preselectSeries`-Param und füllt Exercises + methodicalSeries beim Erstellen vor
+
+**Warum nach Unification:** Nach Unification gibt es nur noch einen Add-Flow — der neue Training-Flow baut dann sauber darauf auf.
+
+### Y. Library / Picker Unification (nach MÜRs, eigenständiger Cycle)
+**Kontext:** Aktuell existieren zwei separate Screens mit ähnlicher UI:
+- `app/(tabs)/library/index.tsx` — Library-Tab, `+` → TrainingPickerSheet (wähle Training)
+- `app/exercise-picker.tsx` — Modal, `+` → fügt direkt zum bekannten Training hinzu (via `usePickModeStore`)
+
+**Idee:** Library-Screen als einheitliche Basis, mit optionalem `trainingId`-Param:
+- Kein `trainingId` (Tab-Navigation) → `+` öffnet TrainingPickerSheet wie bisher
+- Mit `trainingId` (aus Training geöffnet) → `+` fügt direkt hinzu, kein Sheet nötig
+
+**Vorteil:** Verbesserungen (neue Filter, Series-Support, Skeleton-Loader) müssen nur einmal gepflegt werden. Kein Silent-Divergence-Problem mehr.
+
+**Warum nicht jetzt:** Berührt bestehenden Add-Exercise-Flow, `usePickModeStore`, alle Training-Screens die den Picker öffnen. Klarer eigenständiger Refactor-Cycle — nicht in MÜRs mischen.
 
 ## Was bewusst draußen bleibt
 

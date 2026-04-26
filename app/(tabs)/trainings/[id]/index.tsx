@@ -1,14 +1,14 @@
 import { Platform, View, ActivityIndicator, Alert, Pressable } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
-import { Screen, Text, Button, Card, Badge, Icon, PlayerCard, toast, SkeletonDetail, SkeletonList } from '@/components/ui';
+import { Screen, Text, Button, Card, Badge, Icon, PlayerCard, toast, SkeletonDetail, SkeletonList, MethodicalSeriesBlock } from '@/components/ui';
 import {
   useTrainingDetail,
   useDeleteTraining,
   useStartTraining,
   useRemoveExerciseFromTraining,
   useRemovePlayerFromTraining,
-  useAddExerciseToTraining,
   useAddPlayersToTraining,
+  useRemoveMethodicalSeriesFromTraining,
 } from '@/lib/queries/useTrainings';
 import { usePickModeStore } from '@/lib/store/pickModeStore';
 import { COLORS } from '@/lib/theme';
@@ -26,8 +26,8 @@ export default function TrainingDetailScreen() {
   const startTraining = useStartTraining();
   const removeExercise = useRemoveExerciseFromTraining();
   const removePlayer = useRemovePlayerFromTraining();
-  const addExercise = useAddExerciseToTraining();
   const addPlayers = useAddPlayersToTraining();
+  const removeSeries = useRemoveMethodicalSeriesFromTraining();
 
   const canEditExercises =
     training?.training_status === 'draft' || training?.training_status === 'in_progress';
@@ -95,18 +95,9 @@ export default function TrainingDetailScreen() {
 
   const handleAddExercises = () => {
     if (!training) return;
-    const existingIds = training.exercises?.map((e) => e.documentId) ?? [];
-    usePickModeStore.getState().startAdd(async (exerciseId) => {
-      try {
-        await addExercise.mutateAsync({ trainingId: id, exerciseId });
-        toast.success('Übung hinzugefügt');
-      } catch {
-        toast.error('Übung konnte nicht hinzugefügt werden');
-      }
-    });
     router.push({
-      pathname: '/exercise-picker',
-      params: { excludeIds: existingIds.join(',') },
+      pathname: '/library-pick',
+      params: { trainingId: id, trainingName: training.Name },
     });
   };
 
@@ -175,43 +166,81 @@ export default function TrainingDetailScreen() {
         </View>
       </View>
 
-      {/* Exercises */}
+      {/* Exercises — MÜR blocks first, then standalone */}
       <View className="px-5 pb-4">
         <View className="flex-row justify-between items-center mb-3">
           <Text variant="headline">Übungen ({training.exercises?.length || 0})</Text>
           {canEditExercises && (
-            <Button
-              variant="ghost"
-              size="sm"
-              leftIcon="add"
-              onPress={handleAddExercises}
-            >
+            <Button variant="ghost" size="sm" leftIcon="add" onPress={handleAddExercises}>
               Hinzufügen
             </Button>
           )}
         </View>
-        {training.exercises?.map((exercise, idx) => (
-          <Card key={exercise.documentId} className="mb-3 flex-row items-center">
-            <View className="flex-1">
-              <View className="flex-row justify-between items-start">
+
+        {/* MÜR blocks */}
+        {(training.methodicalSeries ?? []).map((series) => {
+          const seriesDocId = series.documentId;
+          const blockExercises = (training.exercises ?? []).filter(
+            (e) => e.methodicalSeries?.some((s) => s.documentId === seriesDocId)
+          );
+          return (
+            <MethodicalSeriesBlock
+              key={seriesDocId}
+              series={series}
+              blockExercises={blockExercises}
+              totalInSeries={blockExercises.length}
+              mode={canEditExercises ? 'edit' : 'view'}
+              onNavigateToDetail={() => router.push({ pathname: '/series-detail/[id]' as any, params: { id: seriesDocId } })}
+              onNavigateToExercise={(exId) => router.push({ pathname: '/exercise-detail/[id]', params: { id: exId, readOnly: '1' } })}
+              onRemoveSeries={
+                canEditExercises
+                  ? () =>
+                      removeSeries.mutate({
+                        trainingId: id,
+                        seriesDocumentId: seriesDocId,
+                        exerciseDocumentIds: blockExercises.map((e) => e.documentId),
+                      })
+                  : undefined
+              }
+              onRemoveExercise={
+                canEditExercises
+                  ? (exerciseId) => removeExercise.mutate({ trainingId: id, exerciseId })
+                  : undefined
+              }
+            />
+          );
+        })}
+
+        {/* Standalone exercises — not belonging to any MÜR in this training */}
+        {(() => {
+          const seriesIds = new Set((training.methodicalSeries ?? []).map((s) => s.documentId));
+          const standalone = (training.exercises ?? []).filter(
+            (e) => !e.methodicalSeries?.some((s) => seriesIds.has(s.documentId))
+          );
+          return standalone.map((exercise) => (
+            <Card key={exercise.documentId} className="mb-3 flex-row items-center">
+              <Pressable
+                onPress={() => router.push({ pathname: '/exercise-detail/[id]', params: { id: exercise.documentId, readOnly: '1' } })}
+                className="flex-1 flex-row justify-between items-start"
+              >
                 <Text variant="subhead" weight="semibold" className="flex-1 mr-2">
-                  {idx + 1}. {exercise.Name}
+                  {exercise.Name}
                 </Text>
                 <Text variant="caption1" color="muted">{exercise.Minutes} Min</Text>
-              </View>
-            </View>
-            {canEditExercises && (
-              <Pressable
-                onPress={() => confirmRemoveExercise(exercise.documentId, exercise.Name)}
-                disabled={removeExercise.isPending}
-                hitSlop={8}
-                className="ml-3 w-11 h-11 rounded-full bg-destructive/10 items-center justify-center active:opacity-70 disabled:opacity-40"
-              >
-                <Icon name="close" size={20} color="destructive" />
               </Pressable>
-            )}
-          </Card>
-        ))}
+              {canEditExercises && (
+                <Pressable
+                  onPress={() => confirmRemoveExercise(exercise.documentId, exercise.Name)}
+                  disabled={removeExercise.isPending}
+                  hitSlop={8}
+                  className="ml-3 w-11 h-11 rounded-full bg-destructive/10 items-center justify-center active:opacity-70 disabled:opacity-40"
+                >
+                  <Icon name="close" size={20} color="destructive" />
+                </Pressable>
+              )}
+            </Card>
+          ));
+        })()}
       </View>
 
       {/* Players */}

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exercise Card — Action Button Variants</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:          #111113;
+    --card:        #1c1c1e;
+    --surface:     #2c2c2e;
+    --surface-2:   #3a3a3c;
+    --border:      rgba(255,255,255,0.08);
+    --primary:     #007aff;
+    --primary-dim: rgba(0,122,255,0.15);
+    --success:     #34c759;
+    --success-dim: rgba(52,199,89,0.15);
+    --destructive: #ff3b30;
+    --destr-dim:   rgba(255,59,48,0.12);
+    --muted:       rgba(255,255,255,0.38);
+    --fg:          rgba(255,255,255,0.92);
+    --fg-2:        rgba(255,255,255,0.55);
+    --radius:      14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    min-height: 100vh;
+    padding: 48px 32px;
+  }
+
+  h1 {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 40px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    max-width: 1100px;
+  }
+
+  .col-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  /* ─── BASE CARD ─────────────────────────────── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .card-body {
+    padding: 14px 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .ex-name {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--fg);
+  }
+
+  .ex-name.done {
+    text-decoration: line-through;
+    opacity: .5;
+  }
+
+  .timer-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .timer-input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 5px 8px;
+    color: var(--fg);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    width: 44px;
+    text-align: right;
+    outline: none;
+  }
+
+  .timer-label {
+    font-size: 12px;
+    color: var(--fg-2);
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0 -1px;
+  }
+
+  /* ─── VARIANT 1 — current ───────────────────── */
+  .v1-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .circle-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid var(--surface-2);
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .15s;
+    flex-shrink: 0;
+  }
+
+  .circle-btn.done {
+    background: var(--success);
+    border-color: var(--success);
+  }
+
+  .checkmark {
+    display: none;
+    width: 14px;
+    height: 14px;
+  }
+
+  .circle-btn.done .checkmark { display: block; }
+
+  /* ─── VARIANT 2 — 75/25 split ───────────────── */
+  .v2-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .done-btn {
+    flex: 3;
+    padding: 13px 12px;
+    border-radius: 10px;
+    border: 1.5px solid rgba(52,199,89,.35);
+    background: transparent;
+    color: var(--success);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    transition: all .2s;
+  }
+
+  .done-btn.done {
+    background: var(--success);
+    border-color: var(--success);
+    color: #fff;
+  }
+
+  .done-btn svg { flex-shrink: 0; }
+
+  .delete-btn {
+    flex: 1;
+    padding: 13px 0;
+    border-radius: 10px;
+    border: 1.5px solid rgba(255,59,48,.3);
+    background: var(--destr-dim);
+    color: var(--destructive);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .15s;
+  }
+
+  /* ─── VARIANT 3 — icon bar ───────────────────── */
+  .v3-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .icon-bar-btn {
+    flex: 1;
+    padding: 14px 0;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .2s;
+  }
+
+  .icon-bar-btn.check {
+    background: var(--success-dim);
+    border: 1.5px solid rgba(52,199,89,.25);
+  }
+
+  .icon-bar-btn.check.done {
+    background: var(--success);
+    border-color: var(--success);
+  }
+
+  .icon-bar-btn.trash {
+    background: var(--destr-dim);
+    border: 1.5px solid rgba(255,59,48,.2);
+  }
+
+  /* ─── STATE LABEL ────────────────────────────── */
+  .state-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .col { }
+
+  .pair {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* hover states */
+  .done-btn:hover:not(.done) { background: rgba(52,199,89,.08); }
+  .delete-btn:hover { background: rgba(255,59,48,.2); }
+  .icon-bar-btn.check:hover:not(.done) { background: rgba(52,199,89,.2); }
+  .icon-bar-btn.trash:hover { background: rgba(255,59,48,.22); }
+  .circle-btn:hover:not(.done) { border-color: var(--success); }
+</style>
+</head>
+<body>
+
+<h1>Exercise Card — Action Button Variants</h1>
+
+<div class="grid">
+
+  <!-- ════ VARIANT 1 — current ════ -->
+  <div class="col">
+    <div class="col-label">Variant 1 · Current</div>
+    <div class="pair">
+      <div>
+        <span class="state-badge">Pending</span>
+        <div class="card">
+          <div class="card-body">
+            <div class="ex-name">Kopfball aus dem Lauf</div>
+            <div class="v1-actions">
+              <button class="circle-btn">
+                <svg class="checkmark" viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="timer-row">
+                <input class="timer-input" value="15" type="number">
+                <span class="timer-label">min</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <span class="state-badge">Done</span>
+        <div class="card">
+          <div class="card-body">
+            <div class="ex-name done">Kopfball aus dem Lauf</div>
+            <div class="v1-actions">
+              <button class="circle-btn done">
+                <svg class="checkmark" viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="timer-row">
+                <input class="timer-input" value="15" type="number">
+                <span class="timer-label">min</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ VARIANT 2 — 75/25 split ════ -->
+  <div class="col">
+    <div class="col-label">Variant 2 · 75 / 25 Split</div>
+    <div class="pair">
+      <div>
+        <span class="state-badge">Pending</span>
+        <div class="card">
+          <div class="card-body">
+            <div class="ex-name">Kopfball aus dem Lauf</div>
+            <div class="timer-row">
+              <input class="timer-input" value="15" type="number">
+              <span class="timer-label">min</span>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div style="padding:10px;">
+            <div class="v2-actions">
+              <button class="done-btn">
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><polyline points="2,7.5 6.5,12 13,3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Erledigt
+              </button>
+              <button class="delete-btn">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="4" y1="4" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="4" x2="4" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <span class="state-badge">Done</span>
+        <div class="card">
+          <div class="card-body">
+            <div class="ex-name done">Kopfball aus dem Lauf</div>
+            <div class="timer-row">
+              <input class="timer-input" value="15" type="number">
+              <span class="timer-label">min</span>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div style="padding:10px;">
+            <div class="v2-actions">
+              <button class="done-btn done">
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><polyline points="2,7.5 6.5,12 13,3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Erledigt
+              </button>
+              <button class="delete-btn">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="4" y1="4" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="4" x2="4" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ VARIANT 3 — icon bar ════ -->
+  <div class="col">
+    <div class="col-label">Variant 3 · Icon Bar</div>
+    <div class="pair">
+      <div>
+        <span class="state-badge">Pending</span>
+        <div class="card">
+          <div class="card-body">
+            <div class="ex-name">Kopfball aus dem Lauf</div>
+            <div class="timer-row">
+              <input class="timer-input" value="15" type="number">
+              <span class="timer-label">min</span>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div style="padding:10px;">
+            <div class="v3-actions">
+              <button class="icon-bar-btn check">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><polyline points="3,11 9,17 19,5" stroke="#34c759" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button class="icon-bar-btn trash">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><line x1="4" y1="4" x2="14" y2="14" stroke="#ff3b30" stroke-width="2" stroke-linecap="round"/><line x1="14" y1="4" x2="4" y2="14" stroke="#ff3b30" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <span class="state-badge">Done</span>
+        <div class="card">
+          <div class="card-body">
+            <div class="ex-name done">Kopfball aus dem Lauf</div>
+            <div class="timer-row">
+              <input class="timer-input" value="15" type="number">
+              <span class="timer-label">min</span>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div style="padding:10px;">
+            <div class="v3-actions">
+              <button class="icon-bar-btn check done">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><polyline points="3,11 9,17 19,5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button class="icon-bar-btn trash">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><line x1="4" y1="4" x2="14" y2="14" stroke="#ff3b30" stroke-width="2" stroke-linecap="round"/><line x1="14" y1="4" x2="4" y2="14" stroke="#ff3b30" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
