@@ -83,7 +83,6 @@ function RootLayoutNav() {
       <Stack.Screen
         name="exercise-detail/[id]"
         options={{
-          presentation: 'modal',
           headerShown: true,
           headerStyle: { backgroundColor: '#0a0a0f' },
           headerTintColor: '#fff',

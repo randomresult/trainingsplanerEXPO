@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { View, Pressable } from 'react-native';
-import { useLocalSearchParams, router } from 'expo-router';
+import { useLocalSearchParams, router, Stack } from 'expo-router';
 import {
   Screen,
   Text,
@@ -22,6 +22,7 @@ export default function MethodicalSeriesDetailScreen() {
   if (isLoading) {
     return (
       <Screen scroll padding="base">
+        <Stack.Screen options={{ title: 'Lernpfad' }} />
         <View className="pt-4">
           <SkeletonDetail />
           <View className="mt-6">
@@ -35,6 +36,7 @@ export default function MethodicalSeriesDetailScreen() {
   if (!series) {
     return (
       <Screen>
+        <Stack.Screen options={{ title: 'Lernpfad' }} />
         <View className="flex-1 items-center justify-center">
           <Icon name="list-outline" size={40} color="muted" />
           <Text variant="footnote" color="muted" className="mt-3">
@@ -49,6 +51,8 @@ export default function MethodicalSeriesDetailScreen() {
 
   return (
     <Screen scroll>
+      <Stack.Screen options={{ title: series.name }} />
+
       {/* Hero */}
       <View className="bg-primary/10 px-5 pt-5 pb-6">
         <View className="w-12 h-12 rounded-full bg-primary/20 items-center justify-center mb-4">
@@ -89,41 +93,40 @@ export default function MethodicalSeriesDetailScreen() {
           {series.exercises?.length ?? 0} Übungen
         </Text>
 
-        {/* Per-exercise completion: stubbed false — cross-training PlayerProgress query deferred */}
-        {(series.exercises ?? []).map((ex, idx) => {
-          const done = false;
-          return (
-            <Pressable
-              key={ex.documentId}
-              onPress={() =>
-                router.push({
-                  pathname: '/exercise-detail/[id]',
-                  params: { id: ex.documentId },
-                })
-              }
-              className="flex-row items-center gap-3 mb-3 bg-card border border-border rounded-xl px-3 py-3 active:opacity-80"
-            >
-              <View className="w-7 h-7 rounded-full bg-primary/15 items-center justify-center shrink-0">
-                <Text variant="caption2" weight="bold" color="primary">
-                  {idx + 1}
-                </Text>
-              </View>
-              <Text variant="subhead" className="flex-1" numberOfLines={2}>
-                {ex.Name}
+        {(series.exercises ?? []).map((ex, idx) => (
+          <Pressable
+            key={ex.documentId}
+            onPress={() =>
+              router.push({
+                pathname: '/exercise-detail/[id]',
+                params: { id: ex.documentId },
+              })
+            }
+            className="flex-row items-center gap-3 mb-3 bg-card border border-border rounded-xl px-3 py-3 active:opacity-80"
+          >
+            <View className="w-7 h-7 rounded-full bg-primary/15 items-center justify-center shrink-0">
+              <Text variant="caption2" weight="bold" color="primary">
+                {idx + 1}
               </Text>
-              <View
-                className={`w-6 h-6 rounded-full border-2 items-center justify-center shrink-0 ${
-                  done ? 'bg-success border-success' : 'border-muted'
-                }`}
-              >
-                {done && <Icon name="checkmark" size={14} color="inverse" />}
-              </View>
+            </View>
+            <Text variant="subhead" className="flex-1" numberOfLines={2}>
+              {ex.Name}
+            </Text>
+            <Pressable
+              onPress={(e) => {
+                e.stopPropagation?.();
+                trainingPickerRef.current?.present(ex.documentId, ex.Name);
+              }}
+              hitSlop={10}
+              className="w-9 h-9 rounded-full bg-primary/15 items-center justify-center shrink-0"
+            >
+              <Icon name="add" size={18} color="primary" />
             </Pressable>
-          );
-        })}
+          </Pressable>
+        ))}
       </View>
 
-      {/* Add to training CTA */}
+      {/* Add whole series CTA */}
       <View className="px-5 pb-8">
         <Pressable
           onPress={() =>
