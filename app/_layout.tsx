@@ -52,7 +52,7 @@ function RootLayoutNav() {
       <Stack.Screen name="(auth)" />
       <Stack.Screen name="(tabs)" />
       <Stack.Screen
-        name="exercise-picker"
+        name="library-pick"
         options={{
           headerShown: true,
           headerStyle: { backgroundColor: '#0a0a0f' },
