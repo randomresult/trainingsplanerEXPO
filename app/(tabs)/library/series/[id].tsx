@@ -22,7 +22,7 @@ export default function MethodicalSeriesDetailScreen() {
   if (isLoading) {
     return (
       <Screen scroll padding="base">
-        <Stack.Screen options={{ title: 'Lernpfad' }} />
+        <Stack.Screen options={{ title: '' }} />
         <View className="pt-4">
           <SkeletonDetail />
           <View className="mt-6">
@@ -36,7 +36,7 @@ export default function MethodicalSeriesDetailScreen() {
   if (!series) {
     return (
       <Screen>
-        <Stack.Screen options={{ title: 'Lernpfad' }} />
+        <Stack.Screen options={{ title: '' }} />
         <View className="flex-1 items-center justify-center">
           <Icon name="list-outline" size={40} color="muted" />
           <Text variant="footnote" color="muted" className="mt-3">
