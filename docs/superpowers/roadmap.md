@@ -1,7 +1,7 @@
 # Roadmap — nächste Cycles
 
 **Stand:** 2026-04-26
-**Kontext:** Library-Picker ist shipped & merged. Dies ist die geplante Reihenfolge der nächsten Arbeits-Cycles. Bitte in dieser Reihenfolge angehen, außer ein neuer Blocker kommt dazwischen.
+**Kontext:** Picker-Unification (Item Y) ist shipped & merged. Series-to-New-Training (Item X) ist jetzt unblocked. Dies ist die geplante Reihenfolge der nächsten Cycles. Bitte in dieser Reihenfolge angehen, außer ein neuer Blocker kommt dazwischen.
 
 ## Reihenfolge
 
@@ -35,8 +35,7 @@
 - Karten-Design: C-1 (category chip + progress pill oben, Name + Ziel, Divider, Übungsanzahl + `+`-Button)
 - Fortschritt auf Karte (`3/6`-Pill): cross-training via `PlayerProgress` — für initial MVP deferred, Pill bleibt hidden bis Query gebaut
 - `+`-Button auf Karte → `TrainingPickerSheet` (muss für Series erweitert werden — Task 6b im Plan)
-- Kein Series-Support im `exercise-picker.tsx` — Library-Tab ist der Add-Flow
-- Library/Picker-Unification: bewusst ausgelagert (siehe Item X unten)
+- Library/Picker-Unification: bewusst ausgelagert → in Item Y gelandet
 
 **Was bewusst nicht in Scope:**
 - Erstellen/Editieren von MÜRs (Strapi web-only)
@@ -67,27 +66,35 @@
 
 **Scope:** Siehe `specs/training-programs.md` Draft. Empfohlenes Modell: Player-Program-Enrollment mit optionaler Goal-Suggest-Integration. Explizit als Post-MVP markiert.
 
-### X. Series-to-New-Training (kleiner Task, nach Picker-Unification)
+### ✅ X. Series-to-New-Training — UNBLOCKED, bereit für nächsten Cycle
 **Kontext:** `TrainingPickerSheet` zeigt existierende Trainings. Wenn der User stattdessen ein neues Training mit einer ganzen Reihe erstellen will, fehlt der Flow. `training-new.tsx` kennt nur `?preselect=<exerciseId>`, kein `?preselectSeries=`.
+
+**War blockiert durch:** Picker-Unification (Item Y) — jetzt erledigt.
 
 **Scope:**
 - `TrainingPickerSheet` bekommt "Neues Training erstellen"-Option, die zu `training-new.tsx?preselectSeries=<id>&seriesName=<name>&exerciseIds=<csv>` navigiert
 - `training-new.tsx` liest `preselectSeries`-Param und füllt Exercises + methodicalSeries beim Erstellen vor
 
-**Warum nach Unification:** Nach Unification gibt es nur noch einen Add-Flow — der neue Training-Flow baut dann sauber darauf auf.
+### ✅ Y. Library / Picker Unification — SHIPPED 2026-04-26
 
-### Y. Library / Picker Unification (nach MÜRs, eigenständiger Cycle)
-**Kontext:** Aktuell existieren zwei separate Screens mit ähnlicher UI:
-- `app/(tabs)/library/index.tsx` — Library-Tab, `+` → TrainingPickerSheet (wähle Training)
-- `app/exercise-picker.tsx` — Modal, `+` → fügt direkt zum bekannten Training hinzu (via `usePickModeStore`)
+**Docs:**
+- Spec: `specs/2026-04-26-picker-unification-design.md`
+- Plan: `plans/2026-04-26-picker-unification.md`
+- Mockup: `mockups/exercise-card-actions.html`
 
-**Idee:** Library-Screen als einheitliche Basis, mit optionalem `trainingId`-Param:
-- Kein `trainingId` (Tab-Navigation) → `+` öffnet TrainingPickerSheet wie bisher
-- Mit `trainingId` (aus Training geöffnet) → `+` fügt direkt hinzu, kein Sheet nötig
+**Was shipped:**
+- ✅ `exercise-picker.tsx` gelöscht, `usePickModeStore` vereinfacht
+- ✅ `app/library-pick.tsx` — einheitlicher Pick-Mode-Entry mit `trainingId`-Param
+- ✅ `components/screens/LibraryScreen.tsx` — gemeinsame Basis für Tab + Pick-Mode
+- ✅ `app/series-detail/[id].tsx` — root-level Route mit Pick-Mode-Support (festes CTA, Einzel-Übung `+`)
+- ✅ `pickSessionStore` — no-duplicate-adds, server-seeding bei App-Restart, Session-Persistenz über Picker-Re-Opens
+- ✅ `exercise-detail` — Pick-Mode-CTA mit `trainingId`-Param; `readOnly`-Param unterdrückt CTA in Training-Draft
+- ✅ `MethodicalSeriesBlock` — neues Header-Design (collapsed/expanded, Details-Button, X-Button), X auf Übungen in Execute-Mode
+- ✅ Live-Training-Verbesserungen: größerer Done-Button (w-14), `TimePickerModal` für Dauer, Collapse-Chevron pro Übung, Pills unterhalb Action-Row (ohne Dauer-Pill)
+- ✅ Training-Draft: Nummern-Prefix entfernt, Tap auf Übung öffnet Read-Only-Detail
 
-**Vorteil:** Verbesserungen (neue Filter, Series-Support, Skeleton-Loader) müssen nur einmal gepflegt werden. Kein Silent-Divergence-Problem mehr.
-
-**Warum nicht jetzt:** Berührt bestehenden Add-Exercise-Flow, `usePickModeStore`, alle Training-Screens die den Picker öffnen. Klarer eigenständiger Refactor-Cycle — nicht in MÜRs mischen.
+**Was bewusst nicht in Scope:**
+- ❌ Series-to-New-Training Flow (→ Item X, jetzt unblocked)
 
 ## Was bewusst draußen bleibt
 

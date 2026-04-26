@@ -17,13 +17,14 @@ Currently affected: `exercise-detail/[id]` was changed from modal → push for t
 
 ## Architecture Notes
 
-### Library / Picker split (to be unified — see roadmap Item X)
-Two screens currently serve "add exercise to training":
-- `app/(tabs)/library/index.tsx` — browse mode, `+` → TrainingPickerSheet
-- `app/exercise-picker.tsx` — pick mode (from training screens), `+` → direct add via `usePickModeStore`
+### Unified Library / Pick-Mode (shipped 2026-04-26)
+One screen serves both browse and pick mode:
+- `app/(tabs)/library/index.tsx` — tab browse, `+` → `TrainingPickerSheet`
+- `app/library-pick.tsx` → `components/screens/LibraryScreen` with `trainingId` param — `+` adds directly, no sheet
 
-Any new filter, content type, or UI improvement must land in **both** until the unification
-cycle is done. After unification, `exercise-picker.tsx` and `usePickModeStore` are deleted.
+**Pick-session state:** `lib/store/pickSessionStore.ts` tracks `addedExerciseIds` and `addedSeriesIds` for the current picker session. Seeded from `useTrainingDetail` on first open (handles app restart). Short-circuits on re-open for same `trainingId` (preserves in-session adds). All add paths (`LibraryScreen` list button, `exercise-detail` direct add, `series-detail` whole-series add) call `markAdded` / `markSeriesAdded`.
+
+`exercise-picker.tsx` and the single-add mode of `usePickModeStore` are deleted.
 
 ### Training data model (both-arrays)
 `training.exercises[]` = ALL exercises, MÜR and standalone — single source of truth for execute/progress.
