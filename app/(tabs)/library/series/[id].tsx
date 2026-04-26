@@ -58,7 +58,7 @@ export default function MethodicalSeriesDetailScreen() {
       {/* Hero — image absolutely fills, overlay drives height */}
       <View className="overflow-hidden">
         <Image source={SERIES_BG} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
-        <View className="bg-black/55 px-5 pt-5 pb-6">
+        <View style={{ backgroundColor: 'rgba(0,0,0,0.55)' }} className="px-5 pt-5 pb-6">
           <View className="w-12 h-12 rounded-full bg-white/15 items-center justify-center mb-4">
             <Icon name="school-outline" size={26} color="foreground" />
           </View>

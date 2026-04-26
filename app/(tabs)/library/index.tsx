@@ -247,8 +247,8 @@ export default function LibraryListScreen() {
                 {/* Background image — absolute fill, parent height driven by content */}
                 <Image source={SERIES_BG} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
 
-                {/* Dark overlay + content */}
-                <View className="bg-black/55 p-4">
+                {/* Dark overlay — inline style avoids NativeWind rgba translation issues */}
+                <View style={{ backgroundColor: 'rgba(0,0,0,0.55)' }} className="p-4">
                   <View className="flex-row items-start justify-between mb-3">
                     {item.category ? (
                       <View className="bg-amber-500/25 border border-amber-400/50 rounded-md px-2 py-1">
