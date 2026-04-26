@@ -131,7 +131,7 @@ export function LibraryScreen({ trainingId, trainingName }: LibraryScreenProps) 
     setFilters((s) => ({ ...s, [key]: s[key].filter((v) => v !== name) }));
   const clearDuration = () => setFilters((s) => ({ ...s, duration: null }));
 
-  const handleAddExercise = async (exerciseId: string) => {
+  const handleAddExercise = useCallback(async (exerciseId: string) => {
     if (!trainingId || addingId === exerciseId) return;
     setAddingId(exerciseId);
     try {
@@ -143,10 +143,9 @@ export function LibraryScreen({ trainingId, trainingName }: LibraryScreenProps) 
     } finally {
       setAddingId(null);
     }
-  };
+  }, [trainingId, addingId, addExerciseMutation]);
 
-  // Fix 4: Updated handleAddSeries with loading/added state tracking
-  const handleAddSeries = async (item: MethodicalSeries) => {
+  const handleAddSeries = useCallback(async (item: MethodicalSeries) => {
     if (!trainingId || addingSeriesId === item.documentId) return;
     setAddingSeriesId(item.documentId);
     try {
@@ -162,7 +161,7 @@ export function LibraryScreen({ trainingId, trainingName }: LibraryScreenProps) 
     } finally {
       setAddingSeriesId(null);
     }
-  };
+  }, [trainingId, addingSeriesId, addSeriesMutation]);
 
   // Fix 3: Memoized renderItem for exercises FlatList
   const renderExerciseItem = useCallback(({ item }: { item: any }) => {
@@ -287,7 +286,7 @@ export function LibraryScreen({ trainingId, trainingName }: LibraryScreenProps) 
                 hitSlop={10}
                 className={
                   isSeriesAdded
-                    ? 'w-9 h-9 rounded-full bg-white/15 border border-white/30 items-center justify-center'
+                    ? 'w-9 h-9 rounded-full bg-green-500/25 border border-green-400/40 items-center justify-center'
                     : 'w-9 h-9 rounded-full bg-white/15 border border-white/30 items-center justify-center'
                 }
               >
