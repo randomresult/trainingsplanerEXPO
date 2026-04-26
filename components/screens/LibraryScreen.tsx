@@ -321,6 +321,11 @@ export function LibraryScreen({ trainingId, trainingName }: LibraryScreenProps) 
                 />
               </Pressable>
             ),
+            headerRight: () => (
+              <Pressable onPress={() => router.dismissAll()} className="px-2 py-1" hitSlop={8}>
+                <Text variant="subhead" weight="semibold" color="primary">Fertig</Text>
+              </Pressable>
+            ),
           }}
         />
       )}

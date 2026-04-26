@@ -35,8 +35,6 @@ export default function ExerciseDetailScreen() {
   const headerOptions = {
     headerShown: true as const,
     title: 'Übung',
-    // Modal has no native back chevron on either platform — provide one
-    // explicitly so the user always sees a way out.
     headerLeft: () => (
       <Pressable onPress={() => router.back()} className="px-2 py-1" hitSlop={8}>
         <Icon
@@ -46,6 +44,13 @@ export default function ExerciseDetailScreen() {
         />
       </Pressable>
     ),
+    ...(trainingId ? {
+      headerRight: () => (
+        <Pressable onPress={() => router.dismissAll()} className="px-2 py-1" hitSlop={8}>
+          <Text variant="subhead" weight="semibold" color="primary">Fertig</Text>
+        </Pressable>
+      ),
+    } : {}),
   };
 
   if (isLoading) {

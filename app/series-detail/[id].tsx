@@ -49,6 +49,13 @@ export default function SeriesDetailScreen() {
         />
       </Pressable>
     ),
+    ...(pickMode ? {
+      headerRight: () => (
+        <Pressable onPress={() => router.dismissAll()} className="px-2 py-1" hitSlop={8}>
+          <Text variant="subhead" weight="semibold" color="primary">Fertig</Text>
+        </Pressable>
+      ),
+    } : {}),
   };
 
   const handleAddExercise = async (exerciseId: string) => {
@@ -75,6 +82,7 @@ export default function SeriesDetailScreen() {
         exerciseDocumentIds: (series.exercises ?? []).map((ex) => ex.documentId),
       });
       toast.success('Lernpfad hinzugefügt');
+      router.dismissAll();
     } catch {
       toast.error('Lernpfad konnte nicht hinzugefügt werden');
     } finally {
@@ -222,7 +230,7 @@ export default function SeriesDetailScreen() {
             loading={addingWholeSeries}
             onPress={handleAddWholeSeries}
           >
-            {trainingName ? `Ganze Reihe zu „${trainingName}"` : 'Ganze Reihe hinzufügen'}
+            {trainingName ? `Lernpfad zu „${trainingName}" hinzufügen` : 'Lernpfad hinzufügen'}
           </Button>
         ) : (
           <Pressable
