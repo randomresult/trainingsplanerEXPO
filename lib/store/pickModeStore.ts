@@ -5,7 +5,7 @@ import { create } from 'zustand';
 type OnConfirmCallback = (ids: string[]) => void | Promise<void>;
 
 // Single-add mode — caller receives one id at a time as the user taps + on
-// each card. Used by training-new.tsx → exercise-picker flow.
+// each card. Used by training-new.tsx (legacy flow, to be migrated in Series-to-New-Training task).
 type OnAddCallback = (id: string) => void | Promise<void>;
 
 interface PickModeStore {
