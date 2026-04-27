@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { router } from 'expo-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner-native';
@@ -13,6 +13,7 @@ import { useMethodicalSeries } from '@/lib/queries/useMethodicalSeries';
 import {
   useAddExerciseToTraining,
   useAddMethodicalSeriesToTraining,
+  useTrainingDetail,
 } from '@/lib/queries/useTrainings';
 import { usePickSessionStore } from '@/lib/store/pickSessionStore';
 import type { Exercise, MethodicalSeries } from '@/lib/types/models';
@@ -37,6 +38,18 @@ export function LibraryPickerContainer({ trainingId, trainingName }: LibraryPick
   const addExerciseMutation = useAddExerciseToTraining();
   const addSeriesMutation = useAddMethodicalSeriesToTraining();
   const { addedExerciseIds, addedSeriesIds, markAdded, markSeriesAdded } = usePickSessionStore();
+
+  const { data: training } = useTrainingDetail(trainingId);
+
+  // Re-seed the pickSession store with current server state whenever the
+  // training detail (re)loads or refetches. This keeps the picker's checkmarks
+  // in sync with what's actually persisted, not stale in-session state.
+  useEffect(() => {
+    if (!training) return;
+    const exerciseIds = (training.exercises ?? []).map((e) => e.documentId);
+    const seriesIds = (training.methodicalSeries ?? []).map((s) => s.documentId);
+    usePickSessionStore.getState().startSession(trainingId, exerciseIds, seriesIds);
+  }, [training, trainingId]);
 
   const availableFocusareas = useMemo(() => collectTagNames(exercises, 'focusareas'), [exercises]);
   const availablePlayerlevels = useMemo(() => collectTagNames(exercises, 'playerlevels'), [exercises]);
