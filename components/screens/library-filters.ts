@@ -1,15 +1,15 @@
-import type { Exercise } from '@/lib/types/models';
+import type { Exercise, Tag } from '@/lib/types/models';
 import type { LibraryFilterState } from '@/components/sheets/LibraryFilterSheet';
 
-export const tagNames = (rel: any[] | undefined): string[] =>
-  (rel ?? []).map((t) => t?.Name).filter(Boolean) as string[];
+export const tagNames = (rel: Tag[] | undefined): string[] =>
+  (rel ?? []).map((t) => t.Name).filter(Boolean) as string[];
 
 export const collectTagNames = (
   exercises: Exercise[] | undefined,
   key: 'focusareas' | 'playerlevels' | 'categories',
 ): string[] => {
   const set = new Set<string>();
-  (exercises ?? []).forEach((ex: any) => tagNames(ex[key]).forEach((n) => set.add(n)));
+  (exercises ?? []).forEach((ex) => tagNames(ex[key]).forEach((n) => set.add(n)));
   return Array.from(set).sort();
 };
 
@@ -17,11 +17,11 @@ export const filterExercises = (
   exercises: Exercise[] | undefined,
   filters: LibraryFilterState,
 ): Exercise[] => {
-  const matchesMulti = (selected: string[], rel: any[] | undefined) => {
+  const matchesMulti = (selected: string[], rel: Tag[] | undefined) => {
     if (selected.length === 0) return true;
     return tagNames(rel).some((n) => selected.includes(n));
   };
-  return (exercises ?? []).filter((ex: any) => {
+  return (exercises ?? []).filter((ex) => {
     if (!matchesMulti(filters.focusareas, ex.focusareas)) return false;
     if (!matchesMulti(filters.playerlevels, ex.playerlevels)) return false;
     if (!matchesMulti(filters.categories, ex.categories)) return false;
