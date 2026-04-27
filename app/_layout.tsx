@@ -2,6 +2,7 @@ import '../global.css';
 import { useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
+import { ThemeProvider, DarkTheme } from '@react-navigation/native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
@@ -9,6 +10,21 @@ import { useAuthStore } from '@/lib/store';
 import { useAppFonts } from '@/lib/fonts';
 import { Toaster } from '@/components/ui';
 import { COLORS } from '@/lib/theme';
+
+// Matched to tailwind's `bg-background = hsl(0, 0%, 4%)` so headers, screen
+// content, and the navigation container all share one dark colour. Mismatches
+// here cause a silver/white flicker at the top edge during push transitions.
+const DARK_BG = '#0a0a0a';
+
+// Override DarkTheme background so the navigator container matches the app.
+const APP_NAV_THEME = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    background: DARK_BG,
+    card: DARK_BG,
+  },
+};
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -58,7 +74,6 @@ function RootLayoutNav() {
           headerStyle: { backgroundColor: '#0a0a0f' },
           headerTintColor: '#fff',
           headerShadowVisible: false,
-          contentStyle: { backgroundColor: '#0a0a0f' },
         }}
       />
       <Stack.Screen
@@ -68,7 +83,6 @@ function RootLayoutNav() {
           headerStyle: { backgroundColor: '#0a0a0f' },
           headerTintColor: '#fff',
           headerShadowVisible: false,
-          contentStyle: { backgroundColor: '#0a0a0f' },
         }}
       />
       <Stack.Screen
@@ -79,7 +93,6 @@ function RootLayoutNav() {
           headerStyle: { backgroundColor: '#0a0a0f' },
           headerTintColor: '#fff',
           headerShadowVisible: false,
-          contentStyle: { backgroundColor: '#0a0a0f' },
         }}
       />
       <Stack.Screen
@@ -90,7 +103,6 @@ function RootLayoutNav() {
           headerStyle: { backgroundColor: '#0a0a0f' },
           headerTintColor: '#fff',
           headerShadowVisible: false,
-          contentStyle: { backgroundColor: '#0a0a0f' },
         }}
       />
       <Stack.Screen
@@ -100,7 +112,6 @@ function RootLayoutNav() {
           headerStyle: { backgroundColor: '#0a0a0f' },
           headerTintColor: '#fff',
           headerShadowVisible: false,
-          contentStyle: { backgroundColor: '#0a0a0f' },
           title: 'Übung',
         }}
       />
@@ -112,21 +123,23 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
-        <BottomSheetModalProvider>
-          <RootLayoutNav />
-          <Toaster
-            position="top-center"
-            offset={120}
-            duration={3000}
-            toastOptions={{
-              style: {
-                backgroundColor: 'hsl(0, 0%, 13%)',
-                borderWidth: 1,
-                borderColor: 'hsl(0, 0%, 15%)'
-              },
-            }}
-          />
-        </BottomSheetModalProvider>
+        <ThemeProvider value={APP_NAV_THEME}>
+          <BottomSheetModalProvider>
+            <RootLayoutNav />
+            <Toaster
+              position="top-center"
+              offset={120}
+              duration={3000}
+              toastOptions={{
+                style: {
+                  backgroundColor: 'hsl(0, 0%, 13%)',
+                  borderWidth: 1,
+                  borderColor: 'hsl(0, 0%, 15%)'
+                },
+              }}
+            />
+          </BottomSheetModalProvider>
+        </ThemeProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>
   );
