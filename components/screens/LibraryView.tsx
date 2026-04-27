@@ -32,13 +32,17 @@ const SERIES_BG = require('../../assets/images/series_background_default.png');
 
 export type LibraryTab = 'exercises' | 'series';
 
+export interface PickHeaderProps {
+  title: string;
+  onClose: () => void;
+  onDone: () => void;
+  doneLabel?: string;
+}
+
 export interface LibraryViewProps {
   // Chrome
-  /** When set, renders a pick-mode `Stack.Screen` header with this title. When undefined, renders the inline „Bibliothek" tab heading. */
-  headerTitle?: string;
-  onHeaderClose?: () => void;
-  onHeaderDone?: () => void;
-  headerDoneLabel?: string;
+  /** When set, renders a pick-mode `Stack.Screen` header. When undefined, renders the inline „Bibliothek" tab heading. */
+  pickHeader?: PickHeaderProps;
 
   // Tab
   activeTab: LibraryTab;
@@ -56,7 +60,7 @@ export interface LibraryViewProps {
 
   // Filters
   filters: LibraryFilterState;
-  onFiltersChange: (f: LibraryFilterState) => void;
+  onFiltersChange: (f: LibraryFilterState | ((prev: LibraryFilterState) => LibraryFilterState)) => void;
   availableFocusareas: string[];
   availablePlayerlevels: string[];
   availableCategories: string[];
@@ -83,10 +87,7 @@ export function LibraryView(props: LibraryViewProps) {
   const filterSheetRef = useRef<LibraryFilterSheetRef>(null);
 
   const {
-    headerTitle,
-    onHeaderClose,
-    onHeaderDone,
-    headerDoneLabel = 'Fertig',
+    pickHeader,
     activeTab,
     onTabChange,
     exercises,
@@ -113,7 +114,7 @@ export function LibraryView(props: LibraryViewProps) {
     onPressSeries,
   } = props;
 
-  const isPickHeader = !!headerTitle;
+  const isPickHeader = !!pickHeader;
 
   const activeFilterCount =
     filters.focusareas.length +
@@ -122,8 +123,8 @@ export function LibraryView(props: LibraryViewProps) {
     (filters.duration ? 1 : 0);
 
   const removeTag = (key: 'focusareas' | 'playerlevels' | 'categories', name: string) =>
-    onFiltersChange({ ...filters, [key]: filters[key].filter((v) => v !== name) });
-  const clearDuration = () => onFiltersChange({ ...filters, duration: null });
+    onFiltersChange((s) => ({ ...s, [key]: s[key].filter((v) => v !== name) }));
+  const clearDuration = () => onFiltersChange((s) => ({ ...s, duration: null }));
 
   const renderExerciseItem = useCallback(({ item }: { item: Exercise }) => {
     const isAdded = addedExerciseIds.has(item.documentId);
@@ -232,9 +233,9 @@ export function LibraryView(props: LibraryViewProps) {
         <Stack.Screen
           options={{
             headerShown: true,
-            title: headerTitle,
+            title: pickHeader.title,
             headerLeft: () => (
-              <Pressable onPress={onHeaderClose} className="px-2 py-1" hitSlop={8}>
+              <Pressable onPress={pickHeader.onClose} className="px-2 py-1" hitSlop={8}>
                 <Icon
                   name={Platform.OS === 'web' ? 'close' : 'chevron-back'}
                   size={22}
@@ -242,15 +243,13 @@ export function LibraryView(props: LibraryViewProps) {
                 />
               </Pressable>
             ),
-            headerRight: onHeaderDone
-              ? () => (
-                  <Pressable onPress={onHeaderDone} className="px-2 py-1" hitSlop={8}>
-                    <Text variant="subhead" weight="semibold" color="primary">
-                      {headerDoneLabel}
-                    </Text>
-                  </Pressable>
-                )
-              : undefined,
+            headerRight: () => (
+              <Pressable onPress={pickHeader.onDone} className="px-2 py-1" hitSlop={8}>
+                <Text variant="subhead" weight="semibold" color="primary">
+                  {pickHeader.doneLabel ?? 'Fertig'}
+                </Text>
+              </Pressable>
+            ),
           }}
         />
       )}
