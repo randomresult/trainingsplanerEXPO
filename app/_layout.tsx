@@ -58,6 +58,7 @@ function RootLayoutNav() {
           headerStyle: { backgroundColor: '#0a0a0f' },
           headerTintColor: '#fff',
           headerShadowVisible: false,
+          contentStyle: { backgroundColor: '#0a0a0f' },
         }}
       />
       <Stack.Screen
@@ -67,6 +68,7 @@ function RootLayoutNav() {
           headerStyle: { backgroundColor: '#0a0a0f' },
           headerTintColor: '#fff',
           headerShadowVisible: false,
+          contentStyle: { backgroundColor: '#0a0a0f' },
         }}
       />
       <Stack.Screen
@@ -77,6 +79,7 @@ function RootLayoutNav() {
           headerStyle: { backgroundColor: '#0a0a0f' },
           headerTintColor: '#fff',
           headerShadowVisible: false,
+          contentStyle: { backgroundColor: '#0a0a0f' },
         }}
       />
       <Stack.Screen
@@ -87,6 +90,7 @@ function RootLayoutNav() {
           headerStyle: { backgroundColor: '#0a0a0f' },
           headerTintColor: '#fff',
           headerShadowVisible: false,
+          contentStyle: { backgroundColor: '#0a0a0f' },
         }}
       />
       <Stack.Screen
@@ -96,6 +100,7 @@ function RootLayoutNav() {
           headerStyle: { backgroundColor: '#0a0a0f' },
           headerTintColor: '#fff',
           headerShadowVisible: false,
+          contentStyle: { backgroundColor: '#0a0a0f' },
           title: 'Übung',
         }}
       />
