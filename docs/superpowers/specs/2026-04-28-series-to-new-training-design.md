@@ -170,7 +170,7 @@ library-pick-draft → LibraryDraftPickerContainer
   → User taps + on Series → store.onAddSeries(sid, exIds) → both Sets grow → ✓✓
   → User taps Card → router.push('/exercise-detail/[id]') (no trainingId)
        detail screen reads store.active → CTA fires onAddExercise + dismisses
-  → "Fertig" → router.dismissAll() → back to training-new
+  → "Fertig" → router.back() → back to training-new (or back to library-pick-draft from a deeper detail screen — single-pop semantics avoid dismissing the training-new modal)
 training-new sees updated local state, re-renders MethodicalSeriesBlocks
 ```
 

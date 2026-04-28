@@ -573,7 +573,7 @@ export default function ExerciseDetailScreen() {
     ...(mode !== 'view' ? {
       headerRight: () => (
         <Pressable
-          onPress={() => router.dismissAll()}
+          onPress={mode === 'draft-pick' ? () => router.back() : () => router.dismissAll()}
           className="px-2 py-1"
           hitSlop={8}
         >
@@ -858,7 +858,11 @@ export default function SeriesDetailScreen() {
     ),
     ...(mode !== 'view' ? {
       headerRight: () => (
-        <Pressable onPress={() => router.dismissAll()} className="px-2 py-1" hitSlop={8}>
+        <Pressable
+          onPress={mode === 'draft-pick' ? () => router.back() : () => router.dismissAll()}
+          className="px-2 py-1"
+          hitSlop={8}
+        >
           <Text variant="subhead" weight="semibold" color="primary">Fertig</Text>
         </Pressable>
       ),
