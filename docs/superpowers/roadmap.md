@@ -78,14 +78,26 @@
 
 **Brainstorming nötig:** Wann ist ein Training „heute"? (Datum-Vergleich vs. Zeit-Stempel.) Was zählt als „diese Woche" — kalendarisch oder rollende 7 Tage? Section-Headers nur zeigen, wenn die Sektion was enthält?
 
-### ✅ X. Series-to-New-Training — UNBLOCKED, bereit für nächsten Cycle
-**Kontext:** `TrainingPickerSheet` zeigt existierende Trainings. Wenn der User stattdessen ein neues Training mit einer ganzen Reihe erstellen will, fehlt der Flow. `training-new.tsx` kennt nur `?preselect=<exerciseId>`, kein `?preselectSeries=`.
+### ✅ X. Series-to-New-Training — SHIPPED 2026-04-28
 
-**War blockiert durch:** Picker-Unification (Item Y) — jetzt erledigt.
+**Docs:**
+- Spec: `specs/2026-04-28-series-to-new-training-design.md`
+- Plan: `plans/completed/2026-04-28-series-to-new-training.md`
 
-**Scope:**
-- `TrainingPickerSheet` bekommt "Neues Training erstellen"-Option, die zu `training-new.tsx?preselectSeries=<id>&seriesName=<name>&exerciseIds=<csv>` navigiert
-- `training-new.tsx` liest `preselectSeries`-Param und füllt Exercises + methodicalSeries beim Erstellen vor
+**Was shipped:**
+- ✅ `app/library-pick-draft.tsx` — neue Route für draft-mode Picker
+- ✅ `components/screens/LibraryDraftPickerContainer.tsx` — dritte LibraryView-Container-Variante (no mutations, callback-basiert)
+- ✅ `lib/store/draftPickStore.ts` — Zustand-Store für training-new ↔ Picker-Handoff (active flag, initial+added Sets, onAdd-Callbacks, cancel auf training-new unmount)
+- ✅ `app/training-new.tsx` — Body-Rewrite: liest `preselectSeries`+`seriesName`+`exerciseIds` URL-Params, rendert `MethodicalSeriesBlock`-basierte Inhalt-Sektion + Standalone-Cards, „Auswählen" öffnet draft-Picker, Spieler nicht mehr mandatory (`canCreate = name.trim() && exerciseIds.length > 0`), Submit landet via `?scrollToId=` + auto-scroll auf der Trainings-Tab
+- ✅ `app/exercise-detail/[id].tsx` + `app/series-detail/[id].tsx` — drei Modi (`draft-pick` / `training-pick` / `view`), „Fertig" mode-conditional (`router.back()` in draft-pick, `dismissAll()` sonst, um Modal-State von training-new zu erhalten)
+- ✅ `useCreateTraining` — akzeptiert `methodicalSeriesIds`, single POST connectet beide Relationen atomar
+- ✅ `useExercises` — `methodicalSeries: true` zur POPULATE + `pageSize: 100` (gleichgezogen mit `useMethodicalSeries`)
+- ✅ `pickModeStore` — Legacy `startAdd`/`onAdd` entfernt, Store nur noch Multi-Select-Confirm für Player-Picker
+- ✅ Defensive: `exercisesById` in training-new mergt `useExercises` + `useMethodicalSeries[].exercises` (deckt Endpoint-Asymmetrien ab)
+
+**Was bewusst nicht in Scope:**
+- ❌ Test-Setup / Storybook (separater Cycle)
+- ❌ `MethodicalSeriesBlock`-Refactoring (verwendet wie es ist)
 
 ### ✅ Y. Library / Picker Unification — SHIPPED 2026-04-26
 
