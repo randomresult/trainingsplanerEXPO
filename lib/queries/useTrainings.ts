@@ -78,6 +78,7 @@ interface CreateTrainingInput {
   name: string;
   date: string;
   exerciseIds: string[];
+  methodicalSeriesIds: string[];
   playerIds: string[];
 }
 
@@ -98,6 +99,9 @@ export const useCreateTraining = () => {
           },
           exercises: {
             connect: input.exerciseIds.map((id) => ({ documentId: id })),
+          },
+          methodicalSeries: {
+            connect: input.methodicalSeriesIds.map((id) => ({ documentId: id })),
           },
           players: {
             connect: input.playerIds.map((id) => ({ documentId: id })),

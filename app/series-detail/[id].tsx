@@ -18,6 +18,7 @@ import { useAddMethodicalSeriesToTraining, useAddExerciseToTraining } from '@/li
 import { toast } from 'sonner-native';
 import { COLORS } from '@/lib/theme';
 import { usePickSessionStore } from '@/lib/store/pickSessionStore';
+import { useDraftPickStore } from '@/lib/store/draftPickStore';
 
 export default function SeriesDetailScreen() {
   const { id, trainingId, trainingName } = useLocalSearchParams<{
@@ -27,16 +28,46 @@ export default function SeriesDetailScreen() {
   }>();
   const { data: series, isLoading } = useMethodicalSeriesDetail(id);
   const trainingPickerRef = useRef<TrainingPickerSheetRef>(null);
-  const pickMode = !!trainingId;
 
   const addSeriesMutation = useAddMethodicalSeriesToTraining();
   const addExerciseMutation = useAddExerciseToTraining();
   const [addingWholeSeries, setAddingWholeSeries] = useState(false);
   const [addingExerciseId, setAddingExerciseId] = useState<string | null>(null);
-  const { addedExerciseIds, addedSeriesIds, markAdded, markSeriesAdded } = usePickSessionStore();
+  const { addedExerciseIds: sessionExerciseIds, addedSeriesIds: sessionSeriesIds, markAdded, markSeriesAdded } = usePickSessionStore();
+
+  const draftActive = useDraftPickStore((s) => s.active);
+  const draftInitialExerciseIds = useDraftPickStore((s) => s.initialExerciseIds);
+  const draftInitialSeriesIds = useDraftPickStore((s) => s.initialSeriesIds);
+  const draftAddedExerciseIds = useDraftPickStore((s) => s.addedExerciseIds);
+  const draftAddedSeriesIds = useDraftPickStore((s) => s.addedSeriesIds);
+  const draftAddExercise = useDraftPickStore((s) => s.addExercise);
+  const draftAddSeries = useDraftPickStore((s) => s.addSeries);
+
+  const mode: 'draft-pick' | 'training-pick' | 'view' =
+    draftActive ? 'draft-pick' : trainingId ? 'training-pick' : 'view';
+
+  const isExerciseAdded = (exerciseId: string) =>
+    mode === 'draft-pick'
+      ? draftAddedExerciseIds.has(exerciseId) || draftInitialExerciseIds.has(exerciseId)
+      : mode === 'training-pick'
+        ? sessionExerciseIds.has(exerciseId)
+        : false;
+
+  const isSeriesAdded =
+    mode === 'draft-pick'
+      ? series ? draftAddedSeriesIds.has(series.documentId) || draftInitialSeriesIds.has(series.documentId) : false
+      : mode === 'training-pick'
+        ? series ? sessionSeriesIds.has(series.documentId) : false
+        : false;
 
   const handleAddExercise = async (exerciseId: string, exerciseName: string) => {
-    if (!trainingId || addingExerciseId === exerciseId) return;
+    if (mode === 'draft-pick') {
+      if (isExerciseAdded(exerciseId)) return;
+      draftAddExercise(exerciseId);
+      toast.success(`${exerciseName} hinzugefügt`);
+      return;
+    }
+    if (mode !== 'training-pick' || !trainingId || addingExerciseId === exerciseId) return;
     setAddingExerciseId(exerciseId);
     try {
       await addExerciseMutation.mutateAsync({ trainingId, exerciseId });
@@ -61,9 +92,13 @@ export default function SeriesDetailScreen() {
         />
       </Pressable>
     ),
-    ...(pickMode ? {
+    ...(mode !== 'view' ? {
       headerRight: () => (
-        <Pressable onPress={() => router.dismissAll()} className="px-2 py-1" hitSlop={8}>
+        <Pressable
+          onPress={mode === 'draft-pick' ? () => router.back() : () => router.dismissAll()}
+          className="px-2 py-1"
+          hitSlop={8}
+        >
           <Text variant="subhead" weight="semibold" color="primary">Fertig</Text>
         </Pressable>
       ),
@@ -71,7 +106,16 @@ export default function SeriesDetailScreen() {
   };
 
   const handleAddWholeSeries = async () => {
-    if (!trainingId || !series || addingWholeSeries) return;
+    if (!series) return;
+    if (mode === 'draft-pick') {
+      if (isSeriesAdded) return;
+      const exerciseDocumentIds = (series.exercises ?? []).map((ex) => ex.documentId);
+      draftAddSeries(series.documentId, exerciseDocumentIds);
+      toast.success('Lernpfad hinzugefügt');
+      router.back();
+      return;
+    }
+    if (mode !== 'training-pick' || !trainingId || addingWholeSeries) return;
     setAddingWholeSeries(true);
     try {
       const exerciseDocumentIds = (series.exercises ?? []).map((ex) => ex.documentId);
@@ -173,7 +217,7 @@ export default function SeriesDetailScreen() {
               onPress={() =>
                 router.push({
                   pathname: '/exercise-detail/[id]',
-                  params: pickMode
+                  params: mode === 'training-pick'
                     ? { id: ex.documentId, trainingId, trainingName: trainingName ?? '' }
                     : { id: ex.documentId },
                 })
@@ -189,17 +233,17 @@ export default function SeriesDetailScreen() {
                 {ex.Name}
               </Text>
               {(() => {
-                const isAdded = addedExerciseIds.has(ex.documentId);
+                const isAdded = isExerciseAdded(ex.documentId);
                 const isAdding = addingExerciseId === ex.documentId;
                 return (
                   <Pressable
                     onPress={(e) => {
                       e.stopPropagation?.();
                       if (isAdded || isAdding) return;
-                      if (pickMode) {
-                        handleAddExercise(ex.documentId, ex.Name);
-                      } else {
+                      if (mode === 'view') {
                         trainingPickerRef.current?.present(ex.documentId, ex.Name);
+                      } else {
+                        handleAddExercise(ex.documentId, ex.Name);
                       }
                     }}
                     hitSlop={10}
@@ -225,32 +269,33 @@ export default function SeriesDetailScreen() {
       </Screen>
 
       {(() => {
-        const seriesAlreadyAdded = pickMode && addedSeriesIds.has(series.documentId);
         return (
           <View className="px-5 py-3 border-t border-border bg-background">
             <Button
               size="lg"
               className="w-full"
-              leftIcon={seriesAlreadyAdded ? 'checkmark' : 'add'}
+              leftIcon={isSeriesAdded ? 'checkmark' : 'add'}
               loading={addingWholeSeries}
-              disabled={seriesAlreadyAdded}
+              disabled={isSeriesAdded}
               onPress={
-                pickMode
-                  ? handleAddWholeSeries
-                  : () => trainingPickerRef.current?.presentSeries(series.documentId, series.name, exerciseIds)
+                mode === 'view'
+                  ? () => trainingPickerRef.current?.presentSeries(series.documentId, series.name, exerciseIds)
+                  : handleAddWholeSeries
               }
             >
-              {seriesAlreadyAdded
+              {isSeriesAdded
                 ? 'Bereits hinzugefügt'
-                : pickMode
-                  ? (trainingName ? `Lernpfad zu „${trainingName}" hinzufügen` : 'Lernpfad hinzufügen')
-                  : 'Ganze Reihe hinzufügen'}
+                : mode === 'draft-pick'
+                  ? 'Lernpfad hinzufügen'
+                  : mode === 'training-pick'
+                    ? (trainingName ? `Lernpfad zu „${trainingName}" hinzufügen` : 'Lernpfad hinzufügen')
+                    : 'Ganze Reihe hinzufügen'}
             </Button>
           </View>
         );
       })()}
 
-      {!pickMode && <TrainingPickerSheet ref={trainingPickerRef} />}
+      {mode === 'view' && <TrainingPickerSheet ref={trainingPickerRef} />}
     </Screen>
   );
 }

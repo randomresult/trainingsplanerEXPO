@@ -92,7 +92,12 @@ export const TrainingPickerSheet = forwardRef<TrainingPickerSheetRef, Props>(
       if (pickMode.kind === 'exercise') {
         router.push(`/training-new?preselect=${encodeURIComponent(pickMode.exerciseId)}`);
       } else {
-        router.push(`/training-new?preselectSeries=${encodeURIComponent(pickMode.seriesId)}`);
+        const params = new URLSearchParams({
+          preselectSeries: pickMode.seriesId,
+          seriesName: pickMode.seriesName,
+          exerciseIds: pickMode.exerciseIds.join(','),
+        });
+        router.push(`/training-new?${params.toString()}`);
       }
     };
 

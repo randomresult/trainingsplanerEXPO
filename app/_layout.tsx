@@ -77,6 +77,15 @@ function RootLayoutNav() {
         }}
       />
       <Stack.Screen
+        name="library-pick-draft"
+        options={{
+          headerShown: true,
+          headerStyle: { backgroundColor: '#0a0a0f' },
+          headerTintColor: '#fff',
+          headerShadowVisible: false,
+        }}
+      />
+      <Stack.Screen
         name="series-detail/[id]"
         options={{
           headerShown: true,

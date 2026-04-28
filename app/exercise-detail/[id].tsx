@@ -15,6 +15,7 @@ import { useExerciseDetail } from '@/lib/queries/useExercises';
 import { useAddExerciseToTraining } from '@/lib/queries/useTrainings';
 import { toast } from 'sonner-native';
 import { usePickSessionStore } from '@/lib/store/pickSessionStore';
+import { useDraftPickStore } from '@/lib/store/draftPickStore';
 import {
   TrainingPickerSheet,
   TrainingPickerSheetRef,
@@ -31,7 +32,14 @@ export default function ExerciseDetailScreen() {
   const trainingPickerRef = useRef<TrainingPickerSheetRef>(null);
   const addExerciseMutation = useAddExerciseToTraining();
   const [adding, setAdding] = useState(false);
-  const { addedExerciseIds, markAdded } = usePickSessionStore();
+  const { addedExerciseIds: sessionAdded, markAdded } = usePickSessionStore();
+  const draftActive = useDraftPickStore((s) => s.active);
+  const draftAddedExerciseIds = useDraftPickStore((s) => s.addedExerciseIds);
+  const draftInitialExerciseIds = useDraftPickStore((s) => s.initialExerciseIds);
+  const draftAddExercise = useDraftPickStore((s) => s.addExercise);
+
+  const mode: 'draft-pick' | 'training-pick' | 'view' =
+    draftActive ? 'draft-pick' : trainingId ? 'training-pick' : 'view';
 
   const handleDirectAdd = async () => {
     if (!trainingId || !exercise || adding) return;
@@ -48,6 +56,13 @@ export default function ExerciseDetailScreen() {
     }
   };
 
+  const handleDraftAdd = () => {
+    if (!exercise) return;
+    draftAddExercise(exercise.documentId);
+    toast.success('Übung hinzugefügt');
+    router.back();
+  };
+
   const headerOptions = {
     headerShown: true as const,
     title: 'Übung',
@@ -60,9 +75,13 @@ export default function ExerciseDetailScreen() {
         />
       </Pressable>
     ),
-    ...(trainingId ? {
+    ...(mode !== 'view' ? {
       headerRight: () => (
-        <Pressable onPress={() => router.dismissAll()} className="px-2 py-1" hitSlop={8}>
+        <Pressable
+          onPress={mode === 'draft-pick' ? () => router.back() : () => router.dismissAll()}
+          className="px-2 py-1"
+          hitSlop={8}
+        >
           <Text variant="subhead" weight="semibold" color="primary">Fertig</Text>
         </Pressable>
       ),
@@ -180,7 +199,12 @@ export default function ExerciseDetailScreen() {
       </Screen>
 
       {!readOnly && (() => {
-        const alreadyAdded = trainingId ? addedExerciseIds.has(exercise.documentId) : false;
+        const alreadyAdded =
+          mode === 'draft-pick'
+            ? draftAddedExerciseIds.has(exercise.documentId) || draftInitialExerciseIds.has(exercise.documentId)
+            : mode === 'training-pick'
+              ? sessionAdded.has(exercise.documentId)
+              : false;
         return (
           <View className="px-5 py-3 border-t border-border bg-background">
             <Button
@@ -190,16 +214,20 @@ export default function ExerciseDetailScreen() {
               loading={adding}
               disabled={alreadyAdded}
               onPress={
-                trainingId
-                  ? handleDirectAdd
-                  : () => trainingPickerRef.current?.present(exercise.documentId, exercise.Name)
+                mode === 'draft-pick'
+                  ? handleDraftAdd
+                  : mode === 'training-pick'
+                    ? handleDirectAdd
+                    : () => trainingPickerRef.current?.present(exercise.documentId, exercise.Name)
               }
             >
               {alreadyAdded
                 ? 'Bereits hinzugefügt'
-                : trainingId
-                  ? (trainingName ? `Übung zu „${trainingName}" hinzufügen` : 'Übung hinzufügen')
-                  : 'Zum Training hinzufügen'}
+                : mode === 'draft-pick'
+                  ? 'Übung hinzufügen'
+                  : mode === 'training-pick'
+                    ? (trainingName ? `Übung zu „${trainingName}" hinzufügen` : 'Übung hinzufügen')
+                    : 'Zum Training hinzufügen'}
             </Button>
           </View>
         );
