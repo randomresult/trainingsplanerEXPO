@@ -14,6 +14,7 @@ interface ExerciseRaw {
   focusareas?: { documentId: string; Name: string }[];
   playerlevels?: { documentId: string; Name: string }[];
   categories?: { documentId: string; Name: string }[];
+  methodicalSeries?: { documentId: string; name: string }[];
 }
 
 // Explicit populate — Strapi v5 populate=* is inconsistent for relations on
@@ -24,6 +25,7 @@ const POPULATE = {
   categories: true,
   Steps: true,
   Videos: true,
+  methodicalSeries: true,
 };
 
 export const useExercises = (searchQuery?: string) => {

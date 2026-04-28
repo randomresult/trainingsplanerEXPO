@@ -154,7 +154,7 @@ export default function NewTrainingScreen() {
         });
       },
     });
-    router.push('/library-pick-draft' as any);
+    router.push('/library-pick-draft');
   };
 
   const handleOpenPlayerPicker = () => {
@@ -249,7 +249,7 @@ export default function NewTrainingScreen() {
                   blockExercises={blockExercises}
                   totalInSeries={blockExercises.length}
                   mode="edit"
-                  onNavigateToDetail={() => router.push({ pathname: '/series-detail/[id]' as any, params: { id: s.documentId } })}
+                  onNavigateToDetail={() => router.push({ pathname: '/series-detail/[id]', params: { id: s.documentId } })}
                   onNavigateToExercise={(exId) => router.push({ pathname: '/exercise-detail/[id]', params: { id: exId, readOnly: '1' } })}
                   onRemoveSeries={() => removeSeries(s.documentId)}
                   onRemoveExercise={(exerciseId) => removeExercise(exerciseId)}
