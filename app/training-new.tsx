@@ -64,10 +64,21 @@ export default function NewTrainingScreen() {
     return () => useDraftPickStore.getState().cancel();
   }, []);
 
-  const exercisesById = useMemo(
-    () => new Map((allExercises ?? []).map((ex: any) => [ex.documentId, ex])),
-    [allExercises],
-  );
+  // Merge two sources so picked exercises always resolve: the standalone
+  // /exercises list AND the nested exercises inside any methodicalSeries.
+  // Without the fallback, a per-exercise `+` from series-detail can add an
+  // id that /exercises doesn't return (different scope/draft state/etc.) —
+  // counter says (1), list stays empty.
+  const exercisesById = useMemo(() => {
+    const map = new Map<string, any>();
+    (allExercises ?? []).forEach((ex: any) => map.set(ex.documentId, ex));
+    (allSeries ?? []).forEach((s: any) => {
+      (s.exercises ?? []).forEach((ex: any) => {
+        if (!map.has(ex.documentId)) map.set(ex.documentId, ex);
+      });
+    });
+    return map;
+  }, [allExercises, allSeries]);
   const seriesById = useMemo(
     () => new Map((allSeries ?? []).map((s: any) => [s.documentId, s])),
     [allSeries],
