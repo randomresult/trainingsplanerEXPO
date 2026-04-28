@@ -17,12 +17,16 @@ Currently affected: `exercise-detail/[id]` was changed from modal → push for t
 
 ## Architecture Notes
 
-### Unified Library / Pick-Mode (shipped 2026-04-26)
-One screen serves both browse and pick mode:
-- `app/(tabs)/library/index.tsx` — tab browse, `+` → `TrainingPickerSheet`
-- `app/library-pick.tsx` → `components/screens/LibraryScreen` with `trainingId` param — `+` adds directly, no sheet
+### Library View + Container split (shipped 2026-04-28)
+The Library UI is split into a pure presentation component plus per-mode containers:
+- `components/screens/LibraryView.tsx` — pure: data + callbacks via props, no hooks beyond local state. Renders search/filter/tab toggle/two FlatLists/`LibraryFilterSheet`.
+- `components/screens/LibraryBrowseContainer.tsx` — tab mode. Owns query hooks. `+` → `TrainingPickerSheet`. No mutations.
+- `components/screens/LibraryPickerContainer.tsx` — pick mode. Owns query hooks + add mutations + `pickSessionStore`. `+` adds directly to the training.
+- `components/screens/library-filters.ts` — shared `tagNames`/`collectTagNames`/`filterExercises` helpers.
+- Routes are thin wrappers: `app/(tabs)/library/index.tsx` → `<LibraryBrowseContainer />`, `app/library-pick.tsx` → `<LibraryPickerContainer trainingId={...} trainingName={...} />`.
+- Header API on `LibraryView`: a single `pickHeader?: { title, onClose, onDone, doneLabel? }` prop. When set the View renders a pick-mode `Stack.Screen` header. When undefined the inline „Bibliothek" largeTitle renders.
 
-**Pick-session state:** `lib/store/pickSessionStore.ts` tracks `addedExerciseIds` and `addedSeriesIds` for the current picker session. Seeded from `useTrainingDetail` on first open (handles app restart). Short-circuits on re-open for same `trainingId` (preserves in-session adds). All add paths (`LibraryScreen` list button, `exercise-detail` direct add, `series-detail` whole-series add) call `markAdded` / `markSeriesAdded`.
+**Pick-session state:** `lib/store/pickSessionStore.ts` tracks `addedExerciseIds` and `addedSeriesIds` for the current picker session. `LibraryPickerContainer` seeds the store via `startSession(trainingId, exerciseIds, seriesIds)` in a `useEffect` that fires whenever `useTrainingDetail` resolves/refetches — so the picker's checkmarks always reflect current server state, including after external removals. `markAdded`/`markSeriesAdded` provide instant optimistic feedback during in-flight mutations; the next refetch re-seeds on top.
 
 `exercise-picker.tsx` and the single-add mode of `usePickModeStore` are deleted.
 

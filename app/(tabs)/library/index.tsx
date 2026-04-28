@@ -1,5 +1,5 @@
-import { LibraryScreen } from '@/components/screens/LibraryScreen';
+import { LibraryBrowseContainer } from '@/components/screens/LibraryBrowseContainer';
 
 export default function LibraryListScreen() {
-  return <LibraryScreen />;
+  return <LibraryBrowseContainer />;
 }
