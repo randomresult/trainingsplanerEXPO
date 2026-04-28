@@ -34,6 +34,7 @@ export const useExercises = (searchQuery?: string) => {
     queryFn: async () => {
       const params: any = {
         populate: POPULATE,
+        pagination: { pageSize: 100 },
       };
 
       if (searchQuery) {
