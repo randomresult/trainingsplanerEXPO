@@ -30,6 +30,10 @@ The Library UI is split into a pure presentation component plus per-mode contain
 
 `exercise-picker.tsx` and the single-add mode of `usePickModeStore` are deleted.
 
+**Draft-pick state:** When creating a *new* training (`training-new.tsx`), the picker uses `lib/store/draftPickStore.ts` instead of mutations. `LibraryDraftPickerContainer` reads `initialExerciseIds`/`initialSeriesIds` (seeded by `training-new` from its local state) for checkmarks, and adds fire `addExercise`/`addSeries` actions on the store, which call back to `training-new`. Cancellation happens on `training-new` unmount; the store stays alive while the user is in `library-pick-draft` or a detail screen so callbacks remain consumable.
+
+`exercise-detail` and `series-detail` have three modes: `draft-pick` (fires draft store callbacks), `training-pick` (mutates), `view` (read-only with `TrainingPickerSheet` for "Add to training"). Mode is computed once at the top of the file from `draftPickStore.active` + the `trainingId` URL param.
+
 ### Training data model (both-arrays)
 `training.exercises[]` = ALL exercises, MÜR and standalone — single source of truth for execute/progress.
 `training.methodicalSeries[]` = grouping metadata only, no exercises populated.
