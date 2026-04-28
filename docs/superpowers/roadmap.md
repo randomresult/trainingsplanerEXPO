@@ -66,6 +66,18 @@
 
 **Scope:** Siehe `specs/training-programs.md` Draft. Empfohlenes Modell: Player-Program-Enrollment mit optionaler Goal-Suggest-Integration. Explizit als Post-MVP markiert.
 
+### 6. Trainings-Liste UX — Today-Highlights / Date-Grouping
+**Kontext:** `app/(tabs)/trainings/index.tsx` rendert aktuell nur das chronologisch erste anstehende Training in der `hero`-Variante, alle anderen `compact`. Wenn an einem Tag zwei oder mehr Trainings anstehen, kriegt nur eins den Hero-Look.
+
+**Open Question (für Brainstorming):**
+- (a) Alle heutigen Trainings bekommen `hero`-Variante (statt nur das erste). Geht ohne neue Section-Logik.
+- (b) Zusätzlich Section-Header einführen: „Heute" / „Diese Woche" / „Dieser Monat" / „Später" als Gruppierung. Mehr Struktur, mehr Code (FlatList-Sections statt flach).
+- (c) Kombination: heute-Highlights + Section-Header.
+
+**Scope (klein):** isolierte Änderung in `(tabs)/trainings/index.tsx` plus evtl. eine kleine Zeitbereichs-Helper-Funktion. Keine Backend-Änderungen.
+
+**Brainstorming nötig:** Wann ist ein Training „heute"? (Datum-Vergleich vs. Zeit-Stempel.) Was zählt als „diese Woche" — kalendarisch oder rollende 7 Tage? Section-Headers nur zeigen, wenn die Sektion was enthält?
+
 ### ✅ X. Series-to-New-Training — UNBLOCKED, bereit für nächsten Cycle
 **Kontext:** `TrainingPickerSheet` zeigt existierende Trainings. Wenn der User stattdessen ein neues Training mit einer ganzen Reihe erstellen will, fehlt der Flow. `training-new.tsx` kennt nur `?preselect=<exerciseId>`, kein `?preselectSeries=`.
 
