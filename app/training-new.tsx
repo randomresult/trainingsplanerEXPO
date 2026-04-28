@@ -166,8 +166,9 @@ export default function NewTrainingScreen() {
     createTraining.mutate(
       { name, date, exerciseIds, methodicalSeriesIds: seriesIds, playerIds },
       {
-        onSuccess: () => {
-          router.back();
+        onSuccess: (newTraining) => {
+          router.dismissAll();
+          router.push(`/trainings?scrollToId=${encodeURIComponent(newTraining.documentId)}`);
           toast.success('Training erstellt');
         },
         onError: () => toast.error('Training konnte nicht erstellt werden'),
